@@ -1,0 +1,44 @@
+{
+  "name": "trustpay-enterprise",
+  "version": "2.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -p \"[{name}]\" -n \"api,web,admin,superadmin\" -c \"cyan,blue,magenta,yellow\" \"npm run dev:api\" \"npm run dev:web\" \"npm run dev:admin\" \"npm run dev:superadmin\"",
+    "dev:api": "npm run dev --workspace=@trustpay/api",
+    "dev:web": "npm run dev --workspace=@trustpay/web",
+    "dev:admin": "npm run dev --workspace=@trustpay/admin",
+    "dev:superadmin": "npm run dev --workspace=@trustpay/superadmin",
+    "build": "npm run build:shared && npm run build:api && npm run build:web && npm run build:admin && npm run build:superadmin",
+    "build:shared": "npm run build --workspace=@trustpay/shared",
+    "build:api": "npm run build --workspace=@trustpay/api",
+    "build:web": "npm run build --workspace=@trustpay/web",
+    "build:admin": "npm run build --workspace=@trustpay/admin",
+    "build:superadmin": "npm run build --workspace=@trustpay/superadmin",
+    "typecheck": "npm run typecheck:shared && npm run typecheck:api && npm run typecheck:web && npm run typecheck:admin && npm run typecheck:superadmin",
+    "typecheck:shared": "npm run typecheck --workspace=@trustpay/shared",
+    "typecheck:api": "npm run typecheck --workspace=@trustpay/api",
+    "typecheck:web": "npm run typecheck --workspace=@trustpay/web",
+    "typecheck:admin": "npm run typecheck --workspace=@trustpay/admin",
+    "typecheck:superadmin": "npm run typecheck --workspace=@trustpay/superadmin",
+    "prisma:generate": "npm run prisma:generate --workspace=@trustpay/api",
+    "prisma:validate": "npm run prisma:validate --workspace=@trustpay/api",
+    "lint": "eslint . --max-warnings=0",
+    "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,json,md}\""
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "concurrently": "^9.1.2",
+    "eslint": "^10.14.0",
+    "prettier": "^3.5.2",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.72.1"
+  },
+  "overrides": {
+    "minimatch": "^11.0.3"
+  }
+}

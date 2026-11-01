@@ -1,0 +1,30 @@
+{
+  "name": "@trustpay/superadmin",
+  "version": "2.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 3002 --host 0.0.0.0",
+    "build": "tsc && vite build",
+    "preview": "vite preview --port 3002",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@clerk/clerk-react": "^5.22.12",
+    "@trustpay/shared": "*",
+    "axios": "^1.7.9",
+    "lucide-react": "^0.475.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.18.5"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.3",
+    "vite": "^6.1.1"
+  }
+}

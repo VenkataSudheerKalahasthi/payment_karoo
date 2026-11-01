@@ -1,0 +1,504 @@
+// Prisma Schema for TrustPay Enterprise v2.0
+// Database Engine: PostgreSQL (Prisma 7 with PostgreSQL Driver Adapter)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ==============================================================================
+// 1. ENUMS
+// ==============================================================================
+
+enum UserRole {
+  CLIENT
+  WORKER
+  ADMIN
+  SUPERADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DEACTIVATED
+}
+
+enum WorkerAvailability {
+  AVAILABLE
+  BUSY
+  UNAVAILABLE
+}
+
+enum ContractStatus {
+  DRAFT
+  PENDING_ACCEPTANCE
+  ACTIVE
+  COMPLETED
+  CANCELLED
+  DISPUTED
+}
+
+enum MilestoneStatus {
+  PENDING
+  IN_PROGRESS
+  SUBMITTED
+  IN_REVISION
+  APPROVED
+  CANCELLED
+}
+
+enum SubmissionStatus {
+  SUBMITTED
+  APPROVED
+  REJECTED
+}
+
+enum RevisionStatus {
+  OPEN
+  RESOLVED
+  CANCELLED
+}
+
+enum NotificationType {
+  CONTRACT_UPDATE
+  MILESTONE_SUBMITTED
+  REVISION_REQUESTED
+  MESSAGE_RECEIVED
+  SYSTEM_ALERT
+  HIRING_REQUEST_RECEIVED
+  HIRING_REQUEST_ACCEPTED
+  HIRING_REQUEST_DECLINED
+  HIRING_REQUEST_NEGOTIATION
+  CONTRACT_ACCEPTED
+}
+
+enum HiringRequestStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  WITHDRAWN
+  NEGOTIATION
+}
+
+// ==============================================================================
+// 2. IDENTITY FOUNDATION
+// ==============================================================================
+
+model Role {
+  id          String   @id @default(uuid())
+  name        UserRole @unique
+  description String
+  permissions String[] @default([])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  users       User[]
+
+  @@map("roles")
+}
+
+model User {
+  id        String     @id @default(uuid())
+  clerkId   String     @unique
+  email     String     @unique
+  firstName String?
+  lastName  String?
+  avatarUrl String?
+  roleId    String
+  role      Role       @relation(fields: [roleId], references: [id])
+  status    UserStatus @default(ACTIVE)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  // Relationships
+  profile                  UserProfile?
+  workerProfile            WorkerProfile?
+  clientContracts          Contract[]                @relation("ClientContracts")
+  workerContracts          Contract[]                @relation("WorkerContracts")
+  clientHiringRequests     HiringRequest[]           @relation("ClientHiringRequests")
+  workerHiringRequests     HiringRequest[]           @relation("WorkerHiringRequests")
+  workerShortlists         WorkerShortlist[]         @relation("ClientShortlists")
+  contractAcceptances      ContractAcceptance[]
+  submissions              MilestoneSubmission[]
+  revisionRequests         RevisionRequest[]
+  conversationParticipants ConversationParticipant[]
+  sentMessages             Message[]
+  notifications            Notification[]
+  auditLogs                AuditLog[]
+  adminActivities          AdminActivity[]           @relation("AdminUser")
+
+  @@index([clerkId])
+  @@index([email])
+  @@index([roleId])
+  @@index([status])
+  @@map("users")
+}
+
+model UserProfile {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  bio         String?
+  phoneNumber String?
+  companyName String?
+  timezone    String?  @default("UTC")
+  avatarUrl   String?
+  address     String?
+  country     String?
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@map("user_profiles")
+}
+
+// ==============================================================================
+// 3. WORKER DOMAIN
+// ==============================================================================
+
+model WorkerProfile {
+  id                      String             @id @default(uuid())
+  userId                  String             @unique
+  headline                String?
+  hourlyRate              Decimal?           @db.Decimal(10, 2)
+  availability            WorkerAvailability @default(AVAILABLE)
+  totalCompletedContracts Int                @default(0)
+  rating                  Decimal            @default(0.0) @db.Decimal(3, 2)
+  user                    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skills                  WorkerSkill[]
+  portfolioItems          PortfolioItem[]
+  shortlistedBy           WorkerShortlist[]
+  createdAt               DateTime           @default(now())
+  updatedAt               DateTime           @updatedAt
+
+  @@index([userId])
+  @@index([availability])
+  @@map("worker_profiles")
+}
+
+model Skill {
+  id           String        @id @default(uuid())
+  name         String        @unique
+  category     String?
+  workerSkills WorkerSkill[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([name])
+  @@map("skills")
+}
+
+model WorkerSkill {
+  id                String        @id @default(uuid())
+  workerProfileId   String
+  skillId           String
+  yearsOfExperience Int           @default(0)
+  workerProfile     WorkerProfile @relation(fields: [workerProfileId], references: [id], onDelete: Cascade)
+  skill             Skill         @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  createdAt         DateTime      @default(now())
+
+  @@unique([workerProfileId, skillId])
+  @@index([workerProfileId])
+  @@index([skillId])
+  @@map("worker_skills")
+}
+
+model PortfolioItem {
+  id              String        @id @default(uuid())
+  workerProfileId String
+  title           String
+  description     String
+  projectUrl      String?
+  attachmentUrl   String?
+  workerProfile   WorkerProfile @relation(fields: [workerProfileId], references: [id], onDelete: Cascade)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([workerProfileId])
+  @@map("portfolio_items")
+}
+
+// ==============================================================================
+// 4. CONTRACT FOUNDATION
+// ==============================================================================
+
+model Contract {
+  id                 String               @id @default(uuid())
+  contractNumber     String               @unique
+  title              String
+  description        String
+  clientId           String
+  workerId           String
+  status             ContractStatus       @default(DRAFT)
+  version            Int                  @default(1)
+  totalAmount        Decimal              @db.Decimal(12, 2)
+  currency           String               @default("USD")
+  scopeOfWork        String?
+  termsAndConditions String?
+  cancellationTerms  String?
+  revisionTerms      String?
+  documentHash       String?
+  startDate          DateTime?
+  endDate            DateTime?
+  client             User                 @relation("ClientContracts", fields: [clientId], references: [id])
+  worker             User                 @relation("WorkerContracts", fields: [workerId], references: [id])
+  milestones         ContractMilestone[]
+  conversations      Conversation[]
+  acceptances        ContractAcceptance[]
+  hiringRequests     HiringRequest[]
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+
+  @@index([contractNumber])
+  @@index([clientId])
+  @@index([workerId])
+  @@index([status])
+  @@map("contracts")
+}
+
+model ContractMilestone {
+  id          String                @id @default(uuid())
+  contractId  String
+  title       String
+  description String
+  amount      Decimal               @db.Decimal(12, 2)
+  order       Int                   @default(1)
+  status      MilestoneStatus       @default(PENDING)
+  dueDate     DateTime?
+  contract    Contract              @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  submissions MilestoneSubmission[]
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+
+  @@index([contractId])
+  @@index([status])
+  @@map("contract_milestones")
+}
+
+model MilestoneSubmission {
+  id               String            @id @default(uuid())
+  milestoneId      String
+  workerId         String
+  notes            String
+  attachmentUrls   String[]          @default([])
+  status           SubmissionStatus  @default(SUBMITTED)
+  submittedAt      DateTime          @default(now())
+  milestone        ContractMilestone @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+  worker           User              @relation(fields: [workerId], references: [id])
+  revisionRequests RevisionRequest[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  @@index([milestoneId])
+  @@index([workerId])
+  @@index([status])
+  @@map("milestone_submissions")
+}
+
+model RevisionRequest {
+  id            String              @id @default(uuid())
+  submissionId  String
+  requestedById String
+  reason        String
+  status        RevisionStatus      @default(OPEN)
+  submission    MilestoneSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  requestedBy   User                @relation(fields: [requestedById], references: [id])
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  @@index([submissionId])
+  @@index([requestedById])
+  @@index([status])
+  @@map("revision_requests")
+}
+
+// ==============================================================================
+// 5. HIRING & MARKETPLACE WORKFLOWS
+// ==============================================================================
+
+model HiringRequest {
+  id                     String              @id @default(uuid())
+  clientId               String
+  workerId               String
+  title                  String
+  description            String
+  proposedBudget         Decimal             @db.Decimal(12, 2)
+  currency               String              @default("USD")
+  requiredSkills         String[]            @default([])
+  proposedStartDate      DateTime?
+  expectedCompletionDate DateTime?
+  status                 HiringRequestStatus @default(PENDING)
+  clientMessage          String?
+  workerResponse         String?
+  contractId             String?
+  respondedAt            DateTime?
+  client                 User                @relation("ClientHiringRequests", fields: [clientId], references: [id], onDelete: Cascade)
+  worker                 User                @relation("WorkerHiringRequests", fields: [workerId], references: [id], onDelete: Cascade)
+  contract               Contract?           @relation(fields: [contractId], references: [id], onDelete: SetNull)
+  createdAt              DateTime            @default(now())
+  updatedAt              DateTime            @updatedAt
+
+  @@index([clientId])
+  @@index([workerId])
+  @@index([status])
+  @@index([contractId])
+  @@map("hiring_requests")
+}
+
+model WorkerShortlist {
+  id              String        @id @default(uuid())
+  clientId        String
+  workerProfileId String
+  notes           String?
+  client          User          @relation("ClientShortlists", fields: [clientId], references: [id], onDelete: Cascade)
+  workerProfile   WorkerProfile @relation(fields: [workerProfileId], references: [id], onDelete: Cascade)
+  createdAt       DateTime      @default(now())
+
+  @@unique([clientId, workerProfileId])
+  @@index([clientId])
+  @@index([workerProfileId])
+  @@map("worker_shortlists")
+}
+
+model ContractAcceptance {
+  id               String   @id @default(uuid())
+  contractId       String
+  userId           String
+  version          Int      @default(1)
+  role             UserRole
+  acceptanceMethod String   @default("DIGITAL_CONFIRMATION")
+  ipAddress        String?
+  userAgent        String?
+  documentHash     String?
+  contract         Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  acceptedAt       DateTime @default(now())
+
+  @@unique([contractId, userId, version])
+  @@index([contractId])
+  @@index([userId])
+  @@index([version])
+  @@map("contract_acceptances")
+}
+
+// ==============================================================================
+// 6. COMMUNICATION
+// ==============================================================================
+
+model Conversation {
+  id           String                    @id @default(uuid())
+  title        String?
+  contractId   String?
+  contract     Contract?                 @relation(fields: [contractId], references: [id], onDelete: SetNull)
+  participants ConversationParticipant[]
+  messages     Message[]
+  createdAt    DateTime                  @default(now())
+  updatedAt    DateTime                  @updatedAt
+
+  @@index([contractId])
+  @@map("conversations")
+}
+
+model ConversationParticipant {
+  id             String       @id @default(uuid())
+  conversationId String
+  userId         String
+  lastReadAt     DateTime?
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+
+  @@unique([conversationId, userId])
+  @@index([conversationId])
+  @@index([userId])
+  @@map("conversation_participants")
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  conversationId String
+  senderId       String
+  content        String
+  attachments    String[]     @default([])
+  isRead         Boolean      @default(false)
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User         @relation(fields: [senderId], references: [id])
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@map("messages")
+}
+
+model Notification {
+  id          String           @id @default(uuid())
+  recipientId String
+  title       String
+  message     String
+  type        NotificationType
+  isRead      Boolean          @default(false)
+  metadata    Json?
+  recipient   User             @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([recipientId])
+  @@index([isRead])
+  @@index([type])
+  @@map("notifications")
+}
+
+// ==============================================================================
+// 6. GOVERNANCE & AUDIT
+// ==============================================================================
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  actorId    String?
+  action     String
+  resource   String
+  resourceId String?
+  details    Json?
+  ipAddress  String?
+  userAgent  String?
+  actor      User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  createdAt  DateTime @default(now())
+
+  @@index([actorId])
+  @@index([action])
+  @@index([resource])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model AdminActivity {
+  id               String   @id @default(uuid())
+  adminId          String
+  action           String
+  targetUserId     String?
+  targetResourceId String?
+  details          Json?
+  admin            User     @relation("AdminUser", fields: [adminId], references: [id], onDelete: Cascade)
+  createdAt        DateTime @default(now())
+
+  @@index([adminId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("admin_activities")
+}
+
+// ==============================================================================
+// 7. SYSTEM FOUNDATION (Phase 1 Preserved)
+// ==============================================================================
+
+model SystemHealthCheck {
+  id        String   @id @default(uuid())
+  checkedAt DateTime @default(now())
+  status    String
+  service   String   @default("TrustPay API")
+
+  @@map("system_health_checks")
+}
