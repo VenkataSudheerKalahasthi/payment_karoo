@@ -23,6 +23,21 @@ import {
   CreatePortfolioItemRequest,
   AcceptContractRequest,
   AmendContractRequest,
+  EscrowRecordDto,
+  GenerateUploadUrlRequest,
+  GenerateUploadUrlResponse,
+  GenerateDownloadUrlResponse,
+  DisputeDto,
+  DisputeDetailDto,
+  CreateDisputeRequest,
+  ProposeDisputeResolutionRequest,
+  ContractAmendmentDto,
+  ProposeAmendmentRequest,
+  RespondToAmendmentRequest,
+  ContractTerminationRequestDto,
+  ProposeTerminationRequest,
+  RespondToTerminationRequest,
+  EscrowActivityDto,
 } from '@trustpay/shared';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
@@ -313,6 +328,152 @@ export const apiService = {
 
   markAllNotificationsRead: async (): Promise<ApiResponse<unknown>> => {
     const res = await apiClient.patch<ApiResponse<unknown>>('/notifications/mark-all-read');
+    return res.data;
+  },
+
+  // Escrow & Private Storage (Phase 4.1)
+  getContractEscrow: async (contractId: string): Promise<ApiResponse<EscrowRecordDto>> => {
+    const res = await apiClient.get<ApiResponse<EscrowRecordDto>>(`/escrow/contracts/${contractId}`);
+    return res.data;
+  },
+
+  authorizeUpload: async (data: GenerateUploadUrlRequest): Promise<ApiResponse<GenerateUploadUrlResponse>> => {
+    const res = await apiClient.post<ApiResponse<GenerateUploadUrlResponse>>('/storage/authorize-upload', data);
+    return res.data;
+  },
+
+  authorizeDownload: async (contractId: string, objectPath: string): Promise<ApiResponse<GenerateDownloadUrlResponse>> => {
+    const res = await apiClient.post<ApiResponse<GenerateDownloadUrlResponse>>('/storage/authorize-download', {
+      contractId,
+      objectPath,
+    });
+    return res.data;
+  },
+
+  // Payments & Cashfree Sandbox Integration (Phase 5)
+  createPaymentOrder: async (
+    contractId: string,
+    idempotencyKey?: string,
+  ): Promise<
+    ApiResponse<{
+      orderId: string;
+      paymentSessionId: string;
+      amount: number;
+      amountMinor: string;
+      currency: string;
+      environment: string;
+      status: string;
+    }>
+  > => {
+    const res = await apiClient.post('/payments/orders', { contractId, idempotencyKey });
+    return res.data;
+  },
+
+  verifyPaymentStatus: async (
+    orderId: string,
+  ): Promise<
+    ApiResponse<{
+      id: string;
+      orderId: string;
+      cfOrderId: string;
+      status: string;
+      cashfreeOrderStatus: string;
+      amount: number;
+      currency: string;
+      environment: string;
+      isLiveMoneyDisabled: boolean;
+      failureReason?: string;
+    }>
+  > => {
+    const res = await apiClient.get(`/payments/orders/${orderId}/verify`);
+    return res.data;
+  },
+
+  getPaymentConfig: async (): Promise<ApiResponse<unknown>> => {
+    const res = await apiClient.get('/payments/config');
+    return res.data;
+  },
+
+  listPaymentTransactions: async (params?: {
+    contractId?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<ApiResponse<{ items: unknown[]; total: number }>> => {
+    const res = await apiClient.get('/payments/transactions', { params });
+    return res.data;
+  },
+
+  // Escrow Activities (Phase 6)
+  getEscrowActivities: async (contractId: string): Promise<ApiResponse<EscrowActivityDto[]>> => {
+    const res = await apiClient.get<ApiResponse<EscrowActivityDto[]>>(`/escrow/contracts/${contractId}/activities`);
+    return res.data;
+  },
+
+  // Disputes (Phase 6)
+  createDispute: async (data: CreateDisputeRequest): Promise<ApiResponse<DisputeDetailDto>> => {
+    const res = await apiClient.post<ApiResponse<DisputeDetailDto>>('/disputes', data);
+    return res.data;
+  },
+
+  getDisputeById: async (id: string): Promise<ApiResponse<DisputeDetailDto>> => {
+    const res = await apiClient.get<ApiResponse<DisputeDetailDto>>(`/disputes/${id}`);
+    return res.data;
+  },
+
+  listDisputes: async (params?: { contractId?: string; status?: string; page?: number; limit?: number }): Promise<ApiResponse<{ items: DisputeDto[]; total: number }>> => {
+    const res = await apiClient.get<ApiResponse<{ items: DisputeDto[]; total: number }>>('/disputes', { params });
+    return res.data;
+  },
+
+  submitDisputeResponse: async (disputeId: string, content: string): Promise<ApiResponse<unknown>> => {
+    const res = await apiClient.post<ApiResponse<unknown>>(`/disputes/${disputeId}/responses`, { content });
+    return res.data;
+  },
+
+  uploadDisputeEvidence: async (disputeId: string, data: { fileName: string; fileKey: string; fileUrl: string; mimeType?: string; fileSize?: number; description?: string }): Promise<ApiResponse<unknown>> => {
+    const res = await apiClient.post<ApiResponse<unknown>>(`/disputes/${disputeId}/evidence`, data);
+    return res.data;
+  },
+
+  proposeDisputeResolution: async (disputeId: string, data: ProposeDisputeResolutionRequest): Promise<ApiResponse<unknown>> => {
+    const res = await apiClient.post<ApiResponse<unknown>>(`/disputes/${disputeId}/resolutions`, data);
+    return res.data;
+  },
+
+  respondToDisputeResolution: async (disputeId: string, resolutionId: string, agree: boolean): Promise<ApiResponse<unknown>> => {
+    const res = await apiClient.post<ApiResponse<unknown>>(`/disputes/${disputeId}/resolutions/${resolutionId}/respond`, { agree });
+    return res.data;
+  },
+
+  // Amendments (Phase 6)
+  proposeAmendment: async (contractId: string, data: ProposeAmendmentRequest): Promise<ApiResponse<ContractAmendmentDto>> => {
+    const res = await apiClient.post<ApiResponse<ContractAmendmentDto>>(`/contracts/${contractId}/amendments`, data);
+    return res.data;
+  },
+
+  listAmendments: async (contractId: string): Promise<ApiResponse<ContractAmendmentDto[]>> => {
+    const res = await apiClient.get<ApiResponse<ContractAmendmentDto[]>>(`/contracts/${contractId}/amendments`);
+    return res.data;
+  },
+
+  respondToAmendment: async (contractId: string, amendmentId: string, data: RespondToAmendmentRequest): Promise<ApiResponse<unknown>> => {
+    const res = await apiClient.post<ApiResponse<unknown>>(`/contracts/${contractId}/amendments/${amendmentId}/respond`, data);
+    return res.data;
+  },
+
+  // Terminations (Phase 6)
+  proposeTermination: async (contractId: string, data: ProposeTerminationRequest): Promise<ApiResponse<ContractTerminationRequestDto>> => {
+    const res = await apiClient.post<ApiResponse<ContractTerminationRequestDto>>(`/contracts/${contractId}/termination-requests`, data);
+    return res.data;
+  },
+
+  listTerminationRequests: async (contractId: string): Promise<ApiResponse<ContractTerminationRequestDto[]>> => {
+    const res = await apiClient.get<ApiResponse<ContractTerminationRequestDto[]>>(`/contracts/${contractId}/termination-requests`);
+    return res.data;
+  },
+
+  respondToTermination: async (contractId: string, requestId: string, data: RespondToTerminationRequest): Promise<ApiResponse<unknown>> => {
+    const res = await apiClient.post<ApiResponse<unknown>>(`/contracts/${contractId}/termination-requests/${requestId}/respond`, data);
     return res.data;
   },
 };

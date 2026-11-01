@@ -71,6 +71,7 @@ export async function getDashboardMetrics(req: Request, res: Response): Promise<
         completedContracts,
         pendingHiringRequests,
         pendingMilestones,
+        openDisputes,
       ] = await Promise.all([
         prisma.contract.count({ where: { clientId: user.id } }),
         prisma.contract.count({ where: { clientId: user.id, status: ContractStatus.ACTIVE } }),
@@ -83,6 +84,12 @@ export async function getDashboardMetrics(req: Request, res: Response): Promise<
             status: MilestoneStatus.SUBMITTED,
           },
         }),
+        prisma.dispute.count({
+          where: {
+            contract: { clientId: user.id },
+            status: { notIn: ['RESOLVED', 'CLOSED', 'WITHDRAWN'] },
+          },
+        }),
       ]);
 
       sendSuccess(res, 200, {
@@ -93,6 +100,7 @@ export async function getDashboardMetrics(req: Request, res: Response): Promise<
         completedContracts,
         pendingHiringRequests,
         pendingMilestones,
+        openDisputes,
         unreadNotifications,
         recentActivities: recentNotifications.map((n) => ({
           id: n.id,
@@ -113,6 +121,8 @@ export async function getDashboardMetrics(req: Request, res: Response): Promise<
       completedContracts,
       pendingHiringRequests,
       pendingMilestones,
+      openDisputes,
+      revisionRequests,
     ] = await Promise.all([
       prisma.contract.count({ where: { workerId: user.id } }),
       prisma.contract.count({ where: { workerId: user.id, status: ContractStatus.ACTIVE } }),
@@ -125,6 +135,18 @@ export async function getDashboardMetrics(req: Request, res: Response): Promise<
           status: { in: [MilestoneStatus.PENDING, MilestoneStatus.IN_PROGRESS, MilestoneStatus.IN_REVISION] },
         },
       }),
+      prisma.dispute.count({
+        where: {
+          contract: { workerId: user.id },
+          status: { notIn: ['RESOLVED', 'CLOSED', 'WITHDRAWN'] },
+        },
+      }),
+      prisma.contractMilestone.count({
+        where: {
+          contract: { workerId: user.id, status: ContractStatus.ACTIVE },
+          status: MilestoneStatus.IN_REVISION,
+        },
+      }),
     ]);
 
     sendSuccess(res, 200, {
@@ -135,6 +157,8 @@ export async function getDashboardMetrics(req: Request, res: Response): Promise<
       completedContracts,
       pendingHiringRequests,
       pendingMilestones,
+      openDisputes,
+      revisionRequests,
       unreadNotifications,
       recentActivities: recentNotifications.map((n) => ({
         id: n.id,

@@ -73,6 +73,91 @@ enum NotificationType {
   HIRING_REQUEST_DECLINED
   HIRING_REQUEST_NEGOTIATION
   CONTRACT_ACCEPTED
+  DISPUTE_RAISED
+  DISPUTE_RESPONSE_SUBMITTED
+  DISPUTE_EVIDENCE_UPLOADED
+  DISPUTE_RESOLUTION_PROPOSED
+  DISPUTE_RESOLVED
+  AMENDMENT_PROPOSED
+  AMENDMENT_ACCEPTED
+  AMENDMENT_REJECTED
+  TERMINATION_REQUESTED
+  TERMINATION_ACCEPTED
+  TERMINATION_REJECTED
+}
+
+enum DisputeCategory {
+  QUALITY_OF_WORK
+  MISSED_DEADLINE
+  SCOPE_DISPUTE
+  UNRESPONSIVE_PARTY
+  UNAUTHORIZED_MODIFICATION
+  PAYMENT_ISSUE
+  BREACH_OF_TERMS
+  OTHER
+}
+
+enum DisputeStatus {
+  OPEN
+  EVIDENCE_REQUESTED
+  EVIDENCE_SUBMITTED
+  UNDER_REVIEW
+  RESPONSE_REQUIRED
+  MEDIATION
+  RESOLUTION_PROPOSED
+  RESOLUTION_ACCEPTED
+  RESOLUTION_REJECTED
+  ESCALATED
+  RESOLVED
+  CLOSED
+  WITHDRAWN
+}
+
+enum DisputeResolutionType {
+  FULL_REFUND_TO_CLIENT
+  FULL_RELEASE_TO_WORKER
+  SPLIT_SETTLEMENT
+  CANCEL_CONTRACT
+  DISMISS_DISPUTE
+}
+
+enum DisputeResolutionStatus {
+  PROPOSED
+  ACCEPTED_BY_PARTIES
+  REJECTED_BY_PARTY
+  ENFORCED_BY_ADMIN
+  SUPERSEDED
+}
+
+enum AmendmentStatus {
+  DRAFT
+  PENDING_REVIEW
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+enum TerminationStatus {
+  PENDING_REVIEW
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+  RESOLVED
+}
+
+enum EscrowOperationalState {
+  PAYMENT_VERIFIED_SANDBOX
+  ALLOCATED
+  WORK_IN_PROGRESS
+  MILESTONE_SUBMITTED
+  MILESTONE_UNDER_REVIEW
+  MILESTONE_APPROVED
+  REVISION_REQUESTED
+  DISPUTED
+  ON_HOLD
+  RELEASE_ELIGIBLE
+  COMPLETED
+  TERMINATED
 }
 
 enum HiringRequestStatus {
@@ -81,6 +166,81 @@ enum HiringRequestStatus {
   DECLINED
   WITHDRAWN
   NEGOTIATION
+}
+
+enum LedgerAccountType {
+  ASSET
+  LIABILITY
+  EQUITY
+  REVENUE
+  EXPENSE
+}
+
+enum LedgerAccountStatus {
+  ACTIVE
+  FROZEN
+  CLOSED
+}
+
+enum LedgerTransactionType {
+  ESCROW_DEPOSIT
+  ESCROW_RELEASE
+  ESCROW_REFUND
+  PLATFORM_FEE
+  ADJUSTMENT
+  REVERSAL
+}
+
+enum LedgerTransactionStatus {
+  PENDING
+  POSTED
+  FAILED
+  REVERSED
+}
+
+enum LedgerEntryType {
+  DEBIT
+  CREDIT
+}
+
+enum EscrowStatus {
+  NOT_INITIALIZED
+  PENDING_FUNDING
+  FUNDING_PROCESSING
+  FUNDED
+  PARTIALLY_ALLOCATED
+  RELEASE_PENDING
+  PARTIALLY_RELEASED
+  RELEASED
+  REFUND_PENDING
+  PARTIALLY_REFUNDED
+  REFUNDED
+  DISPUTED
+  FAILED
+  CANCELLED
+}
+
+enum PaymentTransactionType {
+  ESCROW_FUNDING
+  MILESTONE_RELEASE
+  REFUND
+  PLATFORM_FEE
+}
+
+enum PaymentTransactionStatus {
+  INITIATED
+  REQUIRES_ACTION
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+}
+
+enum WebhookEventStatus {
+  PENDING
+  PROCESSED
+  FAILED
+  IGNORED
 }
 
 // ==============================================================================
@@ -128,6 +288,19 @@ model User {
   notifications            Notification[]
   auditLogs                AuditLog[]
   adminActivities          AdminActivity[]           @relation("AdminUser")
+  ledgerAccounts           LedgerAccount[]
+  payerTransactions        PaymentTransaction[]      @relation("PayerTransactions")
+  payeeTransactions        PaymentTransaction[]      @relation("PayeeTransactions")
+  financialConfigs         PlatformFinancialConfig[]
+  initiatedDisputes        Dispute[]                 @relation("InitiatedDisputes")
+  respondentDisputes       Dispute[]                 @relation("RespondentDisputes")
+  disputeResponses         DisputeResponse[]
+  disputeEvidence          DisputeEvidence[]
+  proposedResolutions      DisputeResolution[]       @relation("ProposedResolutions")
+  disputeNotes             DisputeInternalNote[]
+  proposedAmendments       ContractAmendment[]       @relation("ProposedAmendments")
+  initiatedTerminations    ContractTerminationRequest[] @relation("InitiatedTerminations")
+  escrowActivities         EscrowActivity[]
 
   @@index([clerkId])
   @@index([email])
@@ -248,6 +421,11 @@ model Contract {
   conversations      Conversation[]
   acceptances        ContractAcceptance[]
   hiringRequests     HiringRequest[]
+  escrowRecord       EscrowRecord?
+  paymentTransactions PaymentTransaction[]
+  disputes           Dispute[]
+  amendments         ContractAmendment[]
+  terminationRequests ContractTerminationRequest[]
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
 
@@ -269,6 +447,8 @@ model ContractMilestone {
   dueDate     DateTime?
   contract    Contract              @relation(fields: [contractId], references: [id], onDelete: Cascade)
   submissions MilestoneSubmission[]
+  escrowAllocation EscrowMilestoneAllocation?
+  disputes         Dispute[]
   createdAt   DateTime              @default(now())
   updatedAt   DateTime              @updatedAt
 
@@ -501,4 +681,384 @@ model SystemHealthCheck {
   service   String   @default("TrustPay API")
 
   @@map("system_health_checks")
+}
+
+// ==============================================================================
+// 8. DOUBLE-ENTRY ACCOUNTING LEDGER (Phase 4 Foundation)
+// ==============================================================================
+
+model LedgerAccount {
+  id          String              @id @default(uuid())
+  accountCode String              @unique
+  accountName String
+  accountType LedgerAccountType
+  currency    String              @default("USD")
+  ownerUserId String?
+  status      LedgerAccountStatus @default(ACTIVE)
+  ownerUser   User?               @relation(fields: [ownerUserId], references: [id], onDelete: SetNull)
+  entries     LedgerEntry[]
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  @@index([accountCode])
+  @@index([accountType])
+  @@index([ownerUserId])
+  @@index([currency])
+  @@map("ledger_accounts")
+}
+
+model LedgerTransaction {
+  id                   String                  @id @default(uuid())
+  transactionReference String                  @unique
+  transactionType      LedgerTransactionType
+  status               LedgerTransactionStatus @default(PENDING)
+  currency             String                  @default("USD")
+  description          String
+  sourceType           String
+  sourceId             String?
+  idempotencyKey       String                  @unique
+  metadata             Json?
+  postedAt             DateTime?
+  entries              LedgerEntry[]
+  createdAt            DateTime                @default(now())
+
+  @@index([transactionReference])
+  @@index([transactionType])
+  @@index([status])
+  @@index([idempotencyKey])
+  @@index([createdAt])
+  @@map("ledger_transactions")
+}
+
+model LedgerEntry {
+  id                  String            @id @default(uuid())
+  ledgerTransactionId String
+  ledgerAccountId     String
+  entryType           LedgerEntryType
+  amountMinor         BigInt
+  currency            String            @default("USD")
+  ledgerTransaction   LedgerTransaction @relation(fields: [ledgerTransactionId], references: [id], onDelete: Cascade)
+  ledgerAccount       LedgerAccount     @relation(fields: [ledgerAccountId], references: [id], onDelete: Restrict)
+  createdAt           DateTime          @default(now())
+
+  @@index([ledgerTransactionId])
+  @@index([ledgerAccountId])
+  @@index([entryType])
+  @@map("ledger_entries")
+}
+
+// ==============================================================================
+// 9. ESCROW DOMAIN & ALLOCATIONS (Phase 4 Foundation)
+// ==============================================================================
+
+model EscrowRecord {
+  id                        String                      @id @default(uuid())
+  contractId                String                      @unique
+  status                    EscrowStatus                @default(NOT_INITIALIZED)
+  currency                  String                      @default("USD")
+  contractualAmountMinor    BigInt
+  expectedFundedAmountMinor BigInt
+  fundedAmountMinor         BigInt                      @default(0)
+  allocatedAmountMinor      BigInt                      @default(0)
+  releasedAmountMinor       BigInt                      @default(0)
+  refundedAmountMinor       BigInt                      @default(0)
+  disputeHold               Boolean                     @default(false)
+  operationalState          EscrowOperationalState      @default(PAYMENT_VERIFIED_SANDBOX)
+  contract                  Contract                    @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  paymentTransactions       PaymentTransaction[]
+  milestoneAllocations      EscrowMilestoneAllocation[]
+  activities                EscrowActivity[]
+  createdAt                 DateTime                    @default(now())
+  updatedAt                 DateTime                    @updatedAt
+
+  @@index([contractId])
+  @@index([status])
+  @@map("escrow_records")
+}
+
+model EscrowMilestoneAllocation {
+  id                   String            @id @default(uuid())
+  escrowRecordId       String
+  milestoneId          String            @unique
+  allocatedAmountMinor BigInt
+  releasedAmountMinor  BigInt            @default(0)
+  refundedAmountMinor  BigInt            @default(0)
+  isReleased           Boolean           @default(false)
+  releasedAt           DateTime?
+  escrowRecord         EscrowRecord      @relation(fields: [escrowRecordId], references: [id], onDelete: Cascade)
+  milestone            ContractMilestone @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+
+  @@index([escrowRecordId])
+  @@index([milestoneId])
+  @@map("escrow_milestone_allocations")
+}
+
+// ==============================================================================
+// 10. PAYMENT TRANSACTIONS & WEBHOOK AUDIT (Phase 4 Foundation)
+// ==============================================================================
+
+model PaymentTransaction {
+  id                    String                   @id @default(uuid())
+  transactionReference  String                   @unique
+  escrowRecordId        String?
+  contractId            String
+  payerId               String
+  payeeId               String?
+  type                  PaymentTransactionType
+  status                PaymentTransactionStatus @default(INITIATED)
+  amountMinor           BigInt
+  currency              String                   @default("USD")
+  provider              String?                  @default("PENDING_SELECTION")
+  providerTransactionId String?
+  providerOrderId       String?
+  failureReason         String?
+  idempotencyKey        String                   @unique
+  metadata              Json?
+  escrowRecord          EscrowRecord?            @relation(fields: [escrowRecordId], references: [id], onDelete: SetNull)
+  contract              Contract                 @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  payer                 User                     @relation("PayerTransactions", fields: [payerId], references: [id])
+  payee                 User?                    @relation("PayeeTransactions", fields: [payeeId], references: [id])
+  createdAt             DateTime                 @default(now())
+  updatedAt             DateTime                 @updatedAt
+
+  @@index([contractId])
+  @@index([payerId])
+  @@index([payeeId])
+  @@index([status])
+  @@index([idempotencyKey])
+  @@map("payment_transactions")
+}
+
+model WebhookEvent {
+  id           String             @id @default(uuid())
+  provider     String
+  eventId      String
+  eventType    String
+  status       WebhookEventStatus @default(PENDING)
+  payload      Json
+  signature    String?
+  processedAt  DateTime?
+  errorMessage String?
+  retryCount   Int                @default(0)
+  createdAt    DateTime           @default(now())
+
+  @@unique([provider, eventId])
+  @@index([provider])
+  @@index([status])
+  @@map("webhook_events")
+}
+
+// ==============================================================================
+// 11. PLATFORM FINANCIAL GOVERNANCE (Phase 4 Foundation)
+// ==============================================================================
+
+model PlatformFinancialConfig {
+  id                     String   @id @default(uuid())
+  platformFeePercentage  Decimal  @default(5.00) @db.Decimal(5, 2)
+  fixedFeeMinor          BigInt   @default(0)
+  supportedCurrencies    String[] @default(["USD", "EUR", "GBP"])
+  activeProvider         String   @default("PENDING_SELECTION")
+  isLiveMoneyDisabled    Boolean  @default(true)
+  updatedByUserId        String?
+  updatedByUser          User?    @relation(fields: [updatedByUserId], references: [id], onDelete: SetNull)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@map("platform_financial_configs")
+}
+
+
+// ==============================================================================
+// 12. ADVANCED ESCROW ACTIVITIES, DISPUTES & CONTRACT LIFECYCLE (Phase 6)
+// ==============================================================================
+
+model Dispute {
+  id                 String              @id @default(uuid())
+  disputeNumber      String              @unique
+  contractId         String
+  milestoneId        String?
+  initiatorId        String
+  respondentId       String
+  category           DisputeCategory
+  status             DisputeStatus       @default(OPEN)
+  title              String
+  description        String
+  claimedAmountMinor BigInt?
+  disputeHoldActive  Boolean             @default(true)
+  resolvedAt         DateTime?
+  closedAt           DateTime?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+
+  contract           Contract            @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  milestone          ContractMilestone?  @relation(fields: [milestoneId], references: [id], onDelete: SetNull)
+  initiator          User                @relation("InitiatedDisputes", fields: [initiatorId], references: [id])
+  respondent         User                @relation("RespondentDisputes", fields: [respondentId], references: [id])
+  responses          DisputeResponse[]
+  evidence           DisputeEvidence[]
+  resolutions        DisputeResolution[]
+  internalNotes      DisputeInternalNote[]
+
+  @@index([contractId])
+  @@index([milestoneId])
+  @@index([initiatorId])
+  @@index([respondentId])
+  @@index([status])
+  @@index([category])
+  @@map("disputes")
+}
+
+model DisputeResponse {
+  id        String   @id @default(uuid())
+  disputeId String
+  authorId  String
+  content   String
+  createdAt DateTime @default(now())
+
+  dispute   Dispute  @relation(fields: [disputeId], references: [id], onDelete: Cascade)
+  author    User     @relation(fields: [authorId], references: [id])
+
+  @@index([disputeId])
+  @@index([authorId])
+  @@map("dispute_responses")
+}
+
+model DisputeEvidence {
+  id           String   @id @default(uuid())
+  disputeId    String
+  uploadedById String
+  fileName     String
+  fileKey      String
+  fileUrl      String
+  mimeType     String?
+  fileSize     BigInt?
+  description  String?
+  createdAt    DateTime @default(now())
+
+  dispute      Dispute  @relation(fields: [disputeId], references: [id], onDelete: Cascade)
+  uploadedBy   User     @relation(fields: [uploadedById], references: [id])
+
+  @@index([disputeId])
+  @@index([uploadedById])
+  @@map("dispute_evidence")
+}
+
+model DisputeResolution {
+  id                String                  @id @default(uuid())
+  disputeId         String
+  proposedById      String
+  resolutionType    DisputeResolutionType
+  status            DisputeResolutionStatus @default(PROPOSED)
+  clientAmountMinor BigInt                  @default(0)
+  workerAmountMinor BigInt                  @default(0)
+  rationale         String
+  clientAgreed      Boolean?
+  clientAgreedAt    DateTime?
+  workerAgreed      Boolean?
+  workerAgreedAt    DateTime?
+  enforcedByAdminId String?
+  enforcedAt        DateTime?
+  createdAt         DateTime                @default(now())
+  updatedAt         DateTime                @updatedAt
+
+  dispute           Dispute                 @relation(fields: [disputeId], references: [id], onDelete: Cascade)
+  proposedBy        User                    @relation("ProposedResolutions", fields: [proposedById], references: [id])
+
+  @@index([disputeId])
+  @@index([proposedById])
+  @@index([status])
+  @@map("dispute_resolutions")
+}
+
+model DisputeInternalNote {
+  id        String   @id @default(uuid())
+  disputeId String
+  authorId  String
+  note      String
+  createdAt DateTime @default(now())
+
+  dispute   Dispute  @relation(fields: [disputeId], references: [id], onDelete: Cascade)
+  author    User     @relation(fields: [authorId], references: [id])
+
+  @@index([disputeId])
+  @@index([authorId])
+  @@map("dispute_internal_notes")
+}
+
+model ContractAmendment {
+  id                   String          @id @default(uuid())
+  amendmentNumber      String          @unique
+  contractId           String
+  proposedById         String
+  status               AmendmentStatus @default(PENDING_REVIEW)
+  proposedVersion      Int
+  titleChange          String?
+  descriptionChange    String?
+  scopeChange          String?
+  amountChangeMinor    BigInt?
+  termsChange          String?
+  milestonesSnapshot   Json?
+  reason               String
+  clientAcceptedAt     DateTime?
+  workerAcceptedAt     DateTime?
+  previousDocumentHash String?
+  updatedDocumentHash  String?
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+
+  contract             Contract        @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  proposedBy           User            @relation("ProposedAmendments", fields: [proposedById], references: [id])
+
+  @@index([contractId])
+  @@index([proposedById])
+  @@index([status])
+  @@map("contract_amendments")
+}
+
+model ContractTerminationRequest {
+  id                      String            @id @default(uuid())
+  contractId              String
+  initiatedById           String
+  status                  TerminationStatus @default(PENDING_REVIEW)
+  reason                  String
+  proposedSettlementMinor BigInt?
+  settlementTerms         String?
+  respondedById           String?
+  responseReason          String?
+  respondedAt             DateTime?
+  createdAt               DateTime          @default(now())
+  updatedAt               DateTime          @updatedAt
+
+  contract                Contract          @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  initiatedBy             User              @relation("InitiatedTerminations", fields: [initiatedById], references: [id])
+
+  @@index([contractId])
+  @@index([initiatedById])
+  @@index([status])
+  @@map("contract_termination_requests")
+}
+
+model EscrowActivity {
+  id                      String                 @id @default(uuid())
+  escrowRecordId          String
+  milestoneId             String?
+  actorId                 String?
+  operationalState        EscrowOperationalState
+  previousState           EscrowOperationalState?
+  eventType               String
+  description             String
+  metadata                Json?
+  isLiveFinancialMovement  Boolean                @default(false)
+  createdAt               DateTime               @default(now())
+
+  escrowRecord            EscrowRecord           @relation(fields: [escrowRecordId], references: [id], onDelete: Cascade)
+  actor                   User?                  @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([escrowRecordId])
+  @@index([milestoneId])
+  @@index([actorId])
+  @@index([operationalState])
+  @@map("escrow_activities")
 }

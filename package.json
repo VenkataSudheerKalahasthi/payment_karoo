@@ -27,6 +27,7 @@
     "prisma:generate": "npm run prisma:generate --workspace=@trustpay/api",
     "prisma:validate": "npm run prisma:validate --workspace=@trustpay/api",
     "lint": "eslint . --max-warnings=0",
+    "test": "vitest run",
     "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,json,md}\""
   },
@@ -36,7 +37,8 @@
     "eslint": "^10.14.0",
     "prettier": "^3.5.2",
     "typescript": "^5.7.3",
-    "typescript-eslint": "^8.72.1"
+    "typescript-eslint": "^8.72.1",
+    "vitest": "5.0.5"
   },
   "overrides": {
     "minimatch": "^11.0.3"

@@ -7,6 +7,10 @@ import {
   MilestoneStatus,
   SubmissionStatus,
   NotificationType,
+  EscrowOperationalState,
+  EscrowStatus,
+  AmendmentStatus,
+  TerminationStatus,
 } from '@prisma/client';
 import { sendSuccess, sendError } from '../../utils/response.js';
 import { recordAuditLog } from '../../utils/audit.js';
@@ -418,6 +422,30 @@ export async function submitMilestone(req: Request, res: Response): Promise<void
         data: { status: MilestoneStatus.SUBMITTED },
       });
 
+      const escrow = await tx.escrowRecord.findUnique({
+        where: { contractId: milestone.contractId },
+      });
+
+      if (escrow) {
+        await tx.escrowRecord.update({
+          where: { id: escrow.id },
+          data: { operationalState: EscrowOperationalState.MILESTONE_SUBMITTED },
+        });
+
+        await tx.escrowActivity.create({
+          data: {
+            escrowRecordId: escrow.id,
+            milestoneId: milestone.id,
+            actorId: worker.id,
+            operationalState: EscrowOperationalState.MILESTONE_SUBMITTED,
+            previousState: escrow.operationalState,
+            eventType: 'MILESTONE_SUBMITTED',
+            description: `Worker submitted deliverable for milestone "${milestone.title}".`,
+            isLiveFinancialMovement: false,
+          },
+        });
+      }
+
       await tx.notification.create({
         data: {
           recipientId: milestone.contract.clientId,
@@ -512,6 +540,30 @@ export async function requestRevision(req: Request, res: Response): Promise<void
         data: { status: SubmissionStatus.REJECTED },
       });
 
+      const escrow = await tx.escrowRecord.findUnique({
+        where: { contractId: milestone.contractId },
+      });
+
+      if (escrow) {
+        await tx.escrowRecord.update({
+          where: { id: escrow.id },
+          data: { operationalState: EscrowOperationalState.REVISION_REQUESTED },
+        });
+
+        await tx.escrowActivity.create({
+          data: {
+            escrowRecordId: escrow.id,
+            milestoneId: milestone.id,
+            actorId: client.id,
+            operationalState: EscrowOperationalState.REVISION_REQUESTED,
+            previousState: escrow.operationalState,
+            eventType: 'REVISION_REQUESTED',
+            description: `Client requested revision on milestone "${milestone.title}". Reason: ${input.reason}`,
+            isLiveFinancialMovement: false,
+          },
+        });
+      }
+
       await tx.notification.create({
         data: {
           recipientId: milestone.contract.workerId,
@@ -573,6 +625,21 @@ export async function approveMilestone(req: Request, res: Response): Promise<voi
       return;
     }
 
+    if (milestone.contract.status === ContractStatus.DISPUTED) {
+      sendError(res, 400, 'CONTRACT_DISPUTED', 'Cannot approve deliverables on a disputed contract');
+      return;
+    }
+
+    const escrow = await prisma.escrowRecord.findUnique({
+      where: { contractId: milestone.contractId },
+      include: { milestoneAllocations: true },
+    });
+
+    if (escrow && escrow.disputeHold) {
+      sendError(res, 400, 'DISPUTE_HOLD_ACTIVE', 'Milestone approval is blocked while escrow is on dispute hold');
+      return;
+    }
+
     const updated = await prisma.$transaction(async (tx) => {
       const approvedMilestone = await tx.contractMilestone.update({
         where: { id: milestone.id },
@@ -583,6 +650,61 @@ export async function approveMilestone(req: Request, res: Response): Promise<voi
         await tx.milestoneSubmission.update({
           where: { id: milestone.submissions[0].id },
           data: { status: SubmissionStatus.APPROVED },
+        });
+      }
+
+      // Check all milestones to see if contract completed
+      const allMilestones = await tx.contractMilestone.findMany({
+        where: { contractId: milestone.contractId },
+      });
+      const allCompleted = allMilestones.every((m) => m.id === milestone.id || m.status === MilestoneStatus.APPROVED);
+
+      if (escrow) {
+        const allocation = escrow.milestoneAllocations.find((a) => a.milestoneId === milestone.id);
+        const releaseAmount = allocation ? allocation.allocatedAmountMinor : 0n;
+
+        if (allocation) {
+          await tx.escrowMilestoneAllocation.update({
+            where: { id: allocation.id },
+            data: {
+              isReleased: true,
+              releasedAmountMinor: releaseAmount,
+              releasedAt: new Date(),
+            },
+          });
+        }
+
+        const nextOperationalState = allCompleted ? EscrowOperationalState.COMPLETED : EscrowOperationalState.MILESTONE_APPROVED;
+        const newReleasedTotal = escrow.releasedAmountMinor + releaseAmount;
+        const nextEscrowStatus = allCompleted ? EscrowStatus.RELEASED : (newReleasedTotal >= escrow.fundedAmountMinor ? EscrowStatus.RELEASED : EscrowStatus.PARTIALLY_RELEASED);
+
+        await tx.escrowRecord.update({
+          where: { id: escrow.id },
+          data: {
+            releasedAmountMinor: newReleasedTotal,
+            status: nextEscrowStatus,
+            operationalState: nextOperationalState,
+          },
+        });
+
+        await tx.escrowActivity.create({
+          data: {
+            escrowRecordId: escrow.id,
+            milestoneId: milestone.id,
+            actorId: client.id,
+            operationalState: nextOperationalState,
+            previousState: escrow.operationalState,
+            eventType: 'MILESTONE_APPROVED',
+            description: `Client approved milestone "${milestone.title}". Sandbox escrow allocation released. No live ledger funds moved.`,
+            isLiveFinancialMovement: false,
+          },
+        });
+      }
+
+      if (allCompleted) {
+        await tx.contract.update({
+          where: { id: milestone.contractId },
+          data: { status: ContractStatus.COMPLETED },
         });
       }
 
@@ -1108,4 +1230,735 @@ export async function downloadContractPdf(req: Request, res: Response): Promise<
     sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Failed to generate contract PDF document');
   }
 }
+
+// ==============================================================================
+// PHASE 6: CONTROLLED AMENDMENTS & TERMINATION CONTROLLERS
+// ==============================================================================
+
+export async function proposeAmendment(req: Request, res: Response): Promise<void> {
+  const { id: contractId } = req.params;
+  const user = req.user!;
+  const {
+    titleChange,
+    descriptionChange,
+    scopeChange,
+    amountChangeMinor,
+    termsChange,
+    milestonesSnapshot,
+    reason,
+  } = req.body;
+
+  if (!reason || typeof reason !== 'string' || reason.trim().length < 5) {
+    sendError(res, 400, 'VALIDATION_ERROR', 'A detailed justification reason (min 5 chars) is required for amendment proposals');
+    return;
+  }
+
+  try {
+    const contract = await prisma.contract.findUnique({
+      where: { id: contractId },
+      include: { milestones: true },
+    });
+
+    if (!contract) {
+      sendError(res, 404, 'NOT_FOUND', 'Contract not found');
+      return;
+    }
+
+    if (contract.clientId !== user.id && contract.workerId !== user.id) {
+      sendError(res, 403, 'FORBIDDEN', 'Only contract participants can propose amendments');
+      return;
+    }
+
+    if (
+      contract.status === ContractStatus.COMPLETED ||
+      contract.status === ContractStatus.CANCELLED ||
+      contract.status === ContractStatus.DISPUTED
+    ) {
+      sendError(
+        res,
+        400,
+        'INVALID_STATE',
+        `Cannot propose amendment on a contract in ${contract.status} status`,
+      );
+      return;
+    }
+
+    // Check for existing pending amendment to prevent concurrent conflicting versions
+    const existingPendingAmendment = await prisma.contractAmendment.findFirst({
+      where: {
+        contractId: contract.id,
+        status: AmendmentStatus.PENDING_REVIEW,
+      },
+    });
+
+    if (existingPendingAmendment) {
+      sendError(
+        res,
+        400,
+        'PENDING_AMENDMENT_EXISTS',
+        `An amendment proposal (${existingPendingAmendment.amendmentNumber}) is already pending review. The counterparty must accept or decline before proposing another.`,
+      );
+      return;
+    }
+
+    // Milestone protection check: Cannot remove or reduce approved milestones
+    if (milestonesSnapshot && Array.isArray(milestonesSnapshot)) {
+      const approvedMilestones = contract.milestones.filter((m) => m.status === MilestoneStatus.APPROVED);
+      for (const approved of approvedMilestones) {
+        const matchingProposed = (milestonesSnapshot as Array<{ id?: string; title?: string; amount?: number }>).find(
+          (m) => m.id === approved.id || m.title === approved.title,
+        );
+        if (!matchingProposed) {
+          sendError(
+            res,
+            400,
+            'APPROVED_MILESTONE_PROTECTED',
+            `Approved milestone "${approved.title}" cannot be removed in an amendment proposal`,
+          );
+          return;
+        }
+        if (matchingProposed.amount !== undefined && Number(matchingProposed.amount) < Number(approved.amount)) {
+          sendError(
+            res,
+            400,
+            'APPROVED_MILESTONE_PROTECTED',
+            `Approved milestone "${approved.title}" amount cannot be reduced below allocated amount`,
+          );
+          return;
+        }
+      }
+    }
+
+    const isClient = contract.clientId === user.id;
+    const amendmentNumber = `AMD-${new Date().getFullYear()}-${Math.floor(10000 + Math.random() * 90000)}`;
+
+    const amendment = await prisma.contractAmendment.create({
+      data: {
+        amendmentNumber,
+        contractId: contract.id,
+        proposedById: user.id,
+        status: AmendmentStatus.PENDING_REVIEW,
+        proposedVersion: contract.version + 1,
+        titleChange: titleChange || null,
+        descriptionChange: descriptionChange || null,
+        scopeChange: scopeChange || null,
+        amountChangeMinor: amountChangeMinor ? BigInt(amountChangeMinor) : null,
+        termsChange: termsChange || null,
+        milestonesSnapshot: milestonesSnapshot ? (milestonesSnapshot as Prisma.InputJsonValue) : Prisma.JsonNull,
+        reason,
+        clientAcceptedAt: isClient ? new Date() : null,
+        workerAcceptedAt: !isClient ? new Date() : null,
+        previousDocumentHash: contract.documentHash,
+      },
+    });
+
+    const recipientId = isClient ? contract.workerId : contract.clientId;
+    await prisma.notification.create({
+      data: {
+        recipientId,
+        title: `Amendment Proposed: ${amendmentNumber}`,
+        message: `${user.firstName || user.email} proposed an amendment to Contract #${contract.contractNumber}: ${reason}`,
+        type: NotificationType.AMENDMENT_PROPOSED,
+        metadata: { contractId: contract.id, amendmentId: amendment.id, amendmentNumber },
+      },
+    });
+
+    await recordAuditLog({
+      actorId: user.id,
+      action: 'CONTRACT_AMENDMENT_PROPOSED',
+      resource: 'ContractAmendment',
+      resourceId: amendment.id,
+      details: { contractId: contract.id, amendmentNumber },
+      req,
+    });
+
+    sendSuccess(res, 201, {
+      ...amendment,
+      amountChangeMinor: amendment.amountChangeMinor?.toString() || null,
+    });
+  } catch (error) {
+    logger.error('Error proposing amendment:', error);
+    sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Failed to propose contract amendment');
+  }
+}
+
+export async function listAmendments(req: Request, res: Response): Promise<void> {
+  const { id: contractId } = req.params;
+  const user = req.user!;
+
+  try {
+    const contract = await prisma.contract.findUnique({
+      where: { id: contractId },
+      select: { id: true, clientId: true, workerId: true },
+    });
+
+    if (!contract) {
+      sendError(res, 404, 'NOT_FOUND', 'Contract not found');
+      return;
+    }
+
+    const isParticipant = contract.clientId === user.id || contract.workerId === user.id;
+    const isAdmin = user.role.name === UserRole.ADMIN || user.role.name === UserRole.SUPERADMIN;
+
+    if (!isParticipant && !isAdmin) {
+      sendError(res, 403, 'FORBIDDEN', 'Access denied to contract amendments');
+      return;
+    }
+
+    const amendments = await prisma.contractAmendment.findMany({
+      where: { contractId },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        proposedBy: { select: { id: true, firstName: true, lastName: true, email: true } },
+      },
+    });
+
+    sendSuccess(
+      res,
+      200,
+      amendments.map((a) => ({
+        ...a,
+        amountChangeMinor: a.amountChangeMinor?.toString() || null,
+        proposerName: `${a.proposedBy.firstName || ''} ${a.proposedBy.lastName || ''}`.trim() || a.proposedBy.email,
+      })),
+    );
+  } catch (error) {
+    logger.error('Error listing amendments:', error);
+    sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Failed to list contract amendments');
+  }
+}
+
+export async function respondToAmendment(req: Request, res: Response): Promise<void> {
+  const { id: contractId, amendmentId } = req.params;
+  const user = req.user!;
+  const { accept, reason } = req.body;
+
+  if (typeof accept !== 'boolean') {
+    sendError(res, 400, 'VALIDATION_ERROR', 'Accept flag (true/false) is required');
+    return;
+  }
+
+  try {
+    const amendment = await prisma.contractAmendment.findUnique({
+      where: { id: amendmentId },
+      include: {
+        contract: {
+          include: {
+            milestones: true,
+            escrowRecord: true,
+          },
+        },
+      },
+    });
+
+    if (!amendment || amendment.contractId !== contractId) {
+      sendError(res, 404, 'NOT_FOUND', 'Amendment not found');
+      return;
+    }
+
+    if (amendment.status !== AmendmentStatus.PENDING_REVIEW) {
+      sendError(res, 400, 'INVALID_STATE', `Amendment is already in ${amendment.status} status`);
+      return;
+    }
+
+    const contract = amendment.contract;
+    const isClient = contract.clientId === user.id;
+    const isWorker = contract.workerId === user.id;
+
+    if (!isClient && !isWorker) {
+      sendError(res, 403, 'FORBIDDEN', 'Only contract participants can vote on amendments');
+      return;
+    }
+
+    // Counterparty check: The user responding cannot be the one who proposed it
+    if (amendment.proposedById === user.id) {
+      sendError(res, 400, 'CANNOT_RESPOND_TO_OWN', 'You cannot respond to an amendment proposal you initiated');
+      return;
+    }
+
+    if (!accept) {
+      const updated = await prisma.contractAmendment.update({
+        where: { id: amendment.id },
+        data: { status: AmendmentStatus.REJECTED },
+      });
+
+      await prisma.notification.create({
+        data: {
+          recipientId: amendment.proposedById,
+          title: `Amendment Rejected: ${amendment.amendmentNumber}`,
+          message: `${user.firstName || user.email} declined the amendment proposal${reason ? `: ${reason}` : '.'}`,
+          type: NotificationType.AMENDMENT_REJECTED,
+          metadata: { contractId: contract.id, amendmentId: amendment.id },
+        },
+      });
+
+      sendSuccess(res, 200, {
+        ...updated,
+        amountChangeMinor: updated.amountChangeMinor?.toString() || null,
+      });
+      return;
+    }
+
+    // Acceptance Workflow: Apply changes to contract atomically
+    const result = await prisma.$transaction(async (tx) => {
+      const newVersion = contract.version + 1;
+      const clientAcceptedAt = isClient ? new Date() : amendment.clientAcceptedAt;
+      const workerAcceptedAt = isWorker ? new Date() : amendment.workerAcceptedAt;
+
+      // 1. Calculate new milestones and total amount
+      let newTotalAmount = contract.totalAmount;
+      if (amendment.milestonesSnapshot && Array.isArray(amendment.milestonesSnapshot)) {
+        const proposedList = amendment.milestonesSnapshot as Array<{
+          title: string;
+          description: string;
+          amount: number;
+          order?: number;
+          dueDate?: string;
+        }>;
+        const total = proposedList.reduce((acc, m) => acc + Number(m.amount), 0);
+        newTotalAmount = new Prisma.Decimal(total);
+
+        // Update milestones: Keep existing approved ones, update or add remaining
+        for (let i = 0; i < proposedList.length; i++) {
+          const item = proposedList[i];
+          const existing = contract.milestones[i];
+          if (existing && existing.status !== MilestoneStatus.APPROVED) {
+            await tx.contractMilestone.update({
+              where: { id: existing.id },
+              data: {
+                title: item.title,
+                description: item.description,
+                amount: new Prisma.Decimal(item.amount),
+                order: item.order ?? i + 1,
+                dueDate: item.dueDate ? new Date(item.dueDate) : null,
+              },
+            });
+          } else if (!existing) {
+            await tx.contractMilestone.create({
+              data: {
+                contractId: contract.id,
+                title: item.title,
+                description: item.description,
+                amount: new Prisma.Decimal(item.amount),
+                order: item.order ?? i + 1,
+                dueDate: item.dueDate ? new Date(item.dueDate) : null,
+                status: MilestoneStatus.PENDING,
+              },
+            });
+          }
+        }
+      }
+
+      // 2. Compute canonical document hash for the new version
+      const updatedContractForHash = await tx.contract.findUnique({
+        where: { id: contract.id },
+        include: { milestones: { orderBy: { order: 'asc' } } },
+      });
+
+      const canonicalHash = computeCanonicalContractHash({
+        contractNumber: contract.contractNumber,
+        version: newVersion,
+        title: amendment.titleChange || contract.title,
+        totalAmount: Number(newTotalAmount),
+        currency: contract.currency,
+        clientId: contract.clientId,
+        workerId: contract.workerId,
+        scopeOfWork: amendment.scopeChange || contract.scopeOfWork,
+        termsAndConditions: amendment.termsChange || contract.termsAndConditions,
+        cancellationTerms: contract.cancellationTerms,
+        revisionTerms: contract.revisionTerms,
+        milestones: (updatedContractForHash?.milestones || contract.milestones).map((m) => ({
+          order: m.order,
+          title: m.title,
+          description: m.description,
+          amount: Number(m.amount),
+        })),
+      });
+
+      // 3. Update contract record
+      const updatedContract = await tx.contract.update({
+        where: { id: contract.id },
+        data: {
+          version: newVersion,
+          title: amendment.titleChange || contract.title,
+          description: amendment.descriptionChange || contract.description,
+          scopeOfWork: amendment.scopeChange || contract.scopeOfWork,
+          termsAndConditions: amendment.termsChange || contract.termsAndConditions,
+          totalAmount: newTotalAmount,
+          documentHash: canonicalHash,
+        },
+      });
+
+      // 4. Mark amendment accepted
+      const updatedAmendment = await tx.contractAmendment.update({
+        where: { id: amendment.id },
+        data: {
+          status: AmendmentStatus.ACCEPTED,
+          clientAcceptedAt,
+          workerAcceptedAt,
+          updatedDocumentHash: canonicalHash,
+        },
+      });
+
+      // 5. Record fresh contract acceptances for both parties for this version
+      await tx.contractAcceptance.createMany({
+        data: [
+          {
+            contractId: contract.id,
+            userId: contract.clientId,
+            version: newVersion,
+            role: UserRole.CLIENT,
+            acceptanceMethod: 'AMENDMENT_MUTUAL_ACCEPTANCE',
+            documentHash: canonicalHash,
+          },
+          {
+            contractId: contract.id,
+            userId: contract.workerId,
+            version: newVersion,
+            role: UserRole.WORKER,
+            acceptanceMethod: 'AMENDMENT_MUTUAL_ACCEPTANCE',
+            documentHash: canonicalHash,
+          },
+        ],
+      });
+
+      // 6. Log EscrowActivity
+      if (contract.escrowRecord) {
+        await tx.escrowActivity.create({
+          data: {
+            escrowRecordId: contract.escrowRecord.id,
+            actorId: user.id,
+            operationalState: contract.escrowRecord.operationalState,
+            previousState: contract.escrowRecord.operationalState,
+            eventType: 'CONTRACT_AMENDMENT_APPLIED',
+            description: `Contract #${contract.contractNumber} successfully amended to version ${newVersion} with mutual agreement. Hash verified.`,
+            metadata: {
+              amendmentId: amendment.id,
+              amendmentNumber: amendment.amendmentNumber,
+              newVersion,
+              canonicalHash,
+            },
+            isLiveFinancialMovement: false,
+          },
+        });
+      }
+
+      // 7. Notify both parties
+      await tx.notification.createMany({
+        data: [
+          {
+            recipientId: contract.clientId,
+            title: `Amendment Accepted: Contract v${newVersion}`,
+            message: `Contract #${contract.contractNumber} has been updated to version ${newVersion} following mutual acceptance.`,
+            type: NotificationType.AMENDMENT_ACCEPTED,
+            metadata: { contractId: contract.id, version: newVersion },
+          },
+          {
+            recipientId: contract.workerId,
+            title: `Amendment Accepted: Contract v${newVersion}`,
+            message: `Contract #${contract.contractNumber} has been updated to version ${newVersion} following mutual acceptance.`,
+            type: NotificationType.AMENDMENT_ACCEPTED,
+            metadata: { contractId: contract.id, version: newVersion },
+          },
+        ],
+      });
+
+      return { updatedContract, updatedAmendment };
+    });
+
+    sendSuccess(res, 200, {
+      ...result.updatedAmendment,
+      amountChangeMinor: result.updatedAmendment.amountChangeMinor?.toString() || null,
+      contract: result.updatedContract,
+    });
+  } catch (error) {
+    logger.error('Error responding to amendment:', error);
+    sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Failed to process amendment acceptance');
+  }
+}
+
+export async function proposeTermination(req: Request, res: Response): Promise<void> {
+  const { id: contractId } = req.params;
+  const user = req.user!;
+  const { reason, proposedSettlementMinor, settlementTerms } = req.body;
+
+  if (!reason || typeof reason !== 'string' || reason.trim().length < 10) {
+    sendError(res, 400, 'VALIDATION_ERROR', 'A clear justification reason (min 10 chars) is required to propose contract termination');
+    return;
+  }
+
+  try {
+    const contract = await prisma.contract.findUnique({
+      where: { id: contractId },
+    });
+
+    if (!contract) {
+      sendError(res, 404, 'NOT_FOUND', 'Contract not found');
+      return;
+    }
+
+    if (contract.clientId !== user.id && contract.workerId !== user.id) {
+      sendError(res, 403, 'FORBIDDEN', 'Only contract participants can initiate termination requests');
+      return;
+    }
+
+    if (contract.status !== ContractStatus.ACTIVE && contract.status !== ContractStatus.PENDING_ACCEPTANCE) {
+      sendError(res, 400, 'INVALID_STATE', `Cannot terminate contract in ${contract.status} status`);
+      return;
+    }
+
+    // Check for existing pending termination request to prevent duplicate/concurrent proposals
+    const existingPendingTermination = await prisma.contractTerminationRequest.findFirst({
+      where: {
+        contractId: contract.id,
+        status: TerminationStatus.PENDING_REVIEW,
+      },
+    });
+
+    if (existingPendingTermination) {
+      sendError(
+        res,
+        400,
+        'PENDING_TERMINATION_EXISTS',
+        'A termination request is already pending review for this contract. The counterparty must respond before submitting another.',
+      );
+      return;
+    }
+
+    const termination = await prisma.contractTerminationRequest.create({
+      data: {
+        contractId: contract.id,
+        initiatedById: user.id,
+        status: TerminationStatus.PENDING_REVIEW,
+        reason,
+        proposedSettlementMinor: proposedSettlementMinor ? BigInt(proposedSettlementMinor) : null,
+        settlementTerms: settlementTerms || null,
+      },
+    });
+
+    const isClient = contract.clientId === user.id;
+    const recipientId = isClient ? contract.workerId : contract.clientId;
+
+    await prisma.notification.create({
+      data: {
+        recipientId,
+        title: 'Contract Termination Requested',
+        message: `${user.firstName || user.email} requested termination of Contract #${contract.contractNumber}: ${reason}`,
+        type: NotificationType.TERMINATION_REQUESTED,
+        metadata: { contractId: contract.id, terminationId: termination.id },
+      },
+    });
+
+    await recordAuditLog({
+      actorId: user.id,
+      action: 'CONTRACT_TERMINATION_REQUESTED',
+      resource: 'ContractTerminationRequest',
+      resourceId: termination.id,
+      details: { contractId: contract.id, reason },
+      req,
+    });
+
+    sendSuccess(res, 201, {
+      ...termination,
+      proposedSettlementMinor: termination.proposedSettlementMinor?.toString() || null,
+    });
+  } catch (error) {
+    logger.error('Error proposing termination:', error);
+    sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Failed to submit termination request');
+  }
+}
+
+export async function listTerminationRequests(req: Request, res: Response): Promise<void> {
+  const { id: contractId } = req.params;
+  const user = req.user!;
+
+  try {
+    const contract = await prisma.contract.findUnique({
+      where: { id: contractId },
+      select: { id: true, clientId: true, workerId: true },
+    });
+
+    if (!contract) {
+      sendError(res, 404, 'NOT_FOUND', 'Contract not found');
+      return;
+    }
+
+    const isParticipant = contract.clientId === user.id || contract.workerId === user.id;
+    const isAdmin = user.role.name === UserRole.ADMIN || user.role.name === UserRole.SUPERADMIN;
+
+    if (!isParticipant && !isAdmin) {
+      sendError(res, 403, 'FORBIDDEN', 'Access denied to termination requests');
+      return;
+    }
+
+    const requests = await prisma.contractTerminationRequest.findMany({
+      where: { contractId },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        initiatedBy: { select: { id: true, firstName: true, lastName: true, email: true } },
+      },
+    });
+
+    sendSuccess(
+      res,
+      200,
+      requests.map((r) => ({
+        ...r,
+        proposedSettlementMinor: r.proposedSettlementMinor?.toString() || null,
+        initiatorName: `${r.initiatedBy.firstName || ''} ${r.initiatedBy.lastName || ''}`.trim() || r.initiatedBy.email,
+      })),
+    );
+  } catch (error) {
+    logger.error('Error listing termination requests:', error);
+    sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Failed to list termination requests');
+  }
+}
+
+export async function respondToTermination(req: Request, res: Response): Promise<void> {
+  const { id: contractId, requestId } = req.params;
+  const user = req.user!;
+  const { accept, responseReason } = req.body;
+
+  if (typeof accept !== 'boolean') {
+    sendError(res, 400, 'VALIDATION_ERROR', 'Accept flag (true/false) is required');
+    return;
+  }
+
+  try {
+    const termination = await prisma.contractTerminationRequest.findUnique({
+      where: { id: requestId },
+      include: {
+        contract: {
+          include: { escrowRecord: true },
+        },
+      },
+    });
+
+    if (!termination || termination.contractId !== contractId) {
+      sendError(res, 404, 'NOT_FOUND', 'Termination request not found');
+      return;
+    }
+
+    if (termination.status !== TerminationStatus.PENDING_REVIEW) {
+      sendError(res, 400, 'INVALID_STATE', `Termination request is already in ${termination.status} status`);
+      return;
+    }
+
+    const contract = termination.contract;
+    const isClient = contract.clientId === user.id;
+    const isWorker = contract.workerId === user.id;
+
+    if (!isClient && !isWorker) {
+      sendError(res, 403, 'FORBIDDEN', 'Only contract participants can respond to termination requests');
+      return;
+    }
+
+    if (termination.initiatedById === user.id) {
+      sendError(res, 400, 'CANNOT_RESPOND_TO_OWN', 'You cannot respond to your own termination request');
+      return;
+    }
+
+    if (!accept) {
+      const updated = await prisma.contractTerminationRequest.update({
+        where: { id: termination.id },
+        data: {
+          status: TerminationStatus.REJECTED,
+          respondedById: user.id,
+          responseReason: responseReason || null,
+          respondedAt: new Date(),
+        },
+      });
+
+      await prisma.notification.create({
+        data: {
+          recipientId: termination.initiatedById,
+          title: 'Termination Request Declined',
+          message: `${user.firstName || user.email} declined the contract termination request${responseReason ? `: ${responseReason}` : '.'}`,
+          type: NotificationType.TERMINATION_REJECTED,
+          metadata: { contractId: contract.id, requestId: termination.id },
+        },
+      });
+
+      sendSuccess(res, 200, {
+        ...updated,
+        proposedSettlementMinor: updated.proposedSettlementMinor?.toString() || null,
+      });
+      return;
+    }
+
+    // Process termination acceptance
+    const result = await prisma.$transaction(async (tx) => {
+      const updatedTermination = await tx.contractTerminationRequest.update({
+        where: { id: termination.id },
+        data: {
+          status: TerminationStatus.ACCEPTED,
+          respondedById: user.id,
+          responseReason: responseReason || null,
+          respondedAt: new Date(),
+        },
+      });
+
+      await tx.contract.update({
+        where: { id: contract.id },
+        data: { status: ContractStatus.CANCELLED },
+      });
+
+      if (contract.escrowRecord) {
+        await tx.escrowRecord.update({
+          where: { id: contract.escrowRecord.id },
+          data: {
+            status: EscrowStatus.CANCELLED,
+            operationalState: EscrowOperationalState.TERMINATED,
+          },
+        });
+
+        await tx.escrowActivity.create({
+          data: {
+            escrowRecordId: contract.escrowRecord.id,
+            actorId: user.id,
+            operationalState: EscrowOperationalState.TERMINATED,
+            previousState: contract.escrowRecord.operationalState,
+            eventType: 'CONTRACT_TERMINATED_MUTUALLY',
+            description: `Contract #${contract.contractNumber} terminated early by mutual agreement. Reason: ${termination.reason}`,
+            metadata: {
+              terminationId: termination.id,
+              settlementTerms: termination.settlementTerms,
+            },
+            isLiveFinancialMovement: false,
+          },
+        });
+      }
+
+      await tx.notification.createMany({
+        data: [
+          {
+            recipientId: contract.clientId,
+            title: `Contract Cancelled: #${contract.contractNumber}`,
+            message: `Contract #${contract.contractNumber} has been terminated by mutual agreement.`,
+            type: NotificationType.TERMINATION_ACCEPTED,
+            metadata: { contractId: contract.id },
+          },
+          {
+            recipientId: contract.workerId,
+            title: `Contract Cancelled: #${contract.contractNumber}`,
+            message: `Contract #${contract.contractNumber} has been terminated by mutual agreement.`,
+            type: NotificationType.TERMINATION_ACCEPTED,
+            metadata: { contractId: contract.id },
+          },
+        ],
+      });
+
+      return updatedTermination;
+    });
+
+    sendSuccess(res, 200, {
+      ...result,
+      proposedSettlementMinor: result.proposedSettlementMinor?.toString() || null,
+    });
+  } catch (error) {
+    logger.error('Error responding to termination:', error);
+    sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Failed to process termination response');
+  }
+}
+
 

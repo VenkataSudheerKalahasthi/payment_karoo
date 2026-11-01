@@ -11,7 +11,17 @@ import {
 } from 'lucide-react';
 import { useAuth, UserButton, SignInButton } from '@clerk/clerk-react';
 import { apiService, setAuthTokenGetter } from './services/api';
-import { SystemHealthStatus, DatabaseHealthStatus, UserRole } from '@trustpay/shared';
+import {
+  SystemHealthStatus,
+  DatabaseHealthStatus,
+  UserRole,
+  FinancialOverviewDto,
+  EscrowRecordDto,
+  PaymentTransactionDto,
+  formatCurrencyMinor,
+} from '@trustpay/shared';
+import { DisputesWorkspace } from './components/DisputesWorkspace';
+import { AdminContractsOversight } from './components/AdminContractsOversight';
 
 interface AdminDashboardMetrics {
   users?: { total: number; clients: number; workers: number; admins: number };
@@ -47,8 +57,14 @@ export const App: React.FC = () => {
   const [apiHealth, setApiHealth] = useState<SystemHealthStatus | null>(null);
   const [dbHealth, setDbHealth] = useState<DatabaseHealthStatus | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<'metrics' | 'users' | 'activities' | 'system'>('metrics');
+  const [activeTab, setActiveTab] = useState<'metrics' | 'users' | 'contracts' | 'activities' | 'financial' | 'disputes' | 'system'>('metrics');
   const [actionMessage, setActionMessage] = useState<string | null>(null);
+
+  // Phase 4.1 Financial Oversight state
+  const [financialOverview, setFinancialOverview] = useState<FinancialOverviewDto | null>(null);
+  const [escrowsList, setEscrowsList] = useState<EscrowRecordDto[]>([]);
+  const [paymentsList, setPaymentsList] = useState<PaymentTransactionDto[]>([]);
+  const [isLoadingFinancial, setIsLoadingFinancial] = useState(false);
 
   useEffect(() => {
     if (isSignedIn) {
@@ -61,6 +77,29 @@ export const App: React.FC = () => {
       });
     }
   }, [isSignedIn, getToken]);
+
+  const loadFinancialData = useCallback(async () => {
+    setIsLoadingFinancial(true);
+    try {
+      const [overviewRes, escrowsRes, paymentsRes] = await Promise.allSettled([
+        apiService.getFinancialOverview(),
+        apiService.listEscrowRecords({ limit: 50 }),
+        apiService.listPaymentTransactions({ limit: 50 }),
+      ]);
+
+      if (overviewRes.status === 'fulfilled' && overviewRes.value.success && overviewRes.value.data) {
+        setFinancialOverview(overviewRes.value.data);
+      }
+      if (escrowsRes.status === 'fulfilled' && escrowsRes.value.success && escrowsRes.value.data) {
+        setEscrowsList(escrowsRes.value.data.items || []);
+      }
+      if (paymentsRes.status === 'fulfilled' && paymentsRes.value.success && paymentsRes.value.data) {
+        setPaymentsList(paymentsRes.value.data.items || []);
+      }
+    } finally {
+      setIsLoadingFinancial(false);
+    }
+  }, []);
 
   const loadAdminData = useCallback(async () => {
     if (!isSignedIn) return;
@@ -95,6 +134,36 @@ export const App: React.FC = () => {
       loadAdminData();
     }
   }, [isSignedIn, loadAdminData]);
+
+  useEffect(() => {
+    if (isSignedIn && activeTab === 'financial') {
+      loadFinancialData();
+    }
+  }, [isSignedIn, activeTab, loadFinancialData]);
+
+  const handleToggleDisputeHold = async (contractId: string, currentHold: boolean) => {
+    const reason = prompt(
+      currentHold
+        ? 'Enter reason for lifting escrow dispute hold:'
+        : 'Enter reason for placing escrow under dispute hold:',
+    );
+    if (!reason || reason.trim().length < 5) {
+      alert('A valid reason (min 5 chars) is required.');
+      return;
+    }
+
+    try {
+      const res = await apiService.setDisputeHold(contractId, !currentHold, reason.trim());
+      if (res.success) {
+        setActionMessage(`Dispute hold successfully ${!currentHold ? 'activated' : 'released'}.`);
+        loadFinancialData();
+      } else {
+        alert(res.error?.message || 'Failed to update dispute hold');
+      }
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : 'Error updating dispute hold');
+    }
+  };
 
   const fetchStatus = async () => {
     setIsRefreshing(true);
@@ -241,6 +310,16 @@ export const App: React.FC = () => {
                 User Directory &amp; Status ({usersList.length})
               </button>
               <button
+                onClick={() => setActiveTab('contracts')}
+                className={`px-4 py-2 rounded-lg text-xs font-semibold transition ${
+                  activeTab === 'contracts'
+                    ? 'bg-slate-800 text-white border border-slate-700'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                Contracts Oversight
+              </button>
+              <button
                 onClick={() => setActiveTab('activities')}
                 className={`px-4 py-2 rounded-lg text-xs font-semibold transition ${
                   activeTab === 'activities'
@@ -249,6 +328,26 @@ export const App: React.FC = () => {
                 }`}
               >
                 Admin Activity History
+              </button>
+              <button
+                onClick={() => setActiveTab('financial')}
+                className={`px-4 py-2 rounded-lg text-xs font-semibold transition ${
+                  activeTab === 'financial'
+                    ? 'bg-slate-800 text-white border border-slate-700'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                Financial Oversight &amp; Escrow
+              </button>
+              <button
+                onClick={() => setActiveTab('disputes')}
+                className={`px-4 py-2 rounded-lg text-xs font-semibold transition ${
+                  activeTab === 'disputes'
+                    ? 'bg-slate-800 text-white border border-slate-700'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                Dispute Resolution &amp; Arbitration
               </button>
               <button
                 onClick={() => setActiveTab('system')}
@@ -354,6 +453,11 @@ export const App: React.FC = () => {
               </div>
             )}
 
+            {/* Contract Oversight */}
+            {activeTab === 'contracts' && (
+              <AdminContractsOversight onNavigateToDisputes={() => setActiveTab('disputes')} />
+            )}
+
             {/* Admin Activity History */}
             {activeTab === 'activities' && (
               <div className="bg-slate-900/60 border border-slate-800 rounded-xl overflow-hidden">
@@ -381,6 +485,165 @@ export const App: React.FC = () => {
                 </div>
               </div>
             )}
+
+            {/* Financial Oversight Tab */}
+            {activeTab === 'financial' && (
+              <div className="space-y-6">
+                {/* Governance Status Notice */}
+                <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-start space-x-3">
+                  <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+                  <div className="space-y-1">
+                    <div className="text-xs font-bold text-amber-300">
+                      LIVE MONEY CUSTODY DISABLED (PENDING PROVIDER SELECTION)
+                    </div>
+                    <p className="text-xs text-amber-200/80 leading-relaxed">
+                      Provider selection is currently pending. In accordance with enterprise financial safeguards, real money collection, disbursement, and automated wallet balances are strictly disabled. Contractual totals represent agreed commitments rather than custodial deposits.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Financial KPI Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="p-5 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1">
+                    <span className="text-xs text-slate-400">Total Contractual Agreed</span>
+                    <div className="text-2xl font-bold text-white">
+                      {financialOverview ? formatCurrencyMinor(financialOverview.totalContractualAgreedMinor, 'USD') : '$0.00'}
+                    </div>
+                    <div className="text-xs text-slate-500">Milestone commitments across all contracts</div>
+                  </div>
+
+                  <div className="p-5 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1">
+                    <span className="text-xs text-slate-400">Custodial Escrow Held</span>
+                    <div className="text-2xl font-bold text-emerald-400">
+                      {financialOverview ? formatCurrencyMinor(financialOverview.totalFundedInEscrowMinor, 'USD') : '$0.00'}
+                    </div>
+                    <div className="text-xs text-slate-500">Live custody disabled pending provider</div>
+                  </div>
+
+                  <div className="p-5 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1">
+                    <span className="text-xs text-slate-400">Released to Workers</span>
+                    <div className="text-2xl font-bold text-blue-400">
+                      {financialOverview ? formatCurrencyMinor(financialOverview.totalReleasedToWorkersMinor, 'USD') : '$0.00'}
+                    </div>
+                    <div className="text-xs text-slate-500">Verified milestone disbursements</div>
+                  </div>
+
+                  <div className="p-5 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1">
+                    <span className="text-xs text-slate-400">System Double-Entry Status</span>
+                    <div className="text-2xl font-bold flex items-center space-x-1.5 text-emerald-400">
+                      <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                      <span>{financialOverview?.systemTrialBalanceBalanced ? 'Balanced' : 'Unbalanced'}</span>
+                    </div>
+                    <div className="text-xs text-slate-500">Debits strictly equal credits per currency</div>
+                  </div>
+                </div>
+
+                {/* Escrow Records Table */}
+                <div className="rounded-xl bg-slate-900/60 border border-slate-800 overflow-hidden">
+                  <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+                    <div>
+                      <h4 className="text-sm font-semibold text-white">Digital Contract Escrow Records</h4>
+                      <p className="text-xs text-slate-400">Lifecycle state machine and dispute management</p>
+                    </div>
+                    <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300">
+                      {escrowsList.length} Escrows
+                    </span>
+                  </div>
+
+                  {isLoadingFinancial ? (
+                    <div className="p-8 text-center text-slate-400 text-xs">Loading escrow records...</div>
+                  ) : escrowsList.length === 0 ? (
+                    <div className="p-8 text-center text-slate-500 text-xs">
+                      No escrow records initialized. Contracts will generate escrow state records upon creation.
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-slate-800/80">
+                      {escrowsList.map((esc) => (
+                        <div key={esc.id} className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
+                          <div className="space-y-1">
+                            <div className="flex items-center space-x-2">
+                              <span className="font-mono font-bold text-white">{esc.contractNumber || 'Contract'}</span>
+                              <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                                esc.status === 'FUNDED'
+                                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                                  : esc.status === 'DISPUTED'
+                                    ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                                    : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                              }`}>
+                                {esc.status}
+                              </span>
+                              {esc.disputeHold && (
+                                <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-rose-500/20 text-rose-300">
+                                  DISPUTE HOLD ACTIVE
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-slate-400">{esc.contractTitle}</div>
+                            <div className="text-slate-500 text-[11px] font-mono">
+                              Contractual: {formatCurrencyMinor(esc.contractualAmountMinor, esc.currency)} |
+                              Funded: {formatCurrencyMinor(esc.fundedAmountMinor, esc.currency)} |
+                              Released: {formatCurrencyMinor(esc.releasedAmountMinor, esc.currency)}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => handleToggleDisputeHold(esc.contractId, esc.disputeHold)}
+                              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
+                                esc.disputeHold
+                                  ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
+                                  : 'bg-rose-600/80 hover:bg-rose-600 text-white'
+                              }`}
+                            >
+                              {esc.disputeHold ? 'Lift Dispute Hold' : 'Place Dispute Hold'}
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Payment Transactions Audit */}
+                <div className="rounded-xl bg-slate-900/60 border border-slate-800 overflow-hidden">
+                  <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+                    <div>
+                      <h4 className="text-sm font-semibold text-white">Payment Transactions Audit</h4>
+                      <p className="text-xs text-slate-400">Provider transactions and settlement status</p>
+                    </div>
+                    <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300">
+                      {paymentsList.length} Transactions
+                    </span>
+                  </div>
+
+                  {paymentsList.length === 0 ? (
+                    <div className="p-8 text-center text-slate-500 text-xs">
+                      No payment transactions recorded. Live provider integration is pending.
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-slate-800/80">
+                      {paymentsList.map((tx) => (
+                        <div key={tx.id} className="p-4 flex items-center justify-between text-xs font-mono">
+                          <div>
+                            <span className="text-slate-200 font-bold">{tx.transactionReference}</span>
+                            <div className="text-slate-500 text-[11px]">
+                              Payer: {tx.payerName || tx.payerId} | Type: {tx.type} | Provider: {tx.provider || 'PENDING'}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-white font-bold">{formatCurrencyMinor(tx.amountMinor, tx.currency)}</div>
+                            <span className="text-amber-400 text-[11px]">{tx.status}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Dispute Resolution Tab (Phase 6) */}
+            {activeTab === 'disputes' && <DisputesWorkspace />}
 
             {/* Telemetry Tab */}
             {activeTab === 'system' && (

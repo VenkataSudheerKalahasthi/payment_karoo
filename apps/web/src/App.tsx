@@ -47,7 +47,10 @@ import { HiringRequestsList } from './components/HiringRequestsList';
 import { ShortlistPage } from './components/ShortlistPage';
 import { DashboardOverview } from './components/DashboardOverview';
 import { ProfileManagement } from './components/ProfileManagement';
+import { NotificationDropdown } from './components/NotificationDropdown';
 import { UserRole, ContractDto, WorkerProfileDto } from '@trustpay/shared';
+import { useLocation } from 'react-router-dom';
+import { PaymentCallbackPage } from './pages/PaymentCallbackPage';
 
 type AppTab = 'dashboard' | 'marketplace' | 'contracts' | 'hiring' | 'shortlist' | 'profile' | 'system';
 
@@ -173,6 +176,11 @@ export const App: React.FC = () => {
 
   const isClient = auth.role === UserRole.CLIENT;
   const isWorker = auth.role === UserRole.WORKER;
+  const location = useLocation();
+
+  if (location.pathname === '/payments/callback') {
+    return <PaymentCallbackPage />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100">
@@ -212,11 +220,14 @@ export const App: React.FC = () => {
               <span>Verify Connectivity</span>
             </button>
 
-            {/* Clerk Authentication Controls */}
+            {/* Clerk Authentication Controls & Notifications */}
             {isLoaded && (
               <>
                 {isSignedIn ? (
-                  <UserButton afterSignOutUrl="/" />
+                  <div className="flex items-center space-x-3">
+                    <NotificationDropdown />
+                    <UserButton afterSignOutUrl="/" />
+                  </div>
                 ) : (
                   <div className="flex items-center space-x-2">
                     <SignInButton mode="modal">
@@ -477,7 +488,7 @@ export const App: React.FC = () => {
               >
                 <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
                   <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>Phase 3 Marketplace &amp; Contracts Active</span>
+                  <span>TrustPay Enterprise v2.0 Active</span>
                 </div>
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
                   Secure Digital Contract &amp; Specialist Escrow Management

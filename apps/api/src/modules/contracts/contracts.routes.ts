@@ -11,6 +11,12 @@ import {
   acceptContract,
   amendContract,
   downloadContractPdf,
+  proposeAmendment,
+  listAmendments,
+  respondToAmendment,
+  proposeTermination,
+  listTerminationRequests,
+  respondToTermination,
 } from './contracts.controller.js';
 import { authenticateUser, requireRole } from '../../middleware/auth.js';
 import { validateRequest } from '../../middleware/validate.js';
@@ -99,6 +105,44 @@ contractsRoutes.post(
   '/:id/milestones/:milestoneId/approve',
   authenticateUser(),
   approveMilestone,
+);
+
+// Controlled Contract Amendments (Phase 6)
+contractsRoutes.post(
+  '/:id/amendments',
+  authenticateUser(),
+  proposeAmendment,
+);
+
+contractsRoutes.get(
+  '/:id/amendments',
+  authenticateUser(),
+  listAmendments,
+);
+
+contractsRoutes.post(
+  '/:id/amendments/:amendmentId/respond',
+  authenticateUser(),
+  respondToAmendment,
+);
+
+// Controlled Contract Termination (Phase 6)
+contractsRoutes.post(
+  '/:id/termination-requests',
+  authenticateUser(),
+  proposeTermination,
+);
+
+contractsRoutes.get(
+  '/:id/termination-requests',
+  authenticateUser(),
+  listTerminationRequests,
+);
+
+contractsRoutes.post(
+  '/:id/termination-requests/:requestId/respond',
+  authenticateUser(),
+  respondToTermination,
 );
 
 export { contractsRoutes };

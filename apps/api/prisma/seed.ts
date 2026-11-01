@@ -1,4 +1,4 @@
-import { PrismaClient, UserRole } from '@prisma/client';
+import { PrismaClient, UserRole, LedgerAccountType } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import pg from 'pg';
 import dotenv from 'dotenv';
@@ -108,6 +108,69 @@ async function seed() {
     });
   }
   console.log(`✅ Seeded ${skills.length} standard skills.`);
+
+  // Seed foundational Chart of Accounts for Double-Entry Ledger
+  const systemAccounts = [
+    {
+      accountCode: '1000-CASH-ESCROW',
+      accountName: 'Custodial Escrow Holding Account',
+      accountType: LedgerAccountType.ASSET,
+      currency: 'USD',
+    },
+    {
+      accountCode: '2000-CLIENT-ESCROW-LIABILITY',
+      accountName: 'Client Escrow Balances Payable',
+      accountType: LedgerAccountType.LIABILITY,
+      currency: 'USD',
+    },
+    {
+      accountCode: '2100-WORKER-PAYABLE',
+      accountName: 'Worker Approved Milestones Payable',
+      accountType: LedgerAccountType.LIABILITY,
+      currency: 'USD',
+    },
+    {
+      accountCode: '4000-PLATFORM-FEE-REVENUE',
+      accountName: 'Platform Transaction Fee Revenue',
+      accountType: LedgerAccountType.REVENUE,
+      currency: 'USD',
+    },
+    {
+      accountCode: '5000-PAYMENT-PROCESSING-EXPENSE',
+      accountName: 'Payment Processor Fee Expense',
+      accountType: LedgerAccountType.EXPENSE,
+      currency: 'USD',
+    },
+  ];
+
+  for (const acc of systemAccounts) {
+    await prisma.ledgerAccount.upsert({
+      where: { accountCode: acc.accountCode },
+      update: { accountName: acc.accountName, accountType: acc.accountType, currency: acc.currency },
+      create: {
+        accountCode: acc.accountCode,
+        accountName: acc.accountName,
+        accountType: acc.accountType,
+        currency: acc.currency,
+      },
+    });
+  }
+  console.log(`✅ Seeded ${systemAccounts.length} system ledger accounts.`);
+
+  // Seed Platform Financial Governance configuration
+  const existingConfig = await prisma.platformFinancialConfig.findFirst();
+  if (!existingConfig) {
+    await prisma.platformFinancialConfig.create({
+      data: {
+        platformFeePercentage: 5.0,
+        fixedFeeMinor: BigInt(0),
+        supportedCurrencies: ['USD', 'EUR', 'GBP'],
+        activeProvider: 'PENDING_SELECTION',
+        isLiveMoneyDisabled: true,
+      },
+    });
+    console.log('✅ Initialized platform financial governance config (Live money custody disabled).');
+  }
 
   console.log('✨ Seed completed successfully.');
 }

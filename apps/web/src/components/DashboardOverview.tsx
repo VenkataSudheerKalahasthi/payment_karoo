@@ -10,6 +10,8 @@ import {
   Activity,
   Send,
   Users,
+  Scale,
+  RotateCcw,
 } from 'lucide-react';
 
 interface DashboardOverviewProps {
@@ -170,6 +172,44 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             <span className="text-[11px] font-medium text-slate-400 block">Completed</span>
             <span className="text-2xl font-bold text-white block">{metrics?.completedContracts ?? 0}</span>
           </div>
+
+          {/* Open Disputes Tile */}
+          <div
+            onClick={() => onNavigate('contracts')}
+            className={`p-4 rounded-xl border cursor-pointer transition space-y-2 ${
+              (metrics?.openDisputes ?? 0) > 0
+                ? 'bg-rose-950/20 border-rose-500/30 hover:border-rose-500/50'
+                : 'bg-slate-900/60 border-slate-800 hover:border-slate-700'
+            }`}
+          >
+            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+              (metrics?.openDisputes ?? 0) > 0
+                ? 'bg-rose-500/10 border border-rose-500/20 text-rose-400'
+                : 'bg-slate-800 border border-slate-700 text-slate-400'
+            }`}>
+              <Scale className="w-4 h-4" />
+            </div>
+            <span className="text-[11px] font-medium text-slate-400 block">Open Disputes</span>
+            <span className={`text-2xl font-bold block ${
+              (metrics?.openDisputes ?? 0) > 0 ? 'text-rose-400' : 'text-white'
+            }`}>
+              {metrics?.openDisputes ?? 0}
+            </span>
+          </div>
+
+          {/* Worker Revision Requests Tile (Worker only) */}
+          {isWorker && (metrics?.revisionRequests ?? 0) > 0 && (
+            <div
+              onClick={() => onNavigate('contracts')}
+              className="p-4 rounded-xl bg-amber-950/20 border border-amber-500/30 hover:border-amber-500/50 cursor-pointer transition space-y-2"
+            >
+              <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+                <RotateCcw className="w-4 h-4" />
+              </div>
+              <span className="text-[11px] font-medium text-slate-400 block">Revisions Requested</span>
+              <span className="text-2xl font-bold text-amber-300 block">{metrics?.revisionRequests ?? 0}</span>
+            </div>
+          )}
 
           {/* Total Contracts Lifetime */}
           <div

@@ -13,6 +13,12 @@ import { notificationsRoutes } from '../modules/notifications/notifications.rout
 import { dashboardRoutes } from '../modules/dashboard/dashboard.routes.js';
 import { adminRoutes } from '../modules/admin/admin.routes.js';
 import { auditLogsRoutes } from '../modules/audit-logs/audit-logs.routes.js';
+import { ledgerRoutes } from '../modules/ledger/ledger.routes.js';
+import { escrowRoutes } from '../modules/escrow/escrow.routes.js';
+import { paymentsRoutes } from '../modules/payments/payments.routes.js';
+import { webhooksRoutes } from '../modules/webhooks/webhooks.routes.js';
+import { storageRoutes } from '../modules/storage/storage.routes.js';
+import disputesRoutes from '../modules/disputes/disputes.routes.js';
 
 const apiRouter = Router();
 
@@ -57,5 +63,23 @@ apiRouter.use('/admin', adminRoutes);
 
 // 14. Audit Log Oversight Module
 apiRouter.use('/audit-logs', auditLogsRoutes);
+
+// 15. Double-Entry Accounting Ledger Module
+apiRouter.use('/ledger', ledgerRoutes);
+
+// 16. Escrow Lifecycle & State Machine Module
+apiRouter.use('/escrow', escrowRoutes);
+
+// 17. Payment Transactions & Financial Config Module
+apiRouter.use('/payments', paymentsRoutes);
+
+// 18. Webhooks Ingestion & Security Preparation Module
+apiRouter.use('/webhooks', webhooksRoutes);
+
+// 19. Private Supabase Storage & Evidence Access Module
+apiRouter.use('/storage', storageRoutes);
+
+// 20. Advanced Dispute Management & Arbitration Module (Phase 6)
+apiRouter.use('/disputes', disputesRoutes);
 
 export { apiRouter };

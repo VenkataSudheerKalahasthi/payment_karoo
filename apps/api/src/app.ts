@@ -46,8 +46,15 @@ export function createApp(): Express {
   // 3. Rate Limiting Middleware
   app.use(globalRateLimiter);
 
-  // 4. Request Body Parsing
-  app.use(express.json({ limit: '10mb' }));
+  // 4. Request Body Parsing (with rawBody capture for webhook signature verification)
+  app.use(
+    express.json({
+      limit: '10mb',
+      verify: (req: express.Request & { rawBody?: string }, _res, buf) => {
+        req.rawBody = buf.toString('utf8');
+      },
+    }),
+  );
   app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
   // 5. Mount API Version 1 Routes

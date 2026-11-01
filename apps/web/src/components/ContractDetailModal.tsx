@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { apiService } from '../services/api';
 import {
   ContractDto,
   UserRole,
   MilestoneStatus,
   ContractStatus,
+  EscrowRecordDto,
 } from '@trustpay/shared';
 import {
   X,
@@ -14,7 +15,26 @@ import {
   Upload,
   ShieldCheck,
   Send,
+  Lock,
+  AlertTriangle,
+  CreditCard,
 } from 'lucide-react';
+import { ContractLifecyclePanel } from './ContractLifecyclePanel';
+
+interface CashfreeSDKInstance {
+  checkout: (options: { paymentSessionId: string; redirectTarget: '_modal' | '_self' }) => Promise<{
+    error?: { message?: string };
+    paymentDetails?: unknown;
+  }>;
+}
+
+type CashfreeConstructor = (options: { mode: 'sandbox' | 'production' }) => CashfreeSDKInstance;
+
+declare global {
+  interface Window {
+    Cashfree?: CashfreeConstructor;
+  }
+}
 
 interface ContractDetailModalProps {
   contract: ContractDto;
@@ -42,6 +62,113 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
   const [isAccepting, setIsAccepting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [escrowRecord, setEscrowRecord] = useState<EscrowRecordDto | null>(null);
+  const [isInitiatingPayment, setIsInitiatingPayment] = useState(false);
+  const [isVerifyingPayment, setIsVerifyingPayment] = useState(false);
+  const [paymentNotice, setPaymentNotice] = useState<string | null>(null);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [paymentTransactions, setPaymentTransactions] = useState<Array<{
+    id: string;
+    transactionReference: string;
+    providerOrderId?: string;
+    status: string;
+    amountMinor: string;
+    currency: string;
+    createdAt: string;
+  }>>([]);
+
+  const loadPayments = () => {
+    if (contract.id) {
+      apiService.listPaymentTransactions({ contractId: contract.id }).then((res) => {
+        if (res.success && res.data?.items) {
+          setPaymentTransactions(res.data.items as typeof paymentTransactions);
+        }
+      }).catch(() => {
+        // Silently handled
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen && contract.id) {
+      apiService.getContractEscrow(contract.id).then((res) => {
+        if (res.success && res.data) {
+          setEscrowRecord(res.data);
+        }
+      }).catch(() => {
+        // Silently handled
+      });
+      loadPayments();
+    }
+  }, [isOpen, contract.id]);
+
+  const loadCashfreeSdk = (): Promise<CashfreeConstructor> => {
+    return new Promise((resolve, reject) => {
+      if (window.Cashfree) {
+        return resolve(window.Cashfree);
+      }
+      const script = document.createElement('script');
+      script.src = 'https://sdk.cashfree.com/js/v3/cashfree.js';
+      script.async = true;
+      script.onload = () => {
+        if (window.Cashfree) {
+          resolve(window.Cashfree);
+        } else {
+          reject(new Error('Cashfree SDK loaded but constructor unavailable'));
+        }
+      };
+      script.onerror = () => reject(new Error('Failed to load Cashfree Checkout SDK script'));
+      document.body.appendChild(script);
+    });
+  };
+
+  const handleCashfreeCheckout = async () => {
+    setIsInitiatingPayment(true);
+    setPaymentError(null);
+    setPaymentNotice(null);
+
+    try {
+      // 1. Create backend order
+      const orderRes = await apiService.createPaymentOrder(contract.id);
+      if (!orderRes.success || !orderRes.data) {
+        setPaymentError(orderRes.error?.message || 'Failed to initialize Cashfree payment order.');
+        setIsInitiatingPayment(false);
+        return;
+      }
+
+      const { orderId, paymentSessionId } = orderRes.data;
+
+      // 2. Load SDK and launch sandbox modal
+      setPaymentNotice(`Sandbox order initialized (${orderId}). Launching checkout...`);
+      const CashfreeFn = await loadCashfreeSdk();
+      const cashfree = CashfreeFn({ mode: 'sandbox' });
+
+      cashfree.checkout({
+        paymentSessionId,
+        redirectTarget: '_modal',
+      }).then(async (result) => {
+        if (result.error) {
+          setPaymentError(result.error.message || 'Payment was cancelled or failed in sandbox.');
+        }
+        // Always verify authoritative server state
+        setIsVerifyingPayment(true);
+        const verifyRes = await apiService.verifyPaymentStatus(orderId);
+        setIsVerifyingPayment(false);
+        if (verifyRes.success && verifyRes.data) {
+          setPaymentNotice(
+            `Payment Status: ${verifyRes.data.status} (${verifyRes.data.cashfreeOrderStatus}) for Order #${orderId} [SANDBOX / ZERO REAL MONEY].`,
+          );
+          loadPayments();
+          onRefresh();
+        }
+      });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Cashfree payment initiation failed';
+      setPaymentError(msg);
+    } finally {
+      setIsInitiatingPayment(false);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -262,6 +389,16 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
           </div>
         )}
 
+        {/* Dispute Warning Banner (Phase 6) */}
+        {(contract.status === ContractStatus.DISPUTED || escrowRecord?.disputeHold) && (
+          <div className="p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs flex items-center space-x-2">
+            <AlertTriangle className="w-4 h-4 shrink-0 text-rose-400" />
+            <span>
+              This contract is currently under formal dispute review. Milestone approvals and financial releases are held until resolution.
+            </span>
+          </div>
+        )}
+
         {/* Commercial & Parties Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Client Card */}
@@ -295,6 +432,167 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
             <p className="text-[10px] text-slate-400">
               {contract.milestones?.length || 0} milestone deliverable{(contract.milestones?.length || 0) > 1 ? 's' : ''}
             </p>
+          </div>
+        </div>
+
+        {/* Escrow & Financial Safeguards Overview (Phase 4.1) */}
+        <div className="p-4 rounded-xl bg-slate-800/40 border border-slate-800 space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-700/60 pb-2.5">
+            <div className="flex items-center space-x-2">
+              <Lock className="w-4 h-4 text-emerald-400" />
+              <h4 className="text-xs font-bold text-white uppercase tracking-wider">Escrow &amp; Financial Governance</h4>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${
+                escrowRecord?.status === 'FUNDED'
+                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                  : escrowRecord?.status === 'DISPUTED'
+                    ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                    : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+              }`}>
+                {escrowRecord?.status || 'PENDING_INITIALIZATION'}
+              </span>
+              {escrowRecord?.disputeHold && (
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300">
+                  DISPUTE HOLD
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-mono">
+            <div className="p-2.5 rounded-lg bg-slate-900/50 border border-slate-800">
+              <span className="text-[10px] text-slate-400 font-sans">Agreed Contractual Total</span>
+              <div className="text-sm font-bold text-white mt-0.5">
+                ${Number(contract.totalAmount).toLocaleString()} <span className="text-slate-400 text-xs font-normal">{contract.currency}</span>
+              </div>
+            </div>
+
+            <div className="p-2.5 rounded-lg bg-slate-900/50 border border-slate-800">
+              <span className="text-[10px] text-slate-400 font-sans">Verified Custodial Deposits</span>
+              <div className="text-sm font-bold text-amber-400 mt-0.5">
+                $0.00 <span className="text-slate-500 text-xs font-normal">USD</span>
+              </div>
+            </div>
+
+            <div className="p-2.5 rounded-lg bg-slate-900/50 border border-slate-800">
+              <span className="text-[10px] text-slate-400 font-sans">Verified Released to Worker</span>
+              <div className="text-sm font-bold text-blue-400 mt-0.5">
+                $0.00 <span className="text-slate-500 text-xs font-normal">USD</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-[11px] text-slate-400 bg-slate-900/60 p-2.5 rounded-lg border border-slate-800 flex items-start space-x-2">
+            <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
+            <span>
+              {isClient
+                ? 'Client Notice: Payment provider integration is pending. Real money has not been debited from your accounts. Milestone approvals acknowledge deliverable completion; financial ledger movements remain disabled until payment gateway activation.'
+                : 'Specialist Notice: Live payouts are disabled pending payment provider selection. Milestone deliverables approved by the client are logged as verified claims.'}
+            </span>
+          </div>
+
+          {/* Cashfree Payment Gateway (Phase 5 - SANDBOX Checkout) */}
+          <div className="p-3.5 rounded-xl bg-gradient-to-r from-indigo-950/40 to-slate-900 border border-indigo-500/20 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <CreditCard className="w-4 h-4 text-indigo-400" />
+                <span className="text-xs font-bold text-white">Cashfree Payment Gateway</span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  SANDBOX / TEST ONLY
+                </span>
+              </div>
+              <span className="text-[10px] text-slate-400">Zero Real Money Debited</span>
+            </div>
+
+            {paymentNotice && (
+              <div className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-300 flex items-center space-x-2">
+                <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>{paymentNotice}</span>
+              </div>
+            )}
+
+            {paymentError && (
+              <div className="p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/20 text-xs text-rose-300 flex items-center space-x-2">
+                <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                <span>{paymentError}</span>
+              </div>
+            )}
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+              <div className="text-xs text-slate-300">
+                <p className="font-semibold">
+                  Test Contract Escrow Funding:{' '}
+                  <span className="text-indigo-300 font-mono">
+                    ₹{(Number(contract.totalAmount)).toLocaleString()} INR
+                  </span>
+                </p>
+                <p className="text-[11px] text-slate-400">
+                  Official Cashfree Hosted Checkout modal initiates test card/UPI payment simulations.
+                </p>
+              </div>
+
+              {isClient ? (
+                <button
+                  onClick={handleCashfreeCheckout}
+                  disabled={isInitiatingPayment || isVerifyingPayment}
+                  className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-xs font-bold text-white shrink-0 shadow-lg shadow-indigo-600/20 transition flex items-center space-x-1.5"
+                >
+                  <CreditCard className="w-3.5 h-3.5" />
+                  <span>
+                    {isInitiatingPayment
+                      ? 'Creating Sandbox Order...'
+                      : isVerifyingPayment
+                      ? 'Verifying Payment...'
+                      : 'Pay via Cashfree (Sandbox)'}
+                  </span>
+                </button>
+              ) : (
+                <div className="text-[11px] text-slate-400 italic">
+                  Specialist view: Client initiates sandbox funding. No real payouts occur.
+                </div>
+              )}
+            </div>
+
+            {/* Verified Test Payment Records */}
+            {paymentTransactions.length > 0 && (
+              <div className="mt-3 pt-3 border-t border-slate-800 space-y-1.5">
+                <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                  Contract Sandbox Payment History ({paymentTransactions.length})
+                </span>
+                <div className="space-y-1">
+                  {paymentTransactions.map((tx) => (
+                    <div
+                      key={tx.id}
+                      className="p-2 rounded bg-slate-900/80 border border-slate-800/80 flex items-center justify-between text-[11px] font-mono"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <span className="text-slate-300">{tx.transactionReference}</span>
+                        {tx.providerOrderId && (
+                          <span className="text-[10px] text-slate-500">({tx.providerOrderId})</span>
+                        )}
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-slate-400">
+                          {(Number(tx.amountMinor) / 100).toFixed(2)} {tx.currency}
+                        </span>
+                        <span
+                          className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
+                            tx.status === 'SUCCEEDED'
+                              ? 'bg-emerald-500/20 text-emerald-300'
+                              : tx.status === 'FAILED'
+                              ? 'bg-rose-500/20 text-rose-300'
+                              : 'bg-amber-500/20 text-amber-300'
+                          }`}
+                        >
+                          {tx.status}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -544,6 +842,15 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
             )}
           </div>
         )}
+
+        {/* Advanced Escrow, Disputes & Contract Lifecycle (Phase 6) */}
+        <ContractLifecyclePanel
+          contract={contract}
+          currentUserId={currentUserId}
+          isClient={isClient}
+          isWorker={isWorker}
+          onRefresh={onRefresh}
+        />
 
         {/* Digital Acceptance Audit Trail */}
         {contract.acceptances && contract.acceptances.length > 0 && (

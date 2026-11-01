@@ -9,10 +9,24 @@ import {
   AlertTriangle,
   UserCog,
   LogIn,
+  BookOpen,
+  Scale,
+  FileText,
 } from 'lucide-react';
 import { useAuth, UserButton, SignInButton } from '@clerk/clerk-react';
 import { apiService, setAuthTokenGetter } from './services/api';
-import { SystemHealthStatus, DatabaseHealthStatus, UserRole } from '@trustpay/shared';
+import {
+  SystemHealthStatus,
+  DatabaseHealthStatus,
+  UserRole,
+  FinancialOverviewDto,
+  TrialBalanceReportDto,
+  LedgerAccountDto,
+  LedgerTransactionDto,
+  PlatformFinancialConfigDto,
+  formatCurrencyMinor,
+} from '@trustpay/shared';
+import { SuperadminDisputesGovernance } from './components/SuperadminDisputesGovernance';
 
 interface SuperadminDashboardMetrics {
   users?: { total: number; clients: number; workers: number; admins: number };
@@ -48,7 +62,7 @@ export const App: React.FC = () => {
   const [apiHealth, setApiHealth] = useState<SystemHealthStatus | null>(null);
   const [dbHealth, setDbHealth] = useState<DatabaseHealthStatus | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<'provisioning' | 'audit' | 'metrics' | 'system'>('provisioning');
+  const [activeTab, setActiveTab] = useState<'provisioning' | 'audit' | 'metrics' | 'financial' | 'disputes' | 'system'>('provisioning');
 
   // Provisioning form state
   const [targetUserId, setTargetUserId] = useState('');
@@ -57,6 +71,14 @@ export const App: React.FC = () => {
   const [isSubmittingRole, setIsSubmittingRole] = useState(false);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+
+  // Financial Governance state (Phase 4.1)
+  const [trialBalance, setTrialBalance] = useState<TrialBalanceReportDto | null>(null);
+  const [ledgerAccounts, setLedgerAccounts] = useState<LedgerAccountDto[]>([]);
+  const [ledgerTransactions, setLedgerTransactions] = useState<LedgerTransactionDto[]>([]);
+  const [financialConfig, setFinancialConfig] = useState<PlatformFinancialConfigDto | null>(null);
+  const [financialOverview, setFinancialOverview] = useState<FinancialOverviewDto | null>(null);
+  const [isLoadingFinancial, setIsLoadingFinancial] = useState(false);
 
   useEffect(() => {
     if (isSignedIn) {
@@ -69,6 +91,37 @@ export const App: React.FC = () => {
       });
     }
   }, [isSignedIn, getToken]);
+
+  const loadFinancialData = useCallback(async () => {
+    setIsLoadingFinancial(true);
+    try {
+      const [tbRes, accRes, txRes, cfgRes, ovRes] = await Promise.allSettled([
+        apiService.getTrialBalance('USD'),
+        apiService.listAccounts({ limit: 50 }),
+        apiService.listTransactions({ limit: 50 }),
+        apiService.getFinancialConfig(),
+        apiService.getFinancialOverview(),
+      ]);
+
+      if (tbRes.status === 'fulfilled' && tbRes.value.success && tbRes.value.data) {
+        setTrialBalance(tbRes.value.data);
+      }
+      if (accRes.status === 'fulfilled' && accRes.value.success && accRes.value.data) {
+        setLedgerAccounts(accRes.value.data.items || []);
+      }
+      if (txRes.status === 'fulfilled' && txRes.value.success && txRes.value.data) {
+        setLedgerTransactions(txRes.value.data.items || []);
+      }
+      if (cfgRes.status === 'fulfilled' && cfgRes.value.success && cfgRes.value.data) {
+        setFinancialConfig(cfgRes.value.data);
+      }
+      if (ovRes.status === 'fulfilled' && ovRes.value.success && ovRes.value.data) {
+        setFinancialOverview(ovRes.value.data);
+      }
+    } finally {
+      setIsLoadingFinancial(false);
+    }
+  }, []);
 
   const loadSuperadminData = useCallback(async () => {
     if (!isSignedIn) return;
@@ -103,6 +156,32 @@ export const App: React.FC = () => {
       loadSuperadminData();
     }
   }, [isSignedIn, loadSuperadminData]);
+
+  useEffect(() => {
+    if (isSignedIn && activeTab === 'financial') {
+      loadFinancialData();
+    }
+  }, [isSignedIn, activeTab, loadFinancialData]);
+
+  const handleReverseTransaction = async (reference: string) => {
+    const reason = prompt(`Enter authorized justification for reversing ledger transaction "${reference}":`);
+    if (!reason || reason.trim().length < 5) {
+      alert('Justification must be at least 5 characters.');
+      return;
+    }
+
+    try {
+      const res = await apiService.reverseTransaction(reference, reason.trim());
+      if (res.success) {
+        setActionMessage(`Transaction ${reference} reversed with offsetting entry.`);
+        loadFinancialData();
+      } else {
+        setActionError(res.error?.message || 'Failed to reverse transaction');
+      }
+    } catch (err: unknown) {
+      setActionError(err instanceof Error ? err.message : 'Error reversing transaction');
+    }
+  };
 
   const fetchStatus = async () => {
     setIsRefreshing(true);
@@ -274,6 +353,26 @@ export const App: React.FC = () => {
                 Governance Metrics
               </button>
               <button
+                onClick={() => setActiveTab('financial')}
+                className={`px-4 py-2 rounded-lg text-xs font-semibold transition ${
+                  activeTab === 'financial'
+                    ? 'bg-purple-900/40 text-purple-200 border border-purple-500/30'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                Ledger &amp; Financial Governance
+              </button>
+              <button
+                onClick={() => setActiveTab('disputes')}
+                className={`px-4 py-2 rounded-lg text-xs font-semibold transition ${
+                  activeTab === 'disputes'
+                    ? 'bg-purple-900/40 text-purple-200 border border-purple-500/30'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                Dispute Arbitration &amp; Holds
+              </button>
+              <button
                 onClick={() => setActiveTab('system')}
                 className={`px-4 py-2 rounded-lg text-xs font-semibold transition ${
                   activeTab === 'system'
@@ -435,6 +534,157 @@ export const App: React.FC = () => {
                 </div>
               </div>
             )}
+
+            {/* Financial Governance Tab */}
+            {activeTab === 'financial' && (
+              <div className="space-y-6">
+                {/* Safeguard Alert */}
+                <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-start space-x-3">
+                  <AlertTriangle className="w-5 h-5 text-purple-400 shrink-0 mt-0.5" />
+                  <div className="space-y-1">
+                    <div className="text-xs font-bold text-purple-300">
+                      SUPERADMIN FINANCIAL GOVERNANCE CONSOLE
+                    </div>
+                    <p className="text-xs text-purple-200/80 leading-relaxed">
+                      Provider: <span className="font-mono font-bold">{financialConfig?.activeProvider || 'PENDING_SELECTION'}</span> | Live Money Custody: <span className="font-bold text-amber-300">{financialConfig?.isLiveMoneyDisabled ? 'DISABLED' : 'ENABLED'}</span> | Supported Currencies: {financialConfig?.supportedCurrencies?.join(', ') || 'USD, EUR, GBP'} | Platform Fee: {financialConfig?.platformFeePercentage ?? 5.0}%. Double-entry ledger entries are immutable. Only explicit reversals via offsetting transactions are permitted. Total Agreed Commitment: <span className="font-mono font-bold text-white">{financialOverview ? formatCurrencyMinor(financialOverview.totalContractualAgreedMinor, 'USD') : '$0.00'}</span>.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Trial Balance Report */}
+                <div className="rounded-xl bg-slate-900/60 border border-slate-800 overflow-hidden">
+                  <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Scale className="w-4 h-4 text-emerald-400" />
+                      <h4 className="text-sm font-semibold text-white">System Trial Balance Report ({trialBalance?.currency || 'USD'})</h4>
+                      {isLoadingFinancial && <span className="text-[10px] text-purple-400">Syncing...</span>}
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                        trialBalance?.isBalanced
+                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                          : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                      }`}>
+                        {trialBalance?.isBalanced ? 'BALANCED' : 'DISCREPANCY DETECTED'}
+                      </span>
+                      <span className="text-xs font-mono text-slate-500">
+                        {trialBalance ? new Date(trialBalance.generatedAt).toLocaleTimeString() : ''}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="p-4 border-b border-slate-800/60 grid grid-cols-2 gap-4 text-xs font-mono">
+                    <div className="p-3 rounded-lg bg-slate-800/40 border border-slate-700/50">
+                      <span className="text-slate-400">Total System Debits:</span>
+                      <div className="text-lg font-bold text-white mt-1">
+                        {trialBalance ? formatCurrencyMinor(trialBalance.totalDebitsMinor, trialBalance.currency) : '$0.00'}
+                      </div>
+                    </div>
+                    <div className="p-3 rounded-lg bg-slate-800/40 border border-slate-700/50">
+                      <span className="text-slate-400">Total System Credits:</span>
+                      <div className="text-lg font-bold text-white mt-1">
+                        {trialBalance ? formatCurrencyMinor(trialBalance.totalCreditsMinor, trialBalance.currency) : '$0.00'}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="divide-y divide-slate-800/80">
+                    {trialBalance?.items.map((item) => (
+                      <div key={item.accountCode} className="p-3 flex items-center justify-between text-xs font-mono">
+                        <div>
+                          <span className="font-bold text-slate-200">{item.accountCode}</span>
+                          <span className="text-slate-500 ml-2">({item.accountName})</span>
+                          <span className="ml-2 text-[10px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-400">{item.accountType}</span>
+                        </div>
+                        <div className="flex items-center space-x-4">
+                          <span className="text-slate-400">Dr: {formatCurrencyMinor(item.debitTotalMinor, trialBalance.currency)}</span>
+                          <span className="text-slate-400">Cr: {formatCurrencyMinor(item.creditTotalMinor, trialBalance.currency)}</span>
+                          <span className="font-bold text-white">Net: {formatCurrencyMinor(item.netBalanceMinor, trialBalance.currency)}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Chart of Accounts */}
+                <div className="rounded-xl bg-slate-900/60 border border-slate-800 overflow-hidden">
+                  <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <BookOpen className="w-4 h-4 text-blue-400" />
+                      <h4 className="text-sm font-semibold text-white">Chart of Accounts Registry</h4>
+                    </div>
+                    <span className="text-xs font-mono text-slate-400">{ledgerAccounts.length} Accounts</span>
+                  </div>
+
+                  <div className="divide-y divide-slate-800/80">
+                    {ledgerAccounts.map((acc) => (
+                      <div key={acc.id} className="p-3 flex items-center justify-between text-xs font-mono">
+                        <div>
+                          <span className="font-bold text-white">{acc.accountCode}</span>
+                          <span className="text-slate-300 ml-2">{acc.accountName}</span>
+                          <span className="ml-2 text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400">{acc.accountType}</span>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                          <span className="text-slate-400">{acc.currency}</span>
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                            {acc.status}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Ledger Transactions Inspection & Reversals */}
+                <div className="rounded-xl bg-slate-900/60 border border-slate-800 overflow-hidden">
+                  <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <FileText className="w-4 h-4 text-purple-400" />
+                      <h4 className="text-sm font-semibold text-white">Double-Entry Ledger Transactions</h4>
+                    </div>
+                    <span className="text-xs font-mono text-slate-400">{ledgerTransactions.length} Transactions</span>
+                  </div>
+
+                  {ledgerTransactions.length === 0 ? (
+                    <div className="p-8 text-center text-slate-500 text-xs">
+                      No transactions posted yet. Double-entry postings are created upon verified financial movements.
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-slate-800/80">
+                      {ledgerTransactions.map((tx) => (
+                        <div key={tx.id} className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs font-mono">
+                          <div className="space-y-1">
+                            <div className="flex items-center space-x-2">
+                              <span className="font-bold text-white">{tx.transactionReference}</span>
+                              <span className="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300">{tx.transactionType}</span>
+                              <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                                tx.status === 'POSTED' ? 'text-emerald-400' : tx.status === 'REVERSED' ? 'text-amber-400' : 'text-slate-400'
+                              }`}>{tx.status}</span>
+                            </div>
+                            <div className="text-slate-400">{tx.description}</div>
+                            <div className="text-slate-500 text-[11px]">
+                              Entries: {tx.entries?.length || 0} legs | Posted: {tx.postedAt ? new Date(tx.postedAt).toLocaleString() : 'N/A'}
+                            </div>
+                          </div>
+
+                          {tx.status === 'POSTED' && tx.transactionType !== 'REVERSAL' && (
+                            <button
+                              onClick={() => handleReverseTransaction(tx.transactionReference)}
+                              className="px-3 py-1.5 rounded bg-rose-600/80 hover:bg-rose-600 text-white text-xs font-medium transition"
+                            >
+                              Reverse Transaction
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Tab: Dispute Arbitration & Governance (Phase 6) */}
+            {activeTab === 'disputes' && <SuperadminDisputesGovernance />}
 
             {/* Tab 4: Cluster Status */}
             {activeTab === 'system' && (

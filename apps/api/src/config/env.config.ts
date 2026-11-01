@@ -29,6 +29,33 @@ const envSchema = z.object({
     ),
   CLERK_SECRET_KEY: z.string().optional().default(''),
   CLERK_PUBLISHABLE_KEY: z.string().optional().default(''),
+
+  // Cashfree Payment Gateway Configuration (Phase 5 - SANDBOX Only)
+  CASHFREE_ENV: z.enum(['SANDBOX', 'PRODUCTION']).default('SANDBOX'),
+  CASHFREE_CLIENT_ID: z.string().optional().default(''),
+  CASHFREE_CLIENT_SECRET: z.string().optional().default(''),
+  CASHFREE_API_VERSION: z.string().default('2023-08-01'),
+  CASHFREE_WEBHOOK_SECRET: z.string().optional().default(''),
+  CASHFREE_RETURN_URL: z
+    .string()
+    .default('http://localhost:3000/payments/callback?order_id={order_id}'),
+  CASHFREE_WEBHOOK_URL: z
+    .string()
+    .default('http://localhost:5000/api/v1/webhooks/cashfree'),
+
+  // Financial Safety Invariants (Strictly Enforced)
+  PAYMENTS_LIVE_ENABLED: z
+    .string()
+    .default('false')
+    .transform((val) => val === 'true'),
+  ESCROW_LIVE_MOVEMENT_ENABLED: z
+    .string()
+    .default('false')
+    .transform((val) => val === 'true'),
+  PAYOUTS_ENABLED: z
+    .string()
+    .default('false')
+    .transform((val) => val === 'true'),
 });
 
 const parsed = envSchema.safeParse(process.env);
