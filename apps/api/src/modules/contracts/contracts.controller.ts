@@ -15,7 +15,14 @@ import {
 import { sendSuccess, sendError } from '../../utils/response.js';
 import { recordAuditLog } from '../../utils/audit.js';
 import { logger } from '../../utils/logger.js';
-import { validateContractTransition } from './contracts.state-machine.js';
+import { validateContractTransition, executeContractTransition } from './contracts.state-machine.js';
+import {
+  createContractVersionSnapshot,
+  listContractVersions,
+  verifyContractIntegrity,
+  getContractActivityHistory,
+} from './contract-version.service.js';
+import { emitContractRealtimeEvent } from '../realtime/socket.service.js';
 import {
   CreateContractInput,
   AcceptContractInput,
@@ -28,6 +35,8 @@ import {
   streamContractPdf,
   computeCanonicalContractHash,
 } from './contract-pdf.service.js';
+import { executeMilestoneTransition } from './milestones.state-machine.js';
+import { projectsService } from '../projects/projects.service.js';
 
 export async function createContract(req: Request, res: Response): Promise<void> {
   const client = req.user!;
@@ -61,7 +70,27 @@ export async function createContract(req: Request, res: Response): Promise<void>
       100 + Math.random() * 900,
     )}`;
 
-    // 3. Atomically create contract, milestones, conversation, and notification
+    const initialDocHash = computeCanonicalContractHash({
+      contractNumber,
+      version: 1,
+      title: input.title,
+      totalAmount,
+      currency: input.currency || 'USD',
+      clientId: client.id,
+      workerId: worker.id,
+      scopeOfWork: input.scopeOfWork || input.description,
+      termsAndConditions: input.termsAndConditions || 'Standard TrustPay Digital Escrow Agreement terms and dispute conditions apply.',
+      cancellationTerms: input.cancellationTerms || 'Cancellation permitted prior to activation, or by mutual consent/arbitration when active.',
+      revisionTerms: input.revisionTerms || 'Up to 2 standard revision cycles per milestone deliverable.',
+      milestones: input.milestones.map((m, idx) => ({
+        order: m.order ?? idx + 1,
+        title: m.title,
+        description: m.description,
+        amount: m.amount,
+      })),
+    });
+
+    // 3. Atomically create contract, milestones, version snapshot, conversation, and notification
     const contract = await prisma.$transaction(async (tx) => {
       const createdContract = await tx.contract.create({
         data: {
@@ -71,6 +100,8 @@ export async function createContract(req: Request, res: Response): Promise<void>
           clientId: client.id,
           workerId: worker.id,
           status: ContractStatus.PENDING_ACCEPTANCE,
+          version: 1,
+          documentHash: initialDocHash,
           totalAmount: new Prisma.Decimal(totalAmount),
           currency: input.currency || 'USD',
           scopeOfWork: input.scopeOfWork || input.description,
@@ -99,6 +130,33 @@ export async function createContract(req: Request, res: Response): Promise<void>
             select: { id: true, firstName: true, lastName: true, email: true },
           },
         },
+      });
+
+      // Create immutable version 1 snapshot
+      await createContractVersionSnapshot({
+        contractId: createdContract.id,
+        version: 1,
+        title: createdContract.title,
+        description: createdContract.description,
+        totalAmount: createdContract.totalAmount,
+        currency: createdContract.currency,
+        scopeOfWork: createdContract.scopeOfWork,
+        termsAndConditions: createdContract.termsAndConditions,
+        cancellationTerms: createdContract.cancellationTerms,
+        revisionTerms: createdContract.revisionTerms,
+        documentHash: initialDocHash,
+        milestones: input.milestones.map((m, idx) => ({
+          order: m.order ?? idx + 1,
+          title: m.title,
+          description: m.description,
+          amount: m.amount,
+          dueDate: m.dueDate,
+        })),
+        versionReason: 'INITIAL_CONTRACT',
+        createdById: client.id,
+        contractStatusAtCreation: ContractStatus.PENDING_ACCEPTANCE,
+        isAccepted: false,
+        tx,
       });
 
       // Initialize dedicated contract conversation
@@ -135,9 +193,25 @@ export async function createContract(req: Request, res: Response): Promise<void>
         contractNumber,
         totalAmount,
         workerId: worker.id,
+        documentHash: contract.documentHash,
+        version: 1,
       },
       req,
     });
+
+    emitContractRealtimeEvent(
+      contract.id,
+      'contract:created',
+      {
+        contractId: contract.id,
+        contractNumber: contract.contractNumber,
+        title: contract.title,
+        totalAmount: Number(contract.totalAmount),
+        version: 1,
+        documentHash: contract.documentHash,
+      },
+      1,
+    );
 
     sendSuccess(res, 201, contract);
   } catch (error) {
@@ -177,10 +251,24 @@ export async function listContracts(req: Request, res: Response): Promise<void> 
             user: { select: { id: true, firstName: true, lastName: true, email: true } },
           },
         },
+        versions: {
+          orderBy: { version: 'asc' },
+        },
         milestones: {
           orderBy: { order: 'asc' },
           include: {
             _count: { select: { submissions: true } },
+            submissions: {
+              orderBy: { submittedAt: 'desc' },
+              include: {
+                worker: { select: { id: true, firstName: true, lastName: true } },
+                revisionRequests: {
+                  include: {
+                    requestedBy: { select: { id: true, firstName: true, lastName: true } },
+                  },
+                },
+              },
+            },
           },
         },
       },
@@ -213,6 +301,9 @@ export async function getContractById(req: Request, res: Response): Promise<void
           include: {
             user: { select: { id: true, firstName: true, lastName: true, email: true } },
           },
+        },
+        versions: {
+          orderBy: { version: 'asc' },
         },
         milestones: {
           orderBy: { order: 'asc' },
@@ -417,9 +508,20 @@ export async function submitMilestone(req: Request, res: Response): Promise<void
         },
       });
 
-      await tx.contractMilestone.update({
-        where: { id: milestone.id },
-        data: { status: MilestoneStatus.SUBMITTED },
+      await executeMilestoneTransition({
+        milestoneId: milestone.id,
+        contractId: milestone.contractId,
+        actorId: worker.id,
+        actorRole: UserRole.WORKER,
+        targetStatus: MilestoneStatus.SUBMITTED,
+        action: 'MILESTONE_SUBMITTED',
+        reason: input.notes,
+        metadata: {
+          submissionId: createdSubmission.id,
+          attachmentUrls: input.attachmentUrls,
+        },
+        requestId: req.headers['x-request-id'] as string | undefined,
+        tx,
       });
 
       const escrow = await tx.escrowRecord.findUnique({
@@ -530,14 +632,25 @@ export async function requestRevision(req: Request, res: Response): Promise<void
         },
       });
 
-      await tx.contractMilestone.update({
-        where: { id: milestone.id },
-        data: { status: MilestoneStatus.IN_REVISION },
-      });
-
       await tx.milestoneSubmission.update({
         where: { id: input.submissionId },
         data: { status: SubmissionStatus.REJECTED },
+      });
+
+      await executeMilestoneTransition({
+        milestoneId: milestone.id,
+        contractId: milestone.contractId,
+        actorId: client.id,
+        actorRole: UserRole.CLIENT,
+        targetStatus: MilestoneStatus.IN_REVISION,
+        action: 'REVISION_REQUESTED',
+        reason: input.reason,
+        metadata: {
+          submissionId: input.submissionId,
+          revisionId: createdRevision.id,
+        },
+        requestId: req.headers['x-request-id'] as string | undefined,
+        tx,
       });
 
       const escrow = await tx.escrowRecord.findUnique({
@@ -641,9 +754,19 @@ export async function approveMilestone(req: Request, res: Response): Promise<voi
     }
 
     const updated = await prisma.$transaction(async (tx) => {
-      const approvedMilestone = await tx.contractMilestone.update({
-        where: { id: milestone.id },
-        data: { status: MilestoneStatus.APPROVED },
+      const transitionRes = await executeMilestoneTransition({
+        milestoneId: milestone.id,
+        contractId: milestone.contractId,
+        actorId: client.id,
+        actorRole: client.role.name as UserRole,
+        targetStatus: MilestoneStatus.APPROVED,
+        action: 'MILESTONE_APPROVED',
+        reason: 'Client reviewed and approved milestone deliverable',
+        metadata: {
+          approvedSubmissionId: milestone.submissions[0]?.id,
+        },
+        requestId: req.headers['x-request-id'] as string | undefined,
+        tx,
       });
 
       if (milestone.submissions.length > 0) {
@@ -652,6 +775,8 @@ export async function approveMilestone(req: Request, res: Response): Promise<voi
           data: { status: SubmissionStatus.APPROVED },
         });
       }
+
+      const approvedMilestone = transitionRes.milestone;
 
       // Check all milestones to see if contract completed
       const allMilestones = await tx.contractMilestone.findMany({
@@ -771,9 +896,16 @@ export async function startMilestone(req: Request, res: Response): Promise<void>
     }
 
     const updated = await prisma.$transaction(async (tx) => {
-      const result = await tx.contractMilestone.update({
-        where: { id: milestone.id },
-        data: { status: MilestoneStatus.IN_PROGRESS },
+      const transitionRes = await executeMilestoneTransition({
+        milestoneId: milestone.id,
+        contractId: milestone.contractId,
+        actorId: worker.id,
+        actorRole: UserRole.WORKER,
+        targetStatus: MilestoneStatus.IN_PROGRESS,
+        action: 'MILESTONE_STARTED',
+        reason: 'Worker commenced development work',
+        requestId: req.headers['x-request-id'] as string | undefined,
+        tx,
       });
 
       await tx.notification.create({
@@ -786,7 +918,7 @@ export async function startMilestone(req: Request, res: Response): Promise<void>
         },
       });
 
-      return result;
+      return transitionRes.milestone;
     });
 
     await recordAuditLog({
@@ -951,6 +1083,12 @@ export async function acceptContract(req: Request, res: Response): Promise<void>
             },
           ],
         });
+
+        // Mark version snapshot as mutually accepted
+        await tx.contractVersion.updateMany({
+          where: { contractId: contract.id, version: contract.version },
+          data: { isAccepted: true },
+        });
       } else {
         // Notify the other party that this party has signed
         await tx.notification.create({
@@ -975,6 +1113,37 @@ export async function acceptContract(req: Request, res: Response): Promise<void>
       details: { version: result.version, method: input.acceptanceMethod, fullyActivated: result.fullyActivated },
       req,
     });
+
+    if (result.fullyActivated) {
+      try {
+        await projectsService.autoProvisionProjectForContract(id);
+      } catch (projErr) {
+        logger.warn('Project auto-provisioning warning:', projErr);
+      }
+
+      emitContractRealtimeEvent(
+        id,
+        'contract:activated',
+        {
+          contractId: id,
+          version: result.version,
+          activatedAt: new Date().toISOString(),
+        },
+        result.version,
+      );
+    } else {
+      emitContractRealtimeEvent(
+        id,
+        'contract:accepted',
+        {
+          contractId: id,
+          version: result.version,
+          acceptedBy: user.id,
+          role: user.role.name,
+        },
+        result.version,
+      );
+    }
 
     sendSuccess(res, 200, result);
   } catch (error: unknown) {
@@ -1145,6 +1314,66 @@ export async function downloadContractPdf(req: Request, res: Response): Promise<
     if (!isPrivileged && contract.clientId !== user.id && contract.workerId !== user.id) {
       sendError(res, 403, 'FORBIDDEN', 'Access denied to this contract document');
       return;
+    }
+
+    // Historical Version Support (?version=X)
+    const requestedVersion = req.query.version ? parseInt(String(req.query.version), 10) : undefined;
+    if (requestedVersion && requestedVersion !== contract.version) {
+      const historicalSnapshot = await prisma.contractVersion.findUnique({
+        where: {
+          contractId_version: {
+            contractId: contract.id,
+            version: requestedVersion,
+          },
+        },
+      });
+
+      if (historicalSnapshot) {
+        const milestones = (historicalSnapshot.milestonesSnapshot as Array<{
+          order: number;
+          title: string;
+          description: string;
+          amount: number | string;
+          dueDate?: string | null;
+        }>) || [];
+
+        streamContractPdf(res, {
+          contractNumber: contract.contractNumber,
+          title: historicalSnapshot.title,
+          description: historicalSnapshot.description,
+          scopeOfWork: historicalSnapshot.scopeOfWork,
+          termsAndConditions: historicalSnapshot.termsAndConditions,
+          cancellationTerms: historicalSnapshot.cancellationTerms,
+          revisionTerms: historicalSnapshot.revisionTerms,
+          version: historicalSnapshot.version,
+          totalAmount: Number(historicalSnapshot.totalAmount),
+          currency: historicalSnapshot.currency,
+          status: historicalSnapshot.isAccepted ? 'MUTUALLY_ACCEPTED' : 'HISTORICAL_VERSION',
+          startDate: contract.startDate,
+          endDate: contract.endDate,
+          client: contract.client,
+          worker: contract.worker,
+          milestones: milestones.map((m) => ({
+            order: m.order,
+            title: m.title,
+            description: m.description,
+            amount: Number(m.amount),
+            status: 'HISTORICAL',
+            dueDate: m.dueDate ? new Date(m.dueDate) : null,
+          })),
+          acceptances: contract.acceptances
+            .filter((a) => a.version === requestedVersion)
+            .map((a) => ({
+              role: a.role,
+              acceptedAt: a.acceptedAt,
+              acceptanceMethod: a.acceptanceMethod,
+              ipAddress: a.ipAddress,
+              documentHash: a.documentHash,
+              user: a.user,
+            })),
+        });
+        return;
+      }
     }
 
     // Verify document hash integrity if contract is ACTIVE or COMPLETED
@@ -1575,11 +1804,12 @@ export async function respondToAmendment(req: Request, res: Response): Promise<v
         })),
       });
 
-      // 3. Update contract record
+      // 3. Update contract record - transitions to PENDING_ACCEPTANCE requiring fresh bilateral sign-off
       const updatedContract = await tx.contract.update({
         where: { id: contract.id },
         data: {
           version: newVersion,
+          status: ContractStatus.PENDING_ACCEPTANCE,
           title: amendment.titleChange || contract.title,
           description: amendment.descriptionChange || contract.description,
           scopeOfWork: amendment.scopeChange || contract.scopeOfWork,
@@ -1600,26 +1830,31 @@ export async function respondToAmendment(req: Request, res: Response): Promise<v
         },
       });
 
-      // 5. Record fresh contract acceptances for both parties for this version
-      await tx.contractAcceptance.createMany({
-        data: [
-          {
-            contractId: contract.id,
-            userId: contract.clientId,
-            version: newVersion,
-            role: UserRole.CLIENT,
-            acceptanceMethod: 'AMENDMENT_MUTUAL_ACCEPTANCE',
-            documentHash: canonicalHash,
-          },
-          {
-            contractId: contract.id,
-            userId: contract.workerId,
-            version: newVersion,
-            role: UserRole.WORKER,
-            acceptanceMethod: 'AMENDMENT_MUTUAL_ACCEPTANCE',
-            documentHash: canonicalHash,
-          },
-        ],
+      // 5. Create immutable version snapshot for the new amended version (isAccepted: false)
+      await createContractVersionSnapshot({
+        contractId: contract.id,
+        version: newVersion,
+        title: updatedContract.title,
+        description: updatedContract.description,
+        totalAmount: updatedContract.totalAmount,
+        currency: updatedContract.currency,
+        scopeOfWork: updatedContract.scopeOfWork,
+        termsAndConditions: updatedContract.termsAndConditions,
+        cancellationTerms: updatedContract.cancellationTerms,
+        revisionTerms: updatedContract.revisionTerms,
+        documentHash: canonicalHash,
+        milestones: (updatedContractForHash?.milestones || contract.milestones).map((m) => ({
+          order: m.order,
+          title: m.title,
+          description: m.description,
+          amount: m.amount,
+          dueDate: m.dueDate,
+        })),
+        versionReason: `Amendment #${amendment.amendmentNumber}: ${amendment.reason}`,
+        createdById: amendment.proposedById,
+        contractStatusAtCreation: ContractStatus.PENDING_ACCEPTANCE,
+        isAccepted: false,
+        tx,
       });
 
       // 6. Log EscrowActivity
@@ -1631,7 +1866,7 @@ export async function respondToAmendment(req: Request, res: Response): Promise<v
             operationalState: contract.escrowRecord.operationalState,
             previousState: contract.escrowRecord.operationalState,
             eventType: 'CONTRACT_AMENDMENT_APPLIED',
-            description: `Contract #${contract.contractNumber} successfully amended to version ${newVersion} with mutual agreement. Hash verified.`,
+            description: `Contract #${contract.contractNumber} successfully amended to version ${newVersion} with mutual agreement. Fresh mutual acceptance required. Hash verified.`,
             metadata: {
               amendmentId: amendment.id,
               amendmentNumber: amendment.amendmentNumber,
@@ -1643,28 +1878,40 @@ export async function respondToAmendment(req: Request, res: Response): Promise<v
         });
       }
 
-      // 7. Notify both parties
+      // 7. Notify both parties: Fresh acceptance required before milestones resume
       await tx.notification.createMany({
         data: [
           {
             recipientId: contract.clientId,
             title: `Amendment Accepted: Contract v${newVersion}`,
-            message: `Contract #${contract.contractNumber} has been updated to version ${newVersion} following mutual acceptance.`,
+            message: `Contract #${contract.contractNumber} has been updated to version ${newVersion}. Fresh mutual acceptance is required before milestones can progress.`,
             type: NotificationType.AMENDMENT_ACCEPTED,
             metadata: { contractId: contract.id, version: newVersion },
           },
           {
             recipientId: contract.workerId,
             title: `Amendment Accepted: Contract v${newVersion}`,
-            message: `Contract #${contract.contractNumber} has been updated to version ${newVersion} following mutual acceptance.`,
+            message: `Contract #${contract.contractNumber} has been updated to version ${newVersion}. Fresh mutual acceptance is required before milestones can progress.`,
             type: NotificationType.AMENDMENT_ACCEPTED,
             metadata: { contractId: contract.id, version: newVersion },
           },
         ],
       });
 
-      return { updatedContract, updatedAmendment };
+      return { updatedContract, updatedAmendment, newVersion, canonicalHash };
     });
+
+    emitContractRealtimeEvent(
+      contract.id,
+      'contract:fresh_acceptance_required',
+      {
+        contractId: contract.id,
+        version: result.newVersion,
+        canonicalHash: result.canonicalHash,
+        amendmentId: amendment.id,
+      },
+      result.newVersion,
+    );
 
     sendSuccess(res, 200, {
       ...result.updatedAmendment,
@@ -1960,5 +2207,66 @@ export async function respondToTermination(req: Request, res: Response): Promise
     sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Failed to process termination response');
   }
 }
+
+/**
+ * Lists all immutable version snapshots of a contract.
+ */
+export async function getContractVersions(req: Request, res: Response): Promise<void> {
+  const { id } = req.params;
+  const user = req.user!;
+  try {
+    const versions = await listContractVersions(id, user.id, user.role.name as UserRole);
+    sendSuccess(res, 200, versions);
+  } catch (error: unknown) {
+    const err = error as { statusCode?: number; code?: string; message?: string };
+    if (err?.statusCode) {
+      sendError(res, err.statusCode, err.code || 'ERROR', err.message || 'Operation failed');
+      return;
+    }
+    logger.error('Error fetching contract versions:', error);
+    sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Failed to fetch contract versions');
+  }
+}
+
+/**
+ * Executes authoritative cryptographic integrity verification of contract terms.
+ */
+export async function verifyContractIntegrityHandler(req: Request, res: Response): Promise<void> {
+  const { id } = req.params;
+  const user = req.user!;
+  try {
+    const report = await verifyContractIntegrity(id, user.id, user.role.name as UserRole);
+    sendSuccess(res, 200, report);
+  } catch (error: unknown) {
+    const err = error as { statusCode?: number; code?: string; message?: string };
+    if (err?.statusCode) {
+      sendError(res, err.statusCode, err.code || 'ERROR', err.message || 'Operation failed');
+      return;
+    }
+    logger.error('Error verifying contract integrity:', error);
+    sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Failed to audit contract integrity');
+  }
+}
+
+/**
+ * Returns chronological activity history for a contract.
+ */
+export async function getContractActivityHistoryHandler(req: Request, res: Response): Promise<void> {
+  const { id } = req.params;
+  const user = req.user!;
+  try {
+    const history = await getContractActivityHistory(id, user.id, user.role.name as UserRole);
+    sendSuccess(res, 200, history);
+  } catch (error: unknown) {
+    const err = error as { statusCode?: number; code?: string; message?: string };
+    if (err?.statusCode) {
+      sendError(res, err.statusCode, err.code || 'ERROR', err.message || 'Operation failed');
+      return;
+    }
+    logger.error('Error fetching contract activity history:', error);
+    sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Failed to fetch contract activity history');
+  }
+}
+
 
 

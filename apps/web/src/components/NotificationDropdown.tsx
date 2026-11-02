@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { apiService } from '../services/api';
 import { NotificationDto } from '@trustpay/shared';
+import { io, Socket } from 'socket.io-client';
 
 export const NotificationDropdown: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -37,6 +38,27 @@ export const NotificationDropdown: React.FC = () => {
     const interval = setInterval(fetchNotifications, 20000); // Poll every 20s
     return () => clearInterval(interval);
   }, [fetchNotifications]);
+
+  // Real-time Socket.IO notification listener
+  useEffect(() => {
+    const socketServerUrl = import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http://localhost:5000';
+    let socket: Socket | null = null;
+    try {
+      socket = io(socketServerUrl, {
+        transports: ['websocket', 'polling'],
+      });
+      socket.on('notification:new', (notif: NotificationDto) => {
+        setNotifications((prev) => [notif, ...prev.filter((n) => n.id !== notif.id)]);
+        setUnreadCount((c) => c + 1);
+      });
+    } catch {
+      // Background fallback to polling
+    }
+
+    return () => {
+      socket?.disconnect();
+    };
+  }, []);
 
   // Click outside listener
   useEffect(() => {

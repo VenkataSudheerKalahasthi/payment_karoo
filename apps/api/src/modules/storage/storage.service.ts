@@ -155,7 +155,7 @@ export class StorageService {
   }
 
   /**
-   * Validates a signed download token.
+   * Validates a signed download token using timing-safe verification.
    */
   verifyDownloadToken(token: string): { userId: string; objectPath: string } {
     try {
@@ -163,7 +163,10 @@ export class StorageService {
       const { payload, signature } = decoded;
 
       const expectedSig = crypto.createHmac('sha256', STORAGE_SECRET).update(payload).digest('hex');
-      if (signature !== expectedSig) {
+      const sigBuf = Buffer.from(signature, 'hex');
+      const expBuf = Buffer.from(expectedSig, 'hex');
+
+      if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
         throw new Error('Invalid signature');
       }
 
@@ -180,6 +183,39 @@ export class StorageService {
         statusCode: 401,
         code: 'INVALID_DOWNLOAD_TOKEN',
         message: 'Signed download token is invalid or has expired.',
+      };
+    }
+  }
+
+  /**
+   * Validates a signed upload token using timing-safe verification.
+   */
+  verifyUploadToken(token: string): { userId: string; bucket: string; objectPath: string } {
+    try {
+      const decoded = JSON.parse(Buffer.from(token, 'base64url').toString('utf-8'));
+      const { payload, signature } = decoded;
+
+      const expectedSig = crypto.createHmac('sha256', STORAGE_SECRET).update(payload).digest('hex');
+      const sigBuf = Buffer.from(signature, 'hex');
+      const expBuf = Buffer.from(expectedSig, 'hex');
+
+      if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
+        throw new Error('Invalid signature');
+      }
+
+      const [userId, bucket, objectPath, expiresAtStr] = payload.split(':');
+      const expiresAt = parseInt(expiresAtStr, 10);
+
+      if (Date.now() > expiresAt) {
+        throw new Error('Upload token expired');
+      }
+
+      return { userId, bucket, objectPath };
+    } catch {
+      throw {
+        statusCode: 401,
+        code: 'INVALID_UPLOAD_TOKEN',
+        message: 'Signed upload token is invalid or has expired.',
       };
     }
   }

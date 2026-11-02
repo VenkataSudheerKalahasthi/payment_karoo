@@ -17,6 +17,9 @@ import {
   proposeTermination,
   listTerminationRequests,
   respondToTermination,
+  getContractVersions,
+  verifyContractIntegrityHandler,
+  getContractActivityHistoryHandler,
 } from './contracts.controller.js';
 import { authenticateUser, requireRole } from '../../middleware/auth.js';
 import { validateRequest } from '../../middleware/validate.js';
@@ -46,6 +49,15 @@ contractsRoutes.get('/', authenticateUser(), listContracts);
 
 // Download professional contract PDF (Client, Worker or Admin)
 contractsRoutes.get('/:id/pdf', authenticateUser(), downloadContractPdf);
+
+// Get immutable contract version snapshots (Client, Worker, Admin, Superadmin)
+contractsRoutes.get('/:id/versions', authenticateUser(), getContractVersions);
+
+// Perform authoritative cryptographic contract integrity verification
+contractsRoutes.get('/:id/integrity', authenticateUser(), verifyContractIntegrityHandler);
+
+// Get complete chronological contract activity history (Audit trail)
+contractsRoutes.get('/:id/activity-history', authenticateUser(), getContractActivityHistoryHandler);
 
 // Get single contract with milestones & submissions (Strict ownership check in controller)
 contractsRoutes.get('/:id', authenticateUser(), getContractById);

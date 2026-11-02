@@ -14,7 +14,11 @@ import {
 import {
   CreateHiringRequestInput,
   RespondHiringRequestInput,
+  CounterofferHiringRequestInput,
 } from './hiring-requests.schema.js';
+import { computeCanonicalContractHash } from '../contracts/contract-pdf.service.js';
+import { createContractVersionSnapshot } from '../contracts/contract-version.service.js';
+import { emitContractRealtimeEvent } from '../realtime/socket.service.js';
 
 /**
  * Create a new hiring request (Client only).
@@ -242,13 +246,25 @@ export async function respondHiringRequest(req: Request, res: Response): Promise
     }
 
     const updated = await prisma.$transaction(async (tx) => {
+      const updateData: Record<string, unknown> = {
+        status: input.status,
+        workerResponse: input.workerResponse,
+        respondedAt: new Date(),
+      };
+
+      if (input.proposedBudget !== undefined) {
+        updateData.proposedBudget = input.proposedBudget;
+      }
+      if (input.proposedStartDate !== undefined) {
+        updateData.proposedStartDate = input.proposedStartDate ? new Date(input.proposedStartDate) : null;
+      }
+      if (input.expectedCompletionDate !== undefined) {
+        updateData.expectedCompletionDate = input.expectedCompletionDate ? new Date(input.expectedCompletionDate) : null;
+      }
+
       const result = await tx.hiringRequest.update({
         where: { id },
-        data: {
-          status: input.status,
-          workerResponse: input.workerResponse,
-          respondedAt: new Date(),
-        },
+        data: updateData,
         include: {
           client: { select: { id: true, firstName: true, email: true } },
           worker: { select: { id: true, firstName: true, email: true } },
@@ -356,6 +372,88 @@ export async function withdrawHiringRequest(req: Request, res: Response): Promis
 }
 
 /**
+ * Client submits a counteroffer / revised terms during negotiation.
+ */
+export async function counterofferHiringRequest(req: Request, res: Response): Promise<void> {
+  const { id } = req.params;
+  const client = req.user!;
+  const input = req.body as CounterofferHiringRequestInput;
+
+  try {
+    const request = await prisma.hiringRequest.findUnique({
+      where: { id },
+    });
+
+    if (!request) {
+      sendError(res, 404, 'NOT_FOUND', 'Hiring request not found');
+      return;
+    }
+
+    if (request.clientId !== client.id) {
+      sendError(res, 403, 'FORBIDDEN', 'Only the hiring client can propose counteroffers');
+      return;
+    }
+
+    if (request.status !== HiringRequestStatus.NEGOTIATION && request.status !== HiringRequestStatus.PENDING) {
+      sendError(res, 400, 'INVALID_STATE', `Counteroffer can only be submitted for requests in negotiation or pending status (current: ${request.status})`);
+      return;
+    }
+
+    const updated = await prisma.$transaction(async (tx) => {
+      const updateData: Prisma.HiringRequestUpdateInput = {
+        status: HiringRequestStatus.PENDING,
+        clientMessage: input.clientMessage,
+      };
+
+      if (input.proposedBudget) {
+        updateData.proposedBudget = new Prisma.Decimal(input.proposedBudget);
+      }
+      if (input.proposedStartDate !== undefined) {
+        updateData.proposedStartDate = input.proposedStartDate ? new Date(input.proposedStartDate) : null;
+      }
+      if (input.expectedCompletionDate !== undefined) {
+        updateData.expectedCompletionDate = input.expectedCompletionDate ? new Date(input.expectedCompletionDate) : null;
+      }
+
+      const result = await tx.hiringRequest.update({
+        where: { id },
+        data: updateData,
+        include: {
+          client: { select: { id: true, firstName: true, email: true } },
+          worker: { select: { id: true, firstName: true, email: true } },
+        },
+      });
+
+      await tx.notification.create({
+        data: {
+          recipientId: request.workerId,
+          title: 'Hiring Proposal Terms Updated',
+          message: `${client.firstName || client.email} submitted a counteroffer for "${request.title}" (${input.proposedBudget ? `$${input.proposedBudget}` : ''}).`,
+          type: NotificationType.HIRING_REQUEST_RECEIVED,
+          metadata: { hiringRequestId: request.id, counteroffer: input.clientMessage },
+        },
+      });
+
+      return result;
+    });
+
+    await recordAuditLog({
+      actorId: client.id,
+      action: 'HIRING_REQUEST_COUNTEROFFER_SUBMITTED',
+      resource: 'HiringRequest',
+      resourceId: request.id,
+      details: { proposedBudget: input.proposedBudget, message: input.clientMessage },
+      req,
+    });
+
+    sendSuccess(res, 200, updated);
+  } catch (error) {
+    logger.error('Error submitting counteroffer:', error);
+    sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Failed to submit counteroffer');
+  }
+}
+
+/**
  * Convert an accepted hiring request into a digital contract draft.
  */
 export async function convertToContract(req: Request, res: Response): Promise<void> {
@@ -392,6 +490,28 @@ export async function convertToContract(req: Request, res: Response): Promise<vo
     const randomSuffix = Math.floor(1000 + Math.random() * 9000).toString();
     const contractNumber = `TP-${dateStr}-${randomSuffix}`;
 
+    const canonicalDocHash = computeCanonicalContractHash({
+      contractNumber,
+      version: 1,
+      title: request.title,
+      totalAmount: Number(request.proposedBudget),
+      currency: request.currency,
+      clientId: request.clientId,
+      workerId: request.workerId,
+      scopeOfWork: request.description,
+      termsAndConditions: 'Standard TrustPay Digital Escrow Agreement terms and milestones delivery policy.',
+      cancellationTerms: 'Cancellation permitted prior to activation, or by mutual consent/arbitration when active.',
+      revisionTerms: 'Standard revision terms apply.',
+      milestones: [
+        {
+          order: 1,
+          title: `${request.title} - Full Deliverable`,
+          description: request.description,
+          amount: Number(request.proposedBudget),
+        },
+      ],
+    });
+
     const contract = await prisma.$transaction(async (tx) => {
       const createdContract = await tx.contract.create({
         data: {
@@ -402,12 +522,15 @@ export async function convertToContract(req: Request, res: Response): Promise<vo
           workerId: request.workerId,
           status: ContractStatus.PENDING_ACCEPTANCE,
           version: 1,
+          documentHash: canonicalDocHash,
           totalAmount: request.proposedBudget,
           currency: request.currency,
           scopeOfWork: request.description,
           startDate: request.proposedStartDate,
           endDate: request.expectedCompletionDate,
           termsAndConditions: 'Standard TrustPay Digital Escrow Agreement terms and milestones delivery policy.',
+          cancellationTerms: 'Cancellation permitted prior to activation, or by mutual consent/arbitration when active.',
+          revisionTerms: 'Standard revision terms apply.',
           milestones: {
             create: [
               {
@@ -426,6 +549,35 @@ export async function convertToContract(req: Request, res: Response): Promise<vo
           client: { select: { id: true, firstName: true, email: true } },
           worker: { select: { id: true, firstName: true, email: true } },
         },
+      });
+
+      // Create immutable version 1 snapshot
+      await createContractVersionSnapshot({
+        contractId: createdContract.id,
+        version: 1,
+        title: createdContract.title,
+        description: createdContract.description,
+        totalAmount: createdContract.totalAmount,
+        currency: createdContract.currency,
+        scopeOfWork: createdContract.scopeOfWork,
+        termsAndConditions: createdContract.termsAndConditions,
+        cancellationTerms: createdContract.cancellationTerms,
+        revisionTerms: createdContract.revisionTerms,
+        documentHash: canonicalDocHash,
+        milestones: [
+          {
+            order: 1,
+            title: `${request.title} - Full Deliverable`,
+            description: request.description,
+            amount: request.proposedBudget,
+            dueDate: request.expectedCompletionDate,
+          },
+        ],
+        versionReason: 'CONVERTED_FROM_HIRING_REQUEST',
+        createdById: request.clientId,
+        contractStatusAtCreation: ContractStatus.PENDING_ACCEPTANCE,
+        isAccepted: false,
+        tx,
       });
 
       // Link contract back to hiring request

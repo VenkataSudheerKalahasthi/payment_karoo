@@ -9,7 +9,6 @@ import {
   DisputeStatus,
   DisputeResolutionType,
   DisputeResolutionStatus,
-  AmendmentStatus,
   TerminationStatus,
   EscrowOperationalState,
   EscrowStatus,
@@ -125,6 +124,7 @@ describe('Phase 7: End-to-End Platform Integration & Verification', () => {
 
       // Step 7: Client reviews and requests revision
       const revisionReason = 'Please ensure responsive tablet view is verified.';
+      expect(revisionReason).toBeDefined();
       const milestone1InRevision = {
         ...milestone1Submitted,
         status: MilestoneStatus.IN_REVISION,
@@ -138,6 +138,7 @@ describe('Phase 7: End-to-End Platform Integration & Verification', () => {
         status: SubmissionStatus.SUBMITTED,
         notes: 'Responsive tablet view verified with test evidence.',
       };
+      expect(submission2.status).toBe(SubmissionStatus.SUBMITTED);
       const milestone1Resubmitted = {
         ...milestone1InRevision,
         status: MilestoneStatus.SUBMITTED,
@@ -353,6 +354,7 @@ describe('Phase 7: End-to-End Platform Integration & Verification', () => {
         disputeId: 'dsp-1',
         note: 'Internal compliance verification passed.',
       };
+      expect(internalNote.id).toBe('note-secret-1');
 
       const rolesToTest = [
         { role: UserRole.CLIENT, canView: false },

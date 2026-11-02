@@ -72,6 +72,10 @@ export async function getDashboardMetrics(req: Request, res: Response): Promise<
         pendingHiringRequests,
         pendingMilestones,
         openDisputes,
+        clientProjectSum,
+        clientApprovedSum,
+        clientPendingMilestonesSum,
+        clientDisputedSum,
       ] = await Promise.all([
         prisma.contract.count({ where: { clientId: user.id } }),
         prisma.contract.count({ where: { clientId: user.id, status: ContractStatus.ACTIVE } }),
@@ -90,6 +94,25 @@ export async function getDashboardMetrics(req: Request, res: Response): Promise<
             status: { notIn: ['RESOLVED', 'CLOSED', 'WITHDRAWN'] },
           },
         }),
+        prisma.contract.aggregate({
+          where: { clientId: user.id, status: { in: [ContractStatus.ACTIVE, ContractStatus.COMPLETED] } },
+          _sum: { totalAmount: true },
+        }),
+        prisma.contractMilestone.aggregate({
+          where: { contract: { clientId: user.id }, status: MilestoneStatus.APPROVED },
+          _sum: { amount: true },
+        }),
+        prisma.contractMilestone.aggregate({
+          where: {
+            contract: { clientId: user.id, status: ContractStatus.ACTIVE },
+            status: { in: [MilestoneStatus.PENDING, MilestoneStatus.IN_PROGRESS, MilestoneStatus.SUBMITTED, MilestoneStatus.IN_REVISION] },
+          },
+          _sum: { amount: true },
+        }),
+        prisma.contract.aggregate({
+          where: { clientId: user.id, status: ContractStatus.DISPUTED },
+          _sum: { totalAmount: true },
+        }),
       ]);
 
       sendSuccess(res, 200, {
@@ -101,6 +124,10 @@ export async function getDashboardMetrics(req: Request, res: Response): Promise<
         pendingHiringRequests,
         pendingMilestones,
         openDisputes,
+        totalProjectValue: clientProjectSum._sum.totalAmount ? Number(clientProjectSum._sum.totalAmount) : 0,
+        approvedMilestoneAmount: clientApprovedSum._sum.amount ? Number(clientApprovedSum._sum.amount) : 0,
+        pendingMilestoneAmount: clientPendingMilestonesSum._sum.amount ? Number(clientPendingMilestonesSum._sum.amount) : 0,
+        disputedMilestoneAmount: clientDisputedSum._sum.totalAmount ? Number(clientDisputedSum._sum.totalAmount) : 0,
         unreadNotifications,
         recentActivities: recentNotifications.map((n) => ({
           id: n.id,
@@ -123,6 +150,10 @@ export async function getDashboardMetrics(req: Request, res: Response): Promise<
       pendingMilestones,
       openDisputes,
       revisionRequests,
+      workerProjectSum,
+      workerApprovedSum,
+      workerPendingMilestonesSum,
+      workerDisputedSum,
     ] = await Promise.all([
       prisma.contract.count({ where: { workerId: user.id } }),
       prisma.contract.count({ where: { workerId: user.id, status: ContractStatus.ACTIVE } }),
@@ -147,6 +178,25 @@ export async function getDashboardMetrics(req: Request, res: Response): Promise<
           status: MilestoneStatus.IN_REVISION,
         },
       }),
+      prisma.contract.aggregate({
+        where: { workerId: user.id, status: { in: [ContractStatus.ACTIVE, ContractStatus.COMPLETED] } },
+        _sum: { totalAmount: true },
+      }),
+      prisma.contractMilestone.aggregate({
+        where: { contract: { workerId: user.id }, status: MilestoneStatus.APPROVED },
+        _sum: { amount: true },
+      }),
+      prisma.contractMilestone.aggregate({
+        where: {
+          contract: { workerId: user.id, status: ContractStatus.ACTIVE },
+          status: { in: [MilestoneStatus.PENDING, MilestoneStatus.IN_PROGRESS, MilestoneStatus.SUBMITTED, MilestoneStatus.IN_REVISION] },
+        },
+        _sum: { amount: true },
+      }),
+      prisma.contract.aggregate({
+        where: { workerId: user.id, status: ContractStatus.DISPUTED },
+        _sum: { totalAmount: true },
+      }),
     ]);
 
     sendSuccess(res, 200, {
@@ -159,6 +209,10 @@ export async function getDashboardMetrics(req: Request, res: Response): Promise<
       pendingMilestones,
       openDisputes,
       revisionRequests,
+      totalProjectValue: workerProjectSum._sum.totalAmount ? Number(workerProjectSum._sum.totalAmount) : 0,
+      approvedMilestoneAmount: workerApprovedSum._sum.amount ? Number(workerApprovedSum._sum.amount) : 0,
+      pendingMilestoneAmount: workerPendingMilestonesSum._sum.amount ? Number(workerPendingMilestonesSum._sum.amount) : 0,
+      disputedMilestoneAmount: workerDisputedSum._sum.totalAmount ? Number(workerDisputedSum._sum.totalAmount) : 0,
       unreadNotifications,
       recentActivities: recentNotifications.map((n) => ({
         id: n.id,

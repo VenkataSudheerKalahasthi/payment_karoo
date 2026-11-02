@@ -1,4 +1,7 @@
-import { ContractStatus, UserRole } from '@prisma/client';
+import { ContractStatus, UserRole, NotificationType, Prisma } from '@prisma/client';
+import { prisma } from '../../config/prisma.js';
+import { emitContractRealtimeEvent } from '../realtime/socket.service.js';
+import { recordAuditLog } from '../../utils/audit.js';
 
 export interface StateTransitionContext {
   currentStatus: ContractStatus;
@@ -8,6 +11,7 @@ export interface StateTransitionContext {
   workerId: string;
   userRole: UserRole;
   allMilestonesApproved: boolean;
+  isMutualTermination?: boolean;
 }
 
 export interface TransitionValidationResult {
@@ -20,7 +24,7 @@ export interface TransitionValidationResult {
  * Prevents unauthorized or invalid lifecycle mutations.
  */
 export function validateContractTransition(ctx: StateTransitionContext): TransitionValidationResult {
-  const { currentStatus, targetStatus, userId, clientId, workerId, userRole, allMilestonesApproved } = ctx;
+  const { currentStatus, targetStatus, userId, clientId, workerId, userRole, allMilestonesApproved, isMutualTermination } = ctx;
   const isPrivileged = userRole === UserRole.ADMIN || userRole === UserRole.SUPERADMIN;
   const isClient = userId === clientId;
   const isWorker = userId === workerId;
@@ -66,8 +70,8 @@ export function validateContractTransition(ctx: StateTransitionContext): Transit
 
     case ContractStatus.PENDING_ACCEPTANCE:
       if (targetStatus === ContractStatus.ACTIVE) {
-        if (!isWorker && !isPrivileged) {
-          return { allowed: false, reason: 'Only the assigned worker can accept and activate the agreement.' };
+        if (!isWorker && !isClient && !isPrivileged) {
+          return { allowed: false, reason: 'Only authorized contract participants can activate the agreement upon mutual acceptance.' };
         }
         return { allowed: true };
       }
@@ -86,6 +90,13 @@ export function validateContractTransition(ctx: StateTransitionContext): Transit
         }
         return { allowed: true };
       }
+      if (targetStatus === ContractStatus.PENDING_ACCEPTANCE) {
+        // Occurs when an amendment is proposed/executed requiring fresh bilateral acceptance
+        if (!isClient && !isWorker && !isPrivileged) {
+          return { allowed: false, reason: 'Only contract participants or administrators can place an active contract into pending acceptance for amendments.' };
+        }
+        return { allowed: true };
+      }
       if (targetStatus === ContractStatus.COMPLETED) {
         if (!isClient && !isPrivileged) {
           return { allowed: false, reason: 'Only the client or administrator can approve final completion.' };
@@ -96,8 +107,8 @@ export function validateContractTransition(ctx: StateTransitionContext): Transit
         return { allowed: true };
       }
       if (targetStatus === ContractStatus.CANCELLED) {
-        if (!isPrivileged) {
-          return { allowed: false, reason: 'Active contracts with allocated milestones require administrative arbitration to cancel.' };
+        if (!isPrivileged && !isMutualTermination) {
+          return { allowed: false, reason: 'Active contracts with allocated milestones require administrative arbitration or bilateral mutual termination.' };
         }
         return { allowed: true };
       }
@@ -122,3 +133,107 @@ export function validateContractTransition(ctx: StateTransitionContext): Transit
   }
 }
 
+/**
+ * Centralized service function executing a validated contract state transition,
+ * persisting the change, creating audit logs, notifying participants, and emitting real-time events.
+ */
+export async function executeContractTransition(params: {
+  contractId: string;
+  targetStatus: ContractStatus;
+  userId: string;
+  userRole: UserRole;
+  reason: string;
+  isMutualTermination?: boolean;
+  tx?: Prisma.TransactionClient;
+}) {
+  const { contractId, targetStatus, userId, userRole, reason, isMutualTermination, tx } = params;
+  const db = tx || prisma;
+
+  const contract = await db.contract.findUnique({
+    where: { id: contractId },
+    include: {
+      milestones: true,
+      client: { select: { id: true, firstName: true, email: true } },
+      worker: { select: { id: true, firstName: true, email: true } },
+    },
+  });
+
+  if (!contract) {
+    throw { statusCode: 404, code: 'NOT_FOUND', message: 'Contract not found' };
+  }
+
+  const allMilestonesApproved =
+    contract.milestones.length > 0 &&
+    contract.milestones.every((m) => m.status === 'APPROVED');
+
+  const validation = validateContractTransition({
+    currentStatus: contract.status,
+    targetStatus,
+    userId,
+    clientId: contract.clientId,
+    workerId: contract.workerId,
+    userRole,
+    allMilestonesApproved,
+    isMutualTermination,
+  });
+
+  if (!validation.allowed) {
+    throw {
+      statusCode: 400,
+      code: 'INVALID_TRANSITION',
+      message: validation.reason || `Transition from ${contract.status} to ${targetStatus} is prohibited`,
+    };
+  }
+
+  const updatedContract = await db.contract.update({
+    where: { id: contractId },
+    data: { status: targetStatus },
+    include: {
+      milestones: { orderBy: { order: 'asc' } },
+      client: { select: { id: true, firstName: true, email: true } },
+      worker: { select: { id: true, firstName: true, email: true } },
+    },
+  });
+
+  // Emit Real-time event
+  emitContractRealtimeEvent(
+    contractId,
+    'contract:status_updated',
+    {
+      contractId,
+      previousStatus: contract.status,
+      newStatus: targetStatus,
+      reason,
+      updatedBy: userId,
+    },
+    contract.version,
+  );
+
+  // Notify Counterparty
+  const otherPartyId = userId === contract.clientId ? contract.workerId : contract.clientId;
+  await db.notification.create({
+    data: {
+      recipientId: otherPartyId,
+      title: `Contract Status Updated: ${targetStatus}`,
+      message: `Contract #${contract.contractNumber} (${contract.title}) status changed from ${contract.status} to ${targetStatus}. Reason: ${reason}`,
+      type: NotificationType.CONTRACT_UPDATE,
+      metadata: { contractId, previousStatus: contract.status, newStatus: targetStatus },
+    },
+  });
+
+  // Record Audit Log
+  await recordAuditLog({
+    actorId: userId,
+    action: `CONTRACT_STATUS_TRANSITION_${targetStatus}`,
+    resource: 'Contract',
+    resourceId: contractId,
+    details: {
+      previousStatus: contract.status,
+      newStatus: targetStatus,
+      reason,
+      version: contract.version,
+    },
+  });
+
+  return updatedContract;
+}

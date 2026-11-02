@@ -6,12 +6,14 @@ import {
   respondHiringRequest,
   withdrawHiringRequest,
   convertToContract,
+  counterofferHiringRequest,
 } from './hiring-requests.controller.js';
 import { authenticateUser, requireRole } from '../../middleware/auth.js';
 import { validateRequest } from '../../middleware/validate.js';
 import {
   createHiringRequestSchema,
   respondHiringRequestSchema,
+  counterofferHiringRequestSchema,
 } from './hiring-requests.schema.js';
 import { UserRole } from '@prisma/client';
 
@@ -39,6 +41,15 @@ hiringRequestsRoutes.patch(
   requireRole(UserRole.WORKER),
   validateRequest({ body: respondHiringRequestSchema }),
   respondHiringRequest,
+);
+
+// Client proposes counteroffer / renegotiated terms
+hiringRequestsRoutes.patch(
+  '/:id/counteroffer',
+  authenticateUser(),
+  requireRole(UserRole.CLIENT),
+  validateRequest({ body: counterofferHiringRequestSchema }),
+  counterofferHiringRequest,
 );
 
 // Client withdraws pending hiring request

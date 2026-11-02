@@ -5,6 +5,9 @@ import {
   DatabaseHealthStatus,
   UserDto,
   ContractDto,
+  ContractVersionDto,
+  ContractIntegrityReportDto,
+  ContractActivityHistoryDto,
   WorkerProfileDto,
   NotificationDto,
   HiringRequestDto,
@@ -18,6 +21,7 @@ import {
   CreateRevisionRequest,
   CreateHiringRequestRequest,
   RespondHiringRequestRequest,
+  CounterofferHiringRequestRequest,
   CreateShortlistRequest,
   AddWorkerSkillRequest,
   CreatePortfolioItemRequest,
@@ -38,6 +42,10 @@ import {
   ProposeTerminationRequest,
   RespondToTerminationRequest,
   EscrowActivityDto,
+  ProjectDto,
+  MilestoneActivityDto,
+  ProjectProgressSummaryDto,
+  CreateProjectRequest,
 } from '@trustpay/shared';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
@@ -57,10 +65,16 @@ export const setAuthTokenGetter = (getter: () => Promise<string | null>) => {
 };
 
 apiClient.interceptors.request.use(async (config) => {
+  if (config.headers?.Authorization) {
+    return config;
+  }
   if (tokenGetter) {
     try {
       const token = await tokenGetter();
       if (token) {
+        if (typeof config.headers?.set === 'function') {
+          config.headers.set('Authorization', `Bearer ${token}`);
+        }
         config.headers.Authorization = `Bearer ${token}`;
       }
     } catch {
@@ -97,14 +111,53 @@ export const apiService = {
   },
 
   // Authentication & Synchronization
-  syncUser: async (role?: 'CLIENT' | 'WORKER'): Promise<ApiResponse<UserDto>> => {
-    const res = await apiClient.post<ApiResponse<UserDto>>('/auth/sync', { role });
-    return res.data;
+  syncUser: async (
+    data: {
+      role?: 'CLIENT' | 'WORKER';
+      email?: string;
+      firstName?: string;
+      lastName?: string;
+      avatarUrl?: string;
+    },
+    token?: string,
+  ): Promise<ApiResponse<UserDto>> => {
+    try {
+      const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
+      const res = await apiClient.post<ApiResponse<UserDto>>('/auth/sync', data, { headers });
+      return res.data;
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err) && err.response) {
+        return err.response.data as ApiResponse<UserDto>;
+      }
+      return {
+        success: false,
+        error: {
+          code: 'SYNC_ERROR',
+          message: err instanceof Error ? err.message : 'Failed to synchronize account credentials',
+        },
+        timestamp: new Date().toISOString(),
+      };
+    }
   },
 
-  getCurrentUser: async (): Promise<ApiResponse<UserDto>> => {
-    const res = await apiClient.get<ApiResponse<UserDto>>('/auth/me');
-    return res.data;
+  getCurrentUser: async (token?: string): Promise<ApiResponse<UserDto>> => {
+    try {
+      const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
+      const res = await apiClient.get<ApiResponse<UserDto>>('/auth/me', { headers });
+      return res.data;
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err) && err.response) {
+        return err.response.data as ApiResponse<UserDto>;
+      }
+      return {
+        success: false,
+        error: {
+          code: 'AUTH_ERROR',
+          message: err instanceof Error ? err.message : 'User session verification failed',
+        },
+        timestamp: new Date().toISOString(),
+      };
+    }
   },
 
   logout: async (): Promise<ApiResponse<{ message: string }>> => {
@@ -165,6 +218,11 @@ export const apiService = {
     return res.data;
   },
 
+  updatePortfolioItem: async (id: string, data: Partial<CreatePortfolioItemRequest>): Promise<ApiResponse<unknown>> => {
+    const res = await apiClient.put<ApiResponse<unknown>>(`/workers/me/portfolio/${id}`, data);
+    return res.data;
+  },
+
   deletePortfolioItem: async (id: string): Promise<ApiResponse<unknown>> => {
     const res = await apiClient.delete<ApiResponse<unknown>>(`/workers/me/portfolio/${id}`);
     return res.data;
@@ -218,6 +276,17 @@ export const apiService = {
     return res.data;
   },
 
+  counterofferHiringRequest: async (
+    id: string,
+    data: CounterofferHiringRequestRequest,
+  ): Promise<ApiResponse<HiringRequestDto>> => {
+    const res = await apiClient.patch<ApiResponse<HiringRequestDto>>(
+      `/hiring-requests/${id}/counteroffer`,
+      data,
+    );
+    return res.data;
+  },
+
   convertHiringRequestToContract: async (id: string): Promise<ApiResponse<ContractDto>> => {
     const res = await apiClient.post<ApiResponse<ContractDto>>(`/hiring-requests/${id}/convert-to-contract`);
     return res.data;
@@ -236,6 +305,21 @@ export const apiService = {
 
   getContract: async (id: string): Promise<ApiResponse<ContractDto>> => {
     const res = await apiClient.get<ApiResponse<ContractDto>>(`/contracts/${id}`);
+    return res.data;
+  },
+
+  getContractVersions: async (id: string): Promise<ApiResponse<ContractVersionDto[]>> => {
+    const res = await apiClient.get<ApiResponse<ContractVersionDto[]>>(`/contracts/${id}/versions`);
+    return res.data;
+  },
+
+  verifyContractIntegrity: async (id: string): Promise<ApiResponse<ContractIntegrityReportDto>> => {
+    const res = await apiClient.get<ApiResponse<ContractIntegrityReportDto>>(`/contracts/${id}/integrity`);
+    return res.data;
+  },
+
+  getContractActivityHistory: async (id: string): Promise<ApiResponse<ContractActivityHistoryDto[]>> => {
+    const res = await apiClient.get<ApiResponse<ContractActivityHistoryDto[]>>(`/contracts/${id}/activity-history`);
     return res.data;
   },
 
@@ -474,6 +558,39 @@ export const apiService = {
 
   respondToTermination: async (contractId: string, requestId: string, data: RespondToTerminationRequest): Promise<ApiResponse<unknown>> => {
     const res = await apiClient.post<ApiResponse<unknown>>(`/contracts/${contractId}/termination-requests/${requestId}/respond`, data);
+    return res.data;
+  },
+
+  // Projects & Milestones (Phase 9)
+  listProjects: async (filters?: { status?: string; page?: number; limit?: number }): Promise<ApiResponse<{ items: ProjectDto[]; pagination: { total: number; page: number; limit: number; totalPages: number } }>> => {
+    const res = await apiClient.get<ApiResponse<{ items: ProjectDto[]; pagination: { total: number; page: number; limit: number; totalPages: number } }>>('/projects', { params: filters });
+    return res.data;
+  },
+
+  getProject: async (projectId: string): Promise<ApiResponse<ProjectDto>> => {
+    const res = await apiClient.get<ApiResponse<ProjectDto>>(`/projects/${projectId}`);
+    return res.data;
+  },
+
+  getProjectByContract: async (contractId: string): Promise<ApiResponse<ProjectDto>> => {
+    const res = await apiClient.get<ApiResponse<ProjectDto>>(`/projects/contract/${contractId}`);
+    return res.data;
+  },
+
+  createProject: async (contractId: string, data?: CreateProjectRequest): Promise<ApiResponse<ProjectDto>> => {
+    const res = await apiClient.post<ApiResponse<ProjectDto>>(`/projects/contract/${contractId}`, data || {});
+    return res.data;
+  },
+
+  getProjectSummary: async (projectId: string): Promise<ApiResponse<ProjectProgressSummaryDto>> => {
+    const res = await apiClient.get<ApiResponse<ProjectProgressSummaryDto>>(`/projects/${projectId}/summary`);
+    return res.data;
+  },
+
+  getMilestoneActivities: async (projectId: string, milestoneId?: string): Promise<ApiResponse<MilestoneActivityDto[]>> => {
+    const res = await apiClient.get<ApiResponse<MilestoneActivityDto[]>>(`/projects/${projectId}/activities`, {
+      params: milestoneId ? { milestoneId } : undefined,
+    });
     return res.data;
   },
 };

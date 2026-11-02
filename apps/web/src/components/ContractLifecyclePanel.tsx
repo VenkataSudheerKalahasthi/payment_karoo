@@ -9,6 +9,12 @@ import {
   Check,
   XCircle,
   ShieldAlert,
+  FileUp,
+  ExternalLink,
+  ShieldCheck,
+  Binary,
+  Download,
+  RefreshCw,
 } from 'lucide-react';
 import { apiService } from '../services/api';
 import {
@@ -18,6 +24,9 @@ import {
   ContractAmendmentDto,
   ContractTerminationRequestDto,
   EscrowActivityDto,
+  ContractVersionDto,
+  ContractIntegrityReportDto,
+  ContractActivityHistoryDto,
   formatCurrencyMinor,
 } from '@trustpay/shared';
 
@@ -36,19 +45,28 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
   isWorker: _isWorker,
   onRefresh,
 }) => {
-  const [activeTab, setActiveTab] = useState<'disputes' | 'amendments' | 'termination' | 'activities'>('disputes');
+  const [activeTab, setActiveTab] = useState<'disputes' | 'amendments' | 'termination' | 'versions' | 'integrity' | 'activities'>('disputes');
   const [dispute, setDispute] = useState<DisputeDetailDto | null>(null);
   const [amendments, setAmendments] = useState<ContractAmendmentDto[]>([]);
   const [terminations, setTerminations] = useState<ContractTerminationRequestDto[]>([]);
   const [activities, setActivities] = useState<EscrowActivityDto[]>([]);
+  const [versions, setVersions] = useState<ContractVersionDto[]>([]);
+  const [integrityReport, setIntegrityReport] = useState<ContractIntegrityReportDto | null>(null);
+  const [activityHistory, setActivityHistory] = useState<ContractActivityHistoryDto[]>([]);
+  const [isAuditingIntegrity, setIsAuditingIntegrity] = useState(false);
 
   // Dispute form state
   const [showCreateDispute, setShowCreateDispute] = useState(false);
   const [disputeCategory, setDisputeCategory] = useState<DisputeCategory>(DisputeCategory.QUALITY_OF_WORK);
+  const [disputeMilestoneId, setDisputeMilestoneId] = useState('');
   const [disputeTitle, setDisputeTitle] = useState('');
   const [disputeDesc, setDisputeDesc] = useState('');
   const [disputeClaim, setDisputeClaim] = useState('');
   const [statementContent, setStatementContent] = useState('');
+  const [showAddEvidence, setShowAddEvidence] = useState(false);
+  const [evidenceFileName, setEvidenceFileName] = useState('');
+  const [evidenceFileUrl, setEvidenceFileUrl] = useState('');
+  const [evidenceDescription, setEvidenceDescription] = useState('');
 
   // Amendment form state
   const [showProposeAmendment, setShowProposeAmendment] = useState(false);
@@ -69,12 +87,21 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
   const loadLifecycleData = useCallback(async () => {
     if (!contract.id) return;
     try {
-      const [disputesRes, amendmentsRes, termRes, actRes] = await Promise.all([
+      const [disputesRes, amendmentsRes, termRes, actRes, verRes, histRes] = await Promise.all([
         apiService.listDisputes({ contractId: contract.id }),
         apiService.listAmendments(contract.id),
         apiService.listTerminationRequests(contract.id),
         apiService.getEscrowActivities(contract.id),
+        apiService.getContractVersions(contract.id),
+        apiService.getContractActivityHistory(contract.id),
       ]);
+
+      if (verRes.success && verRes.data) {
+        setVersions(verRes.data);
+      }
+      if (histRes.success && histRes.data) {
+        setActivityHistory(histRes.data);
+      }
 
       if (disputesRes.success && disputesRes.data?.items?.[0]) {
         // Fetch detailed active dispute
@@ -113,6 +140,7 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
       const claimMinor = disputeClaim ? Math.round(Number(disputeClaim) * 100) : undefined;
       const res = await apiService.createDispute({
         contractId: contract.id,
+        milestoneId: disputeMilestoneId || undefined,
         category: disputeCategory,
         title: disputeTitle.trim(),
         description: disputeDesc.trim(),
@@ -122,6 +150,10 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
       if (res.success && res.data) {
         setDispute(res.data);
         setShowCreateDispute(false);
+        setDisputeTitle('');
+        setDisputeDesc('');
+        setDisputeClaim('');
+        setDisputeMilestoneId('');
         setActionMessage('Dispute opened. Escrow funds placed on protective hold.');
         onRefresh();
         await loadLifecycleData();
@@ -130,6 +162,37 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
       }
     } catch (err: unknown) {
       setErrorMessage(err instanceof Error ? err.message : 'Error creating dispute');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAddEvidence = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!dispute || !evidenceFileName.trim() || !evidenceFileUrl.trim()) return;
+    setIsLoading(true);
+    setErrorMessage(null);
+    try {
+      const res = await apiService.uploadDisputeEvidence(dispute.id, {
+        fileName: evidenceFileName.trim(),
+        fileUrl: evidenceFileUrl.trim(),
+        fileKey: evidenceFileName.trim().replace(/\s+/g, '-'),
+        description: evidenceDescription.trim() || undefined,
+      });
+
+      if (res.success) {
+        setShowAddEvidence(false);
+        setEvidenceFileName('');
+        setEvidenceFileUrl('');
+        setEvidenceDescription('');
+        setActionMessage('Evidence file attached to dispute record.');
+        const updated = await apiService.getDisputeById(dispute.id);
+        if (updated.success && updated.data) setDispute(updated.data);
+      } else {
+        setErrorMessage(res.error?.message || 'Failed to attach evidence');
+      }
+    } catch (err: unknown) {
+      setErrorMessage(err instanceof Error ? err.message : 'Error uploading evidence');
     } finally {
       setIsLoading(false);
     }
@@ -265,6 +328,28 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
     }
   };
 
+  const handleRunIntegrityAudit = async () => {
+    setIsAuditingIntegrity(true);
+    setErrorMessage(null);
+    try {
+      const res = await apiService.verifyContractIntegrity(contract.id);
+      if (res.success && res.data) {
+        setIntegrityReport(res.data);
+        setActionMessage(
+          res.data.isTamperFree
+            ? 'Cryptographic integrity check passed: Zero tampering detected.'
+            : 'Alert: Document hash or milestone allocation divergence detected!',
+        );
+      } else {
+        setErrorMessage(res.error?.message || 'Failed to complete integrity audit');
+      }
+    } catch (err: unknown) {
+      setErrorMessage(err instanceof Error ? err.message : 'Error executing cryptographic audit');
+    } finally {
+      setIsAuditingIntegrity(false);
+    }
+  };
+
   return (
     <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 space-y-4">
       {/* Alert Notices */}
@@ -331,6 +416,30 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
         </button>
 
         <button
+          onClick={() => setActiveTab('versions')}
+          className={`px-3 py-1.5 rounded-lg font-semibold flex items-center space-x-1.5 transition ${
+            activeTab === 'versions'
+              ? 'bg-blue-600 text-white'
+              : 'text-slate-400 hover:text-white bg-slate-800/60'
+          }`}
+        >
+          <History className="w-3.5 h-3.5" />
+          <span>Versions ({versions.length || 1})</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('integrity')}
+          className={`px-3 py-1.5 rounded-lg font-semibold flex items-center space-x-1.5 transition ${
+            activeTab === 'integrity'
+              ? 'bg-blue-600 text-white'
+              : 'text-slate-400 hover:text-white bg-slate-800/60'
+          }`}
+        >
+          <ShieldCheck className="w-3.5 h-3.5" />
+          <span>Integrity & Hash</span>
+        </button>
+
+        <button
           onClick={() => setActiveTab('activities')}
           className={`px-3 py-1.5 rounded-lg font-semibold flex items-center space-x-1.5 transition ${
             activeTab === 'activities'
@@ -338,8 +447,8 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
               : 'text-slate-400 hover:text-white bg-slate-800/60'
           }`}
         >
-          <History className="w-3.5 h-3.5" />
-          <span>Escrow Audit Log ({activities.length})</span>
+          <Binary className="w-3.5 h-3.5" />
+          <span>Audit Log ({activityHistory.length || activities.length})</span>
         </button>
       </div>
 
@@ -444,6 +553,108 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
                     Send
                   </button>
                 </div>
+              </div>
+
+              {/* Evidence Documents Section */}
+              <div className="space-y-2 pt-2 border-t border-slate-800">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    Dispute Evidence &amp; Attachments ({dispute.evidence?.length || 0})
+                  </span>
+                  {!showAddEvidence && (
+                    <button
+                      type="button"
+                      onClick={() => setShowAddEvidence(true)}
+                      className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-emerald-400 hover:text-emerald-300 text-[10px] font-medium border border-slate-700 flex items-center space-x-1"
+                    >
+                      <FileUp className="w-3 h-3" />
+                      <span>Attach Evidence</span>
+                    </button>
+                  )}
+                </div>
+
+                {dispute.evidence && dispute.evidence.length > 0 ? (
+                  <div className="space-y-1.5">
+                    {dispute.evidence.map((ev) => (
+                      <div key={ev.id} className="p-2.5 rounded-lg bg-slate-800/40 border border-slate-800 flex items-center justify-between text-xs">
+                        <div className="space-y-0.5">
+                          <div className="flex items-center space-x-2">
+                            <span className="font-semibold text-white">{ev.fileName}</span>
+                            <span className="text-[10px] text-slate-500">by {ev.uploaderName}</span>
+                          </div>
+                          {ev.description && <p className="text-[11px] text-slate-400">{ev.description}</p>}
+                        </div>
+                        <a
+                          href={ev.downloadUrl || ev.fileUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-emerald-400 hover:text-emerald-300 text-[11px] border border-slate-700 flex items-center space-x-1 shrink-0"
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                          <span>View Evidence</span>
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-[11px] text-slate-500 italic">No formal evidence attachments recorded yet.</p>
+                )}
+
+                {showAddEvidence && (
+                  <form onSubmit={handleAddEvidence} className="p-3 rounded-lg bg-slate-800/80 border border-slate-700 space-y-2 text-xs">
+                    <span className="font-semibold text-white text-xs block">Submit New Evidence</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-[11px] text-slate-300 mb-1">File or Document Name *</label>
+                        <input
+                          type="text"
+                          placeholder="e.g. TestReport.pdf or PR-102"
+                          value={evidenceFileName}
+                          onChange={(e) => setEvidenceFileName(e.target.value)}
+                          className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] text-slate-300 mb-1">File URL / Evidence Link *</label>
+                        <input
+                          type="url"
+                          placeholder="https://..."
+                          value={evidenceFileUrl}
+                          onChange={(e) => setEvidenceFileUrl(e.target.value)}
+                          className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-[11px] text-slate-300 mb-1">Description / Context</label>
+                      <input
+                        type="text"
+                        placeholder="Brief note about this evidence..."
+                        value={evidenceDescription}
+                        onChange={(e) => setEvidenceDescription(e.target.value)}
+                        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs"
+                      />
+                    </div>
+                    <div className="flex justify-end space-x-2 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => setShowAddEvidence(false)}
+                        className="px-2.5 py-1 rounded bg-slate-700 text-slate-300 text-xs"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={isLoading}
+                        className="px-3 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs"
+                      >
+                        Attach
+                      </button>
+                    </div>
+                  </form>
+                )}
               </div>
             </div>
           ) : (
@@ -774,26 +985,150 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
         </div>
       )}
 
-      {/* 4. ESCROW ACTIVITIES TAB */}
-      {activeTab === 'activities' && (
-        <div className="space-y-2 text-xs">
-          <span className="font-semibold text-slate-300">Immutable Escrow Lifecycle Audit Trail</span>
-          {activities.length === 0 ? (
-            <p className="text-slate-500 italic text-center py-4">No escrow events recorded yet.</p>
+      {/* 4. VERSIONS TAB */}
+      {activeTab === 'versions' && (
+        <div className="space-y-3 text-xs">
+          <div className="flex items-center justify-between">
+            <span className="font-semibold text-slate-300">Monotonically Increasing Version Snapshots</span>
+            <span className="text-[11px] text-slate-400">Current: v{contract.version}</span>
+          </div>
+
+          {versions.length === 0 ? (
+            <div className="p-4 rounded-lg bg-slate-800/40 border border-slate-800 text-center text-slate-400">
+              <p>Current Version: v{contract.version}</p>
+              <p className="text-[11px] text-slate-500 mt-1">Initial contract version snapshot active.</p>
+            </div>
           ) : (
-            <div className="max-h-60 overflow-y-auto space-y-1.5">
-              {activities.map((a) => (
-                <div key={a.id} className="p-2.5 rounded bg-slate-800/40 border border-slate-800 space-y-0.5">
-                  <div className="flex justify-between text-slate-400 text-[11px]">
-                    <span className="font-bold text-slate-200">{a.eventType}</span>
-                    <span>{new Date(a.createdAt).toLocaleString()}</span>
+            <div className="space-y-2 max-h-72 overflow-y-auto">
+              {versions.map((v) => (
+                <div key={v.id} className="p-3 rounded-lg bg-slate-800/50 border border-slate-700/60 space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <span className="px-2 py-0.5 rounded font-mono font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[11px]">
+                        v{v.version}
+                      </span>
+                      <span className="font-semibold text-white">{v.title}</span>
+                      {v.version === contract.version && (
+                        <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-300">
+                          CURRENT
+                        </span>
+                      )}
+                    </div>
+                    <span className="font-mono text-emerald-400 font-bold">${v.totalAmount.toLocaleString()} {v.currency}</span>
                   </div>
-                  <p className="text-slate-300">{a.description}</p>
-                  <div className="text-[10px] text-slate-500">
-                    State: <span className="font-mono text-blue-400">{a.operationalState}</span> • Actor: {a.actorName}
+
+                  <p className="text-slate-300 text-[11px]">{v.description}</p>
+                  
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-slate-800 gap-1">
+                    <span className="font-mono truncate max-w-xs" title={v.documentHash}>
+                      SHA-256: {v.documentHash.slice(0, 20)}...
+                    </span>
+                    <div className="flex items-center space-x-2 shrink-0">
+                      <span>Reason: {v.versionReason}</span>
+                      <a
+                        href={`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1'}/contracts/${contract.id}/pdf?version=${v.version}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-blue-400 hover:text-blue-300 flex items-center space-x-1"
+                      >
+                        <Download className="w-3 h-3" />
+                        <span>PDF</span>
+                      </a>
+                    </div>
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 5. INTEGRITY & CRYPTOGRAPHIC HASH TAB */}
+      {activeTab === 'integrity' && (
+        <div className="space-y-3 text-xs">
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="font-semibold text-slate-200">Cryptographic Integrity Audit</span>
+              <p className="text-[11px] text-slate-400">Deterministic SHA-256 canonical hash comparison & tamper detection</p>
+            </div>
+            <button
+              onClick={handleRunIntegrityAudit}
+              disabled={isAuditingIntegrity}
+              className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-semibold flex items-center space-x-1.5 transition"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isAuditingIntegrity ? 'animate-spin' : ''}`} />
+              <span>{isAuditingIntegrity ? 'Auditing...' : 'Run Audit'}</span>
+            </button>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-slate-800/40 border border-slate-700/60 space-y-2 font-mono text-[11px]">
+            <div className="space-y-1">
+              <span className="text-slate-400 font-sans text-xs">Authoritative Stored Hash:</span>
+              <div className="p-2 rounded bg-slate-950 border border-slate-800 break-all text-slate-300">
+                {contract.documentHash || 'Hash pending bilateral sign-off'}
+              </div>
+            </div>
+
+            {integrityReport && (
+              <div className="space-y-2 pt-2 border-t border-slate-800">
+                <div className="flex items-center space-x-2">
+                  <span className="font-sans text-xs text-slate-400">Audit Status:</span>
+                  {integrityReport.isTamperFree ? (
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center space-x-1">
+                      <CheckCircle2 className="w-3 h-3" />
+                      <span>CRYPTOGRAPHICALLY VERIFIED & TAMPER-FREE</span>
+                    </span>
+                  ) : (
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center space-x-1">
+                      <AlertTriangle className="w-3 h-3" />
+                      <span>INTEGRITY VIOLATION / HASH DIVERGENCE</span>
+                    </span>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-[10px] font-sans">
+                  <div className="p-2 rounded bg-slate-900 border border-slate-800">
+                    <span className="text-slate-400">Milestone Total vs Contract:</span>
+                    <p className="font-bold text-white mt-0.5">
+                      ${integrityReport.details.totalMilestoneAmount.toLocaleString()} vs ${integrityReport.details.contractTotalAmount.toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="p-2 rounded bg-slate-900 border border-slate-800">
+                    <span className="text-slate-400">Acceptances:</span>
+                    <p className="font-bold text-white mt-0.5">
+                      Client: {integrityReport.details.clientAccepted ? '✓ Signed' : 'Pending'} • Specialist: {integrityReport.details.workerAccepted ? '✓ Signed' : 'Pending'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* 6. ESCROW & CONTRACT AUDIT LOG TAB */}
+      {activeTab === 'activities' && (
+        <div className="space-y-2 text-xs">
+          <span className="font-semibold text-slate-300">Chronological Contract Activity History</span>
+          {activityHistory.length === 0 && activities.length === 0 ? (
+            <p className="text-slate-500 italic text-center py-4">No activity events recorded yet.</p>
+          ) : (
+            <div className="max-h-64 overflow-y-auto space-y-1.5">
+              {(activityHistory.length > 0 ? activityHistory : activities).map((item) => {
+                const isActLog = 'action' in item;
+                const title = isActLog ? (item as ContractActivityHistoryDto).action : (item as EscrowActivityDto).eventType;
+                const desc = isActLog ? JSON.stringify((item as ContractActivityHistoryDto).details || {}) : (item as EscrowActivityDto).description;
+                const date = new Date(item.createdAt).toLocaleString();
+                return (
+                  <div key={item.id} className="p-2.5 rounded bg-slate-800/40 border border-slate-800 space-y-0.5">
+                    <div className="flex justify-between text-slate-400 text-[11px]">
+                      <span className="font-bold text-slate-200">{title}</span>
+                      <span>{date}</span>
+                    </div>
+                    <p className="text-slate-300 font-mono text-[10px] truncate">{desc}</p>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

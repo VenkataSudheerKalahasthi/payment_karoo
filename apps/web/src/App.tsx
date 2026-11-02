@@ -16,6 +16,7 @@ import {
   Send,
   User,
   LayoutDashboard,
+  FolderKanban,
 } from 'lucide-react';
 import {
   useAuth,
@@ -23,6 +24,7 @@ import {
   UserButton,
   SignInButton,
   SignUpButton,
+  SignOutButton,
 } from '@clerk/clerk-react';
 import { RootState, AppDispatch } from './store';
 import {
@@ -48,11 +50,12 @@ import { ShortlistPage } from './components/ShortlistPage';
 import { DashboardOverview } from './components/DashboardOverview';
 import { ProfileManagement } from './components/ProfileManagement';
 import { NotificationDropdown } from './components/NotificationDropdown';
+import { ProjectsWorkspace } from './components/ProjectsWorkspace';
 import { UserRole, ContractDto, WorkerProfileDto } from '@trustpay/shared';
 import { useLocation } from 'react-router-dom';
 import { PaymentCallbackPage } from './pages/PaymentCallbackPage';
 
-type AppTab = 'dashboard' | 'marketplace' | 'contracts' | 'hiring' | 'shortlist' | 'profile' | 'system';
+type AppTab = 'dashboard' | 'marketplace' | 'contracts' | 'projects' | 'hiring' | 'shortlist' | 'profile' | 'system';
 
 export const App: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -70,6 +73,10 @@ export const App: React.FC = () => {
   const [contracts, setContracts] = useState<ContractDto[]>([]);
   const [isLoadingContracts, setIsLoadingContracts] = useState(false);
   const [roleSelectionRequired, setRoleSelectionRequired] = useState(false);
+  const [isSyncingRole, setIsSyncingRole] = useState(false);
+  const [selectedRoleInProgress, setSelectedRoleInProgress] = useState<'CLIENT' | 'WORKER' | null>(null);
+  const [syncError, setSyncError] = useState<string | null>(null);
+  const [hasCheckedExistingProfile, setHasCheckedExistingProfile] = useState(false);
 
   // Configure token getter for Axios
   useEffect(() => {
@@ -84,42 +91,113 @@ export const App: React.FC = () => {
     }
   }, [isSignedIn, getToken]);
 
-  // Synchronize authenticated Clerk user with database
-  const syncWithDatabase = useCallback(async (chosenRole?: 'CLIENT' | 'WORKER') => {
+  // Initial authentication check: verify if profile already exists in DB
+  const checkInitialProfile = useCallback(async () => {
     if (!isSignedIn) return;
-
     dispatch(setAuthLoading(true));
     try {
-      const meRes = await apiService.getCurrentUser();
+      const token = await getToken();
+      if (!token) {
+        return;
+      }
+      const meRes = await apiService.getCurrentUser(token);
       if (meRes.success && meRes.data) {
         dispatch(setAuthUser(meRes.data));
         setRoleSelectionRequired(false);
-        return;
+        setSyncError(null);
+      } else if (meRes.error?.code === 'USER_NOT_REGISTERED') {
+        setRoleSelectionRequired(true);
+      } else {
+        console.warn('Profile fetch response:', meRes.error);
+        if (!auth.isSynchronized) {
+          setSyncError(meRes.error?.message || 'Could not verify database profile. Ensure backend is reachable.');
+        }
+      }
+    } catch (err: unknown) {
+      console.error('Initial profile check error:', err);
+      setSyncError(err instanceof Error ? err.message : 'Session verification failed.');
+    } finally {
+      dispatch(setAuthLoading(false));
+      setHasCheckedExistingProfile(true);
+    }
+  }, [isSignedIn, getToken, dispatch, auth.isSynchronized]);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    if (!isSignedIn) {
+      dispatch(clearAuthUser());
+      setHasCheckedExistingProfile(false);
+      setRoleSelectionRequired(false);
+      return;
+    }
+
+    if (auth.isSynchronized || hasCheckedExistingProfile) {
+      return;
+    }
+
+    checkInitialProfile();
+  }, [isLoaded, isSignedIn, auth.isSynchronized, hasCheckedExistingProfile, checkInitialProfile]);
+
+  // User explicitly selects their intended role
+  const handleSelectRole = async (chosenRole: 'CLIENT' | 'WORKER') => {
+    if (!isSignedIn) return;
+
+    setIsSyncingRole(true);
+    setSelectedRoleInProgress(chosenRole);
+    setSyncError(null);
+
+    try {
+      const token = await getToken();
+      if (!token) {
+        throw new Error('Authentication session token could not be obtained from Clerk. Please refresh.');
       }
 
-      const syncRes = await apiService.syncUser(chosenRole || 'CLIENT');
+      const primaryEmail =
+        clerkUser?.primaryEmailAddress?.emailAddress ||
+        clerkUser?.emailAddresses?.[0]?.emailAddress;
+
+      const payload = {
+        role: chosenRole,
+        email: primaryEmail || undefined,
+        firstName: clerkUser?.firstName || undefined,
+        lastName: clerkUser?.lastName || undefined,
+        avatarUrl: clerkUser?.imageUrl || undefined,
+      };
+
+      const syncRes = await apiService.syncUser(payload, token);
       if (syncRes.success && syncRes.data) {
         dispatch(setAuthUser(syncRes.data));
         setRoleSelectionRequired(false);
-      } else if (syncRes.error?.code === 'USER_NOT_REGISTERED' || !chosenRole) {
-        setRoleSelectionRequired(true);
+        setSyncError(null);
+      } else {
+        setSyncError(
+          syncRes.error?.message ||
+            'Could not complete account synchronization with the backend. Please check connectivity.',
+        );
+      }
+    } catch (err: unknown) {
+      setSyncError(
+        err instanceof Error
+          ? err.message
+          : 'Failed to synchronize account credentials with the database.',
+      );
+    } finally {
+      setIsSyncingRole(false);
+      setSelectedRoleInProgress(null);
+    }
+  };
+
+  const refreshUserProfile = useCallback(async () => {
+    try {
+      const res = await apiService.getCurrentUser();
+      if (res.success && res.data) {
+        dispatch(setAuthUser(res.data));
       }
     } catch {
-      setRoleSelectionRequired(true);
-    } finally {
-      dispatch(setAuthLoading(false));
+      // Ignore background refresh failure
     }
-  }, [isSignedIn, dispatch]);
-
-  useEffect(() => {
-    if (isLoaded) {
-      if (isSignedIn) {
-        syncWithDatabase();
-      } else {
-        dispatch(clearAuthUser());
-      }
-    }
-  }, [isLoaded, isSignedIn, syncWithDatabase, dispatch]);
+  }, [dispatch]);
 
   // Fetch contracts when authenticated
   const loadContracts = useCallback(async () => {
@@ -253,7 +331,7 @@ export const App: React.FC = () => {
       {/* Role Selection Dialog for First-Time Sync */}
       {roleSelectionRequired && isSignedIn && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur z-50 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-5 text-center">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-5 text-center shadow-2xl">
             <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto">
               <ShieldCheck className="w-6 h-6" />
             </div>
@@ -264,24 +342,77 @@ export const App: React.FC = () => {
               </p>
             </div>
 
+            {isSyncingRole && (
+              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs flex items-center justify-center space-x-2">
+                <RefreshCw className="w-4 h-4 animate-spin text-emerald-400" />
+                <span>Configuring account & synchronizing profile with database...</span>
+              </div>
+            )}
+
+            {syncError && (
+              <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs text-left space-y-1">
+                <div className="font-semibold">Synchronization Alert:</div>
+                <div>{syncError}</div>
+              </div>
+            )}
+
             <div className="grid grid-cols-2 gap-4 pt-2">
               <button
-                onClick={() => syncWithDatabase('CLIENT')}
-                className="p-4 rounded-xl bg-slate-950 border border-slate-800 hover:border-emerald-500 transition text-left space-y-2"
+                type="button"
+                disabled={isSyncingRole}
+                onClick={() => handleSelectRole('CLIENT')}
+                className={`p-4 rounded-xl bg-slate-950 border transition text-left space-y-2 cursor-pointer disabled:cursor-not-allowed group ${
+                  selectedRoleInProgress === 'CLIENT'
+                    ? 'border-emerald-500 bg-emerald-500/5 ring-1 ring-emerald-500'
+                    : 'border-slate-800 hover:border-emerald-500 hover:bg-slate-900/50'
+                } ${isSyncingRole && selectedRoleInProgress !== 'CLIENT' ? 'opacity-40' : ''}`}
               >
-                <Briefcase className="w-6 h-6 text-emerald-400" />
+                <div className="flex items-center justify-between">
+                  <Briefcase className="w-6 h-6 text-emerald-400 group-hover:scale-105 transition-transform" />
+                  {selectedRoleInProgress === 'CLIENT' && <RefreshCw className="w-4 h-4 animate-spin text-emerald-400" />}
+                </div>
                 <h4 className="text-sm font-semibold text-white">I am a Client</h4>
                 <p className="text-[11px] text-slate-400">Propose contracts and manage milestone escrow agreements.</p>
               </button>
 
               <button
-                onClick={() => syncWithDatabase('WORKER')}
-                className="p-4 rounded-xl bg-slate-950 border border-slate-800 hover:border-blue-500 transition text-left space-y-2"
+                type="button"
+                disabled={isSyncingRole}
+                onClick={() => handleSelectRole('WORKER')}
+                className={`p-4 rounded-xl bg-slate-950 border transition text-left space-y-2 cursor-pointer disabled:cursor-not-allowed group ${
+                  selectedRoleInProgress === 'WORKER'
+                    ? 'border-blue-500 bg-blue-500/5 ring-1 ring-blue-500'
+                    : 'border-slate-800 hover:border-blue-500 hover:bg-slate-900/50'
+                } ${isSyncingRole && selectedRoleInProgress !== 'WORKER' ? 'opacity-40' : ''}`}
               >
-                <Users className="w-6 h-6 text-blue-400" />
+                <div className="flex items-center justify-between">
+                  <Users className="w-6 h-6 text-blue-400 group-hover:scale-105 transition-transform" />
+                  {selectedRoleInProgress === 'WORKER' && <RefreshCw className="w-4 h-4 animate-spin text-blue-400" />}
+                </div>
                 <h4 className="text-sm font-semibold text-white">I am a Specialist</h4>
                 <p className="text-[11px] text-slate-400">Offer technical skills and submit milestone deliverables.</p>
               </button>
+            </div>
+
+            <div className="flex items-center justify-between pt-3 border-t border-slate-800 text-xs">
+              <button
+                type="button"
+                onClick={() => checkInitialProfile()}
+                disabled={isSyncingRole}
+                className="text-slate-400 hover:text-emerald-400 transition flex items-center space-x-1 cursor-pointer"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                <span>Verify Existing Profile</span>
+              </button>
+
+              <SignOutButton>
+                <button
+                  type="button"
+                  className="text-slate-400 hover:text-rose-400 transition cursor-pointer"
+                >
+                  Sign Out
+                </button>
+              </SignOutButton>
             </div>
           </div>
         </div>
@@ -355,6 +486,18 @@ export const App: React.FC = () => {
               >
                 <Briefcase className="w-3.5 h-3.5 text-emerald-400" />
                 <span>My Agreements ({contracts.length})</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('projects')}
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition ${
+                  activeTab === 'projects'
+                    ? 'bg-slate-800 text-white border border-slate-700 shadow-sm'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <FolderKanban className="w-3.5 h-3.5 text-teal-400" />
+                <span>Projects & Milestones</span>
               </button>
 
               <button
@@ -465,13 +608,19 @@ export const App: React.FC = () => {
           </div>
         )}
 
+        {/* Tab: Projects & Milestones Workspace */}
+        {isSignedIn && activeTab === 'projects' && (
+          <ProjectsWorkspace
+            currentUserRole={auth.role || UserRole.CLIENT}
+            currentUserId={auth.user?.id || ''}
+          />
+        )}
+
         {/* Tab 6: Profile & Skills Management */}
         {isSignedIn && activeTab === 'profile' && auth.user && (
           <ProfileManagement
             currentUser={auth.user}
-            onProfileUpdated={() => {
-              syncWithDatabase();
-            }}
+            onProfileUpdated={refreshUserProfile}
           />
         )}
 

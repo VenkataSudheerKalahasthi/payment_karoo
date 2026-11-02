@@ -59,10 +59,14 @@ export async function updateMyProfile(req: Request, res: Response): Promise<void
       },
     });
 
-    if (input.avatarUrl !== undefined) {
+    if (input.avatarUrl !== undefined || input.firstName !== undefined || input.lastName !== undefined) {
       await prisma.user.update({
         where: { id: user.id },
-        data: { avatarUrl: input.avatarUrl || null },
+        data: {
+          ...(input.avatarUrl !== undefined ? { avatarUrl: input.avatarUrl || null } : {}),
+          ...(input.firstName !== undefined ? { firstName: input.firstName || null } : {}),
+          ...(input.lastName !== undefined ? { lastName: input.lastName || null } : {}),
+        },
       });
     }
 

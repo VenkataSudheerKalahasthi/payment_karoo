@@ -17,6 +17,10 @@ import {
   AlertCircle,
   Save,
   Layers,
+  Pencil,
+  Eye,
+  Star,
+  X,
 } from 'lucide-react';
 
 interface ProfileManagementProps {
@@ -31,6 +35,9 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
   const isWorker = currentUser.role.name === UserRole.WORKER;
 
   // General profile state
+  const [firstName, setFirstName] = useState(currentUser.firstName || '');
+  const [lastName, setLastName] = useState(currentUser.lastName || '');
+  const [avatarUrl, setAvatarUrl] = useState(currentUser.avatarUrl || '');
   const [bio, setBio] = useState(currentUser.profile?.bio || '');
   const [companyName, setCompanyName] = useState(currentUser.profile?.companyName || '');
   const [phoneNumber, setPhoneNumber] = useState(currentUser.profile?.phoneNumber || '');
@@ -55,7 +62,10 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
   const [portfolioTitle, setPortfolioTitle] = useState('');
   const [portfolioDescription, setPortfolioDescription] = useState('');
   const [portfolioUrl, setPortfolioUrl] = useState('');
+  const [portfolioAttachmentUrl, setPortfolioAttachmentUrl] = useState('');
+  const [editingPortfolioId, setEditingPortfolioId] = useState<string | null>(null);
   const [isAddingPortfolio, setIsAddingPortfolio] = useState(false);
+  const [showPublicPreview, setShowPublicPreview] = useState(false);
 
   // Feedback states
   const [isSavingGeneral, setIsSavingGeneral] = useState(false);
@@ -101,6 +111,9 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
 
     try {
       const res = await apiService.updateProfile({
+        firstName: firstName.trim() || undefined,
+        lastName: lastName.trim() || undefined,
+        avatarUrl: avatarUrl.trim() || undefined,
         bio: bio.trim(),
         companyName: companyName.trim(),
         phoneNumber: phoneNumber.trim(),
@@ -178,29 +191,67 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
     }
   };
 
-  const handleAddPortfolioItem = async (e: React.FormEvent) => {
+  const handleSavePortfolioItem = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!portfolioTitle.trim() || !portfolioDescription.trim()) return;
 
     try {
-      const res = await apiService.createPortfolioItem({
-        title: portfolioTitle.trim(),
-        description: portfolioDescription.trim(),
-        projectUrl: portfolioUrl.trim() || undefined,
-      });
+      if (editingPortfolioId) {
+        const res = await apiService.updatePortfolioItem(editingPortfolioId, {
+          title: portfolioTitle.trim(),
+          description: portfolioDescription.trim(),
+          projectUrl: portfolioUrl.trim() || undefined,
+          attachmentUrl: portfolioAttachmentUrl.trim() || undefined,
+        });
 
-      if (res.success) {
-        setPortfolioTitle('');
-        setPortfolioDescription('');
-        setPortfolioUrl('');
-        setIsAddingPortfolio(false);
-        loadWorkerData();
+        if (res.success) {
+          setPortfolioTitle('');
+          setPortfolioDescription('');
+          setPortfolioUrl('');
+          setPortfolioAttachmentUrl('');
+          setEditingPortfolioId(null);
+          setIsAddingPortfolio(false);
+          loadWorkerData();
+        } else {
+          alert(res.error?.message || 'Failed to update portfolio item');
+        }
       } else {
-        alert(res.error?.message || 'Failed to add portfolio item');
+        const res = await apiService.createPortfolioItem({
+          title: portfolioTitle.trim(),
+          description: portfolioDescription.trim(),
+          projectUrl: portfolioUrl.trim() || undefined,
+          attachmentUrl: portfolioAttachmentUrl.trim() || undefined,
+        });
+
+        if (res.success) {
+          setPortfolioTitle('');
+          setPortfolioDescription('');
+          setPortfolioUrl('');
+          setPortfolioAttachmentUrl('');
+          setIsAddingPortfolio(false);
+          loadWorkerData();
+        } else {
+          alert(res.error?.message || 'Failed to add portfolio item');
+        }
       }
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const handleStartEditPortfolio = (item: {
+    id: string;
+    title: string;
+    description: string;
+    projectUrl?: string | null;
+    attachmentUrl?: string | null;
+  }) => {
+    setEditingPortfolioId(item.id);
+    setPortfolioTitle(item.title);
+    setPortfolioDescription(item.description);
+    setPortfolioUrl(item.projectUrl || '');
+    setPortfolioAttachmentUrl(item.attachmentUrl || '');
+    setIsAddingPortfolio(true);
   };
 
   const handleDeletePortfolioItem = async (id: string) => {
@@ -242,6 +293,41 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
         <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
           <User className="w-4 h-4 text-emerald-400" />
           <h4 className="text-sm font-bold text-white">Identity &amp; Contact Details</h4>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-medium text-slate-300 mb-1">First Name</label>
+            <input
+              type="text"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              placeholder="e.g. Alex"
+              className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-slate-300 mb-1">Last Name</label>
+            <input
+              type="text"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              placeholder="e.g. Morgan"
+              className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-slate-300 mb-1">Profile Avatar URL</label>
+          <input
+            type="url"
+            value={avatarUrl}
+            onChange={(e) => setAvatarUrl(e.target.value)}
+            placeholder="https://example.com/avatar.jpg"
+            className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+          />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -330,9 +416,19 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
       {isWorker && (
         <>
           <form onSubmit={handleSaveWorkerProfile} className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 space-y-4">
-            <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
-              <Briefcase className="w-4 h-4 text-emerald-400" />
-              <h4 className="text-sm font-bold text-white">Specialist Marketplace Parameters</h4>
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center space-x-2">
+                <Briefcase className="w-4 h-4 text-emerald-400" />
+                <h4 className="text-sm font-bold text-white">Specialist Marketplace Parameters</h4>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowPublicPreview(true)}
+                className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-emerald-400 border border-slate-700 flex items-center space-x-1.5 transition"
+              >
+                <Eye className="w-3.5 h-3.5" />
+                <span>Preview Public Profile</span>
+              </button>
             </div>
 
             <div>
@@ -478,9 +574,15 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
               )}
             </div>
 
-            {/* Add Portfolio Form */}
+            {/* Add / Edit Portfolio Form */}
             {isAddingPortfolio && (
-              <form onSubmit={handleAddPortfolioItem} className="p-4 rounded-xl bg-slate-800/80 border border-slate-700 space-y-3 text-xs">
+              <form onSubmit={handleSavePortfolioItem} className="p-4 rounded-xl bg-slate-800/80 border border-slate-700 space-y-3 text-xs">
+                <div className="flex items-center justify-between">
+                  <h5 className="font-semibold text-white">
+                    {editingPortfolioId ? 'Edit Portfolio Project' : 'New Portfolio Project'}
+                  </h5>
+                </div>
+
                 <div>
                   <label className="block text-slate-300 font-medium mb-1">Project Title *</label>
                   <input
@@ -488,7 +590,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                     value={portfolioTitle}
                     onChange={(e) => setPortfolioTitle(e.target.value)}
                     placeholder="e.g. Automated Escrow Smart Engine"
-                    className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs text-slate-200"
+                    className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
                     required
                   />
                 </div>
@@ -500,35 +602,55 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                     onChange={(e) => setPortfolioDescription(e.target.value)}
                     rows={3}
                     placeholder="Describe technology stack, your key contributions, and project outcomes..."
-                    className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs text-slate-200"
+                    className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
                     required
                   />
                 </div>
 
-                <div>
-                  <label className="block text-slate-300 font-medium mb-1">Live Project / Demo URL</label>
-                  <input
-                    type="url"
-                    value={portfolioUrl}
-                    onChange={(e) => setPortfolioUrl(e.target.value)}
-                    placeholder="https://github.com/... or https://..."
-                    className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs text-slate-200"
-                  />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-slate-300 font-medium mb-1">Live Project / Demo URL</label>
+                    <input
+                      type="url"
+                      value={portfolioUrl}
+                      onChange={(e) => setPortfolioUrl(e.target.value)}
+                      placeholder="https://github.com/... or https://..."
+                      className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-300 font-medium mb-1">Project Image / Attachment URL</label>
+                    <input
+                      type="url"
+                      value={portfolioAttachmentUrl}
+                      onChange={(e) => setPortfolioAttachmentUrl(e.target.value)}
+                      placeholder="https://images.unsplash.com/... or https://..."
+                      className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+                    />
+                  </div>
                 </div>
 
                 <div className="flex justify-end space-x-2 pt-1">
                   <button
                     type="button"
-                    onClick={() => setIsAddingPortfolio(false)}
-                    className="px-3 py-1.5 rounded-lg bg-slate-700 text-slate-300"
+                    onClick={() => {
+                      setIsAddingPortfolio(false);
+                      setEditingPortfolioId(null);
+                      setPortfolioTitle('');
+                      setPortfolioDescription('');
+                      setPortfolioUrl('');
+                      setPortfolioAttachmentUrl('');
+                    }}
+                    className="px-3 py-1.5 rounded-lg bg-slate-700 text-slate-300 hover:bg-slate-600 transition"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold"
+                    className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold shadow-md transition"
                   >
-                    Save Portfolio Item
+                    {editingPortfolioId ? 'Save Changes' : 'Create Project'}
                   </button>
                 </div>
               </form>
@@ -543,29 +665,68 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                     className="p-3.5 rounded-xl bg-slate-800/40 border border-slate-800 space-y-2 flex flex-col justify-between"
                   >
                     <div>
+                      {item.attachmentUrl && (
+                        <div className="h-28 w-full rounded-lg overflow-hidden bg-slate-900 border border-slate-700/60 mb-2">
+                          <img
+                            src={item.attachmentUrl}
+                            alt={item.title}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLElement).style.display = 'none';
+                            }}
+                          />
+                        </div>
+                      )}
                       <div className="flex items-center justify-between">
                         <h5 className="text-xs font-semibold text-white">{item.title}</h5>
-                        <button
-                          onClick={() => handleDeletePortfolioItem(item.id)}
-                          className="text-slate-400 hover:text-rose-400 transition"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+                        <div className="flex items-center space-x-1">
+                          <button
+                            type="button"
+                            onClick={() => handleStartEditPortfolio(item)}
+                            className="p-1 text-slate-400 hover:text-emerald-400 transition"
+                            title="Edit Project"
+                          >
+                            <Pencil className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeletePortfolioItem(item.id)}
+                            className="p-1 text-slate-400 hover:text-rose-400 transition"
+                            title="Delete Project"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </div>
-                      <p className="text-xs text-slate-400 mt-1 line-clamp-2">{item.description}</p>
+                      <p className="text-xs text-slate-400 mt-1 line-clamp-3 leading-relaxed">{item.description}</p>
                     </div>
 
-                    {item.projectUrl && (
-                      <a
-                        href={item.projectUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-emerald-400 hover:text-emerald-300 text-xs inline-flex items-center space-x-1 pt-1"
-                      >
-                        <span>Visit Demo</span>
-                        <ExternalLink className="w-3 h-3" />
-                      </a>
-                    )}
+                    <div className="flex items-center justify-between pt-1 border-t border-slate-800/60 text-xs">
+                      {item.projectUrl ? (
+                        <a
+                          href={item.projectUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-emerald-400 hover:text-emerald-300 text-xs inline-flex items-center space-x-1"
+                        >
+                          <span>Visit Demo / Repo</span>
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      ) : (
+                        <span className="text-[10px] text-slate-500">Internal Project</span>
+                      )}
+                      {item.attachmentUrl && (
+                        <a
+                          href={item.attachmentUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-400 hover:text-blue-300 text-[11px] inline-flex items-center space-x-1"
+                        >
+                          <span>Attachment</span>
+                          <ExternalLink className="w-2.5 h-2.5" />
+                        </a>
+                      )}
+                    </div>
                   </div>
                 ))
               ) : (
@@ -574,6 +735,137 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
             </div>
           </div>
         </>
+      )}
+
+      {/* Public Profile Preview Modal */}
+      {showPublicPreview && workerProfile && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 space-y-5 text-slate-100 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center space-x-2">
+                <Eye className="w-4 h-4 text-emerald-400" />
+                <h4 className="text-sm font-bold text-white">Public Specialist Profile Preview</h4>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowPublicPreview(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Profile Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-slate-950 border border-slate-800">
+              <div className="flex items-center space-x-3.5">
+                <div className="w-14 h-14 rounded-full bg-slate-800 border-2 border-emerald-500/30 overflow-hidden flex items-center justify-center text-slate-400 shrink-0">
+                  {avatarUrl ? (
+                    <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    <User className="w-7 h-7" />
+                  )}
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white">
+                    {firstName || lastName ? `${firstName} ${lastName}`.trim() : 'Anonymous Specialist'}
+                  </h3>
+                  <p className="text-xs text-emerald-400">{headline || 'Specialist on TrustPay'}</p>
+                  <p className="text-[11px] text-slate-400 mt-0.5">{country || 'Remote'} • {companyName || 'Independent Consultant'}</p>
+                </div>
+              </div>
+
+              <div className="text-right">
+                <div className="text-lg font-extrabold text-emerald-400">
+                  ${hourlyRate || '0'}<span className="text-xs font-normal text-slate-400">/hr</span>
+                </div>
+                <span className={`inline-block mt-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${
+                  availability === 'AVAILABLE' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
+                  availability === 'BUSY' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' :
+                  'bg-slate-800 text-slate-400'
+                }`}>
+                  {availability}
+                </span>
+              </div>
+            </div>
+
+            {/* Bio */}
+            {bio && (
+              <div className="space-y-1">
+                <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">About Me</span>
+                <p className="text-xs text-slate-300 bg-slate-950/60 p-3 rounded-lg border border-slate-800 leading-relaxed">
+                  {bio}
+                </p>
+              </div>
+            )}
+
+            {/* Skills */}
+            <div className="space-y-1.5">
+              <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">Verified Technical Skills</span>
+              <div className="flex flex-wrap gap-1.5">
+                {workerProfile.skills && workerProfile.skills.length > 0 ? (
+                  workerProfile.skills.map((s) => (
+                    <span
+                      key={s.id}
+                      className="px-2.5 py-1 rounded-lg bg-slate-800 text-xs text-slate-200 border border-slate-700 flex items-center space-x-1.5"
+                    >
+                      <span>{s.skillName || (s as unknown as { skill?: { name: string } }).skill?.name}</span>
+                      <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-1 py-0.2 rounded font-mono">
+                        {s.yearsOfExperience}y
+                      </span>
+                    </span>
+                  ))
+                ) : (
+                  <p className="text-xs text-slate-500 italic">No skills listed yet.</p>
+                )}
+              </div>
+            </div>
+
+            {/* Portfolio Preview */}
+            <div className="space-y-2">
+              <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                Showcased Projects ({workerProfile.portfolioItems?.length || 0})
+              </span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {workerProfile.portfolioItems && workerProfile.portfolioItems.length > 0 ? (
+                  workerProfile.portfolioItems.map((item) => (
+                    <div key={item.id} className="p-3 rounded-lg bg-slate-950 border border-slate-800 space-y-1.5">
+                      {item.attachmentUrl && (
+                        <div className="h-20 w-full rounded overflow-hidden bg-slate-900 border border-slate-800">
+                          <img src={item.attachmentUrl} alt={item.title} className="w-full h-full object-cover" />
+                        </div>
+                      )}
+                      <h5 className="text-xs font-semibold text-white">{item.title}</h5>
+                      <p className="text-[11px] text-slate-400 line-clamp-2">{item.description}</p>
+                      {item.projectUrl && (
+                        <a
+                          href={item.projectUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-emerald-400 text-[10px] inline-flex items-center space-x-1"
+                        >
+                          <span>Live Demo</span>
+                          <ExternalLink className="w-2.5 h-2.5" />
+                        </a>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-xs text-slate-500 italic col-span-2">No projects showcased yet.</p>
+                )}
+              </div>
+            </div>
+
+            <div className="pt-2 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setShowPublicPreview(false)}
+                className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-white transition"
+              >
+                Close Preview
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

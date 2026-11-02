@@ -48,8 +48,16 @@ export const createPortfolioItemSchema = z.object({
   attachmentUrl: z.string().url().optional().or(z.literal('')),
 });
 
+export const updatePortfolioItemSchema = z.object({
+  title: z.string().min(2).max(100).optional(),
+  description: z.string().min(10).max(2000).optional(),
+  projectUrl: z.string().url().optional().or(z.literal('')),
+  attachmentUrl: z.string().url().optional().or(z.literal('')),
+});
+
 export type ListWorkersQuery = z.infer<typeof listWorkersQuerySchema>;
 export type UpdateWorkerProfileInput = z.infer<typeof updateWorkerProfileSchema>;
 export type AddWorkerSkillInput = z.infer<typeof addWorkerSkillSchema>;
 export type CreatePortfolioItemInput = z.infer<typeof createPortfolioItemSchema>;
+export type UpdatePortfolioItemInput = z.infer<typeof updatePortfolioItemSchema>;
 

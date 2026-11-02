@@ -7,6 +7,7 @@ import {
   addWorkerSkill,
   removeWorkerSkill,
   createPortfolioItem,
+  updatePortfolioItem,
   deletePortfolioItem,
 } from './workers.controller.js';
 import { authenticateUser, requireRole } from '../../middleware/auth.js';
@@ -16,6 +17,7 @@ import {
   updateWorkerProfileSchema,
   addWorkerSkillSchema,
   createPortfolioItemSchema,
+  updatePortfolioItemSchema,
 } from './workers.schema.js';
 import { UserRole } from '@prisma/client';
 
@@ -65,6 +67,14 @@ workersRoutes.post(
   requireRole(UserRole.WORKER),
   validateRequest({ body: createPortfolioItemSchema }),
   createPortfolioItem,
+);
+
+workersRoutes.put(
+  '/me/portfolio/:id',
+  authenticateUser(),
+  requireRole(UserRole.WORKER),
+  validateRequest({ body: updatePortfolioItemSchema }),
+  updatePortfolioItem,
 );
 
 workersRoutes.delete(

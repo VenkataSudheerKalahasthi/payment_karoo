@@ -9,6 +9,7 @@ import {
   UpdateWorkerProfileInput,
   AddWorkerSkillInput,
   CreatePortfolioItemInput,
+  UpdatePortfolioItemInput,
 } from './workers.schema.js';
 
 export async function listWorkers(req: Request, res: Response): Promise<void> {
@@ -337,6 +338,47 @@ export async function createPortfolioItem(req: Request, res: Response): Promise<
   } catch (error) {
     logger.error('Error creating portfolio item:', error);
     sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Failed to create portfolio item');
+  }
+}
+
+export async function updatePortfolioItem(req: Request, res: Response): Promise<void> {
+  const user = req.user!;
+  const { id } = req.params;
+  const input = req.body as UpdatePortfolioItemInput;
+
+  try {
+    const workerProfile = await prisma.workerProfile.findUnique({
+      where: { userId: user.id },
+    });
+
+    if (!workerProfile) {
+      sendError(res, 404, 'NOT_FOUND', 'Worker profile not found');
+      return;
+    }
+
+    const item = await prisma.portfolioItem.findUnique({
+      where: { id },
+    });
+
+    if (!item || item.workerProfileId !== workerProfile.id) {
+      sendError(res, 403, 'FORBIDDEN', 'Access denied to portfolio item');
+      return;
+    }
+
+    const updated = await prisma.portfolioItem.update({
+      where: { id },
+      data: {
+        title: input.title !== undefined ? input.title : item.title,
+        description: input.description !== undefined ? input.description : item.description,
+        projectUrl: input.projectUrl !== undefined ? (input.projectUrl || null) : item.projectUrl,
+        attachmentUrl: input.attachmentUrl !== undefined ? (input.attachmentUrl || null) : item.attachmentUrl,
+      },
+    });
+
+    sendSuccess(res, 200, updated);
+  } catch (error) {
+    logger.error('Error updating portfolio item:', error);
+    sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Failed to update portfolio item');
   }
 }
 

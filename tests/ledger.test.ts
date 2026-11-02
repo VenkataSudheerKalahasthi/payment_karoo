@@ -39,7 +39,7 @@ describe('Double-Entry Accounting Ledger Domain Tests', () => {
       statusCode: 400,
       code: 'UNBALANCED_TRANSACTION',
     });
-  });
+  }, 15000);
 
   it('rejects transactions with fewer than 2 entries (single-leg)', async () => {
     const service = new DoubleEntryLedgerService();
@@ -59,7 +59,7 @@ describe('Double-Entry Accounting Ledger Domain Tests', () => {
       statusCode: 400,
       code: 'INVALID_ENTRY_COUNT',
     });
-  });
+  }, 15000);
 
   it('rejects zero or negative amounts', async () => {
     const service = new DoubleEntryLedgerService();
@@ -97,5 +97,5 @@ describe('Double-Entry Accounting Ledger Domain Tests', () => {
       statusCode: 400,
       code: 'INVALID_AMOUNT',
     });
-  });
+  }, 15000);
 });

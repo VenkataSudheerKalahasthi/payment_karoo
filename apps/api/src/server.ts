@@ -2,6 +2,7 @@ import { createApp } from './app.js';
 import { env } from './config/env.config.js';
 import { disconnectDatabase } from './config/prisma.js';
 import { logger } from './utils/logger.js';
+import { initSocketServer } from './modules/realtime/socket.service.js';
 
 const app = createApp();
 
@@ -10,6 +11,10 @@ const server = app.listen(env.API_PORT, env.API_HOST, () => {
   logger.info(`Environment: ${env.NODE_ENV}`);
   logger.info(`Allowed CORS Origins: ${env.CORS_ORIGINS.join(', ')}`);
   logger.info(`Health Check available at: http://${env.API_HOST}:${env.API_PORT}/api/v1/health`);
+
+  // Initialize Socket.IO real-time delivery
+  initSocketServer(server);
+  logger.info('Real-time Socket.IO gateway initialized.');
 });
 
 server.on('error', (err: NodeJS.ErrnoException) => {

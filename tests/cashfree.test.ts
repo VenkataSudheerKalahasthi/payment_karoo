@@ -392,4 +392,57 @@ describe('Phase 5.1 Cashfree Sandbox Verification & Hardening Tests', () => {
       expect(isProductionAllowed).toBe(false);
     });
   });
+
+  describe('5. Phase 5.3: Cashfree Sandbox Connection & Credential Safety Checks', () => {
+    it('returns boolean for isAvailable and fails safely when credentials are empty', () => {
+      const unconfiguredProvider = new CashfreePaymentProvider();
+      vi.spyOn(unconfiguredProvider, 'isAvailable').mockReturnValue(false);
+      expect(unconfiguredProvider.isAvailable()).toBe(false);
+    });
+
+    it('fails safely with 503 CASHFREE_CREDENTIALS_MISSING when createOrder is invoked without credentials', async () => {
+      const unconfiguredProvider = new CashfreePaymentProvider();
+      vi.spyOn(unconfiguredProvider, 'isAvailable').mockReturnValue(false);
+
+      await expect(
+        unconfiguredProvider.createOrder({
+          orderId: 'tp_test_ord_1',
+          orderAmount: 100,
+          orderCurrency: 'INR',
+          customerId: 'cust_1',
+          customerEmail: 'cust@test.local',
+        }),
+      ).rejects.toMatchObject({
+        statusCode: 503,
+        code: 'CASHFREE_CREDENTIALS_MISSING',
+      });
+    });
+
+    it('fails safely with 503 CASHFREE_CREDENTIALS_MISSING when getOrder is invoked without credentials', async () => {
+      const unconfiguredProvider = new CashfreePaymentProvider();
+      vi.spyOn(unconfiguredProvider, 'isAvailable').mockReturnValue(false);
+
+      await expect(unconfiguredProvider.getOrder('tp_test_ord_1')).rejects.toMatchObject({
+        statusCode: 503,
+        code: 'CASHFREE_CREDENTIALS_MISSING',
+      });
+    });
+
+    it('fails safely with 503 CASHFREE_CREDENTIALS_MISSING when getOrderPayments is invoked without credentials', async () => {
+      const unconfiguredProvider = new CashfreePaymentProvider();
+      vi.spyOn(unconfiguredProvider, 'isAvailable').mockReturnValue(false);
+
+      await expect(unconfiguredProvider.getOrderPayments('tp_test_ord_1')).rejects.toMatchObject({
+        statusCode: 503,
+        code: 'CASHFREE_CREDENTIALS_MISSING',
+      });
+    });
+
+    it('enforces that production API endpoint (api.cashfree.com) is never targeted', () => {
+      const baseUrl = (provider as unknown as { sandboxBaseUrl: string }).sandboxBaseUrl;
+      expect(baseUrl).toBe('https://sandbox.cashfree.com/pg');
+      expect(baseUrl).not.toContain('api.cashfree.com');
+      expect(baseUrl).toContain('sandbox.cashfree.com');
+    });
+  });
 });

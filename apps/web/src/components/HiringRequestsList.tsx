@@ -28,6 +28,10 @@ export const HiringRequestsList: React.FC<HiringRequestsListProps> = ({
   const [activeRespondId, setActiveRespondId] = useState<string | null>(null);
   const [respondStatus, setRespondStatus] = useState<'ACCEPTED' | 'DECLINED' | 'NEGOTIATION'>('ACCEPTED');
   const [workerResponseNote, setWorkerResponseNote] = useState('');
+  const [workerNegotiateBudget, setWorkerNegotiateBudget] = useState('');
+  const [activeCounterofferId, setActiveCounterofferId] = useState<string | null>(null);
+  const [counterBudget, setCounterBudget] = useState('');
+  const [counterMessage, setCounterMessage] = useState('');
   const [isActionLoading, setIsActionLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -70,20 +74,49 @@ export const HiringRequestsList: React.FC<HiringRequestsListProps> = ({
     setIsActionLoading(true);
     setErrorMessage(null);
     try {
+      const budget = respondStatus === 'NEGOTIATION' && workerNegotiateBudget ? parseFloat(workerNegotiateBudget) : undefined;
       const res = await apiService.respondHiringRequest(activeRespondId, {
         status: respondStatus,
         workerResponse: workerResponseNote.trim() || undefined,
+        proposedBudget: budget,
       });
 
       if (res.success) {
         setActiveRespondId(null);
         setWorkerResponseNote('');
+        setWorkerNegotiateBudget('');
         loadRequests();
       } else {
         setErrorMessage(res.error?.message || 'Failed to respond to proposal');
       }
     } catch (err: unknown) {
       setErrorMessage(err instanceof Error ? err.message : 'Error responding to proposal');
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+
+  const handleCounterofferSubmit = async () => {
+    if (!activeCounterofferId || !counterMessage.trim()) return;
+    setIsActionLoading(true);
+    setErrorMessage(null);
+    try {
+      const budget = counterBudget ? parseFloat(counterBudget) : undefined;
+      const res = await apiService.counterofferHiringRequest(activeCounterofferId, {
+        proposedBudget: budget,
+        clientMessage: counterMessage.trim(),
+      });
+
+      if (res.success) {
+        setActiveCounterofferId(null);
+        setCounterBudget('');
+        setCounterMessage('');
+        loadRequests();
+      } else {
+        setErrorMessage(res.error?.message || 'Failed to submit counteroffer');
+      }
+    } catch (err: unknown) {
+      setErrorMessage(err instanceof Error ? err.message : 'Error submitting counteroffer');
     } finally {
       setIsActionLoading(false);
     }
@@ -257,6 +290,22 @@ export const HiringRequestsList: React.FC<HiringRequestsListProps> = ({
 
                   <div className="flex items-center space-x-2">
                     {/* Client Actions */}
+                    {isClient && req.status === 'NEGOTIATION' && (
+                      <button
+                        onClick={() => {
+                          setActiveCounterofferId(req.id);
+                          setCounterBudget(req.proposedBudget ? req.proposedBudget.toString() : '');
+                          setCounterMessage('');
+                          setErrorMessage(null);
+                        }}
+                        disabled={isActionLoading}
+                        className="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white flex items-center space-x-1 shadow-sm"
+                      >
+                        <MessageSquare className="w-3.5 h-3.5" />
+                        <span>Counteroffer Terms</span>
+                      </button>
+                    )}
+
                     {isClient && (req.status === 'PENDING' || req.status === 'NEGOTIATION') && (
                       <button
                         onClick={() => handleWithdraw(req.id)}
@@ -362,6 +411,23 @@ export const HiringRequestsList: React.FC<HiringRequestsListProps> = ({
                 </div>
               </div>
 
+              {respondStatus === 'NEGOTIATION' && (
+                <div>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">
+                    Proposed Counter Budget ($ USD)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="1"
+                    value={workerNegotiateBudget}
+                    onChange={(e) => setWorkerNegotiateBudget(e.target.value)}
+                    placeholder="Enter revised proposed budget"
+                    className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-xs text-slate-200 focus:outline-none focus:border-emerald-500 font-mono"
+                  />
+                </div>
+              )}
+
               <div>
                 <label className="block text-xs font-medium text-slate-300 mb-1">Response Note (Optional)</label>
                 <textarea
@@ -394,6 +460,74 @@ export const HiringRequestsList: React.FC<HiringRequestsListProps> = ({
                 className="px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-xs font-semibold text-white shadow-lg shadow-emerald-600/20"
               >
                 {isActionLoading ? 'Saving...' : 'Submit Decision'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Client Counteroffer Modal */}
+      {activeCounterofferId && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 text-slate-100 shadow-2xl">
+            <h3 className="text-base font-bold text-white">Propose Counteroffer</h3>
+            <p className="text-xs text-slate-400">
+              Submit renegotiated terms or adjusted budget in response to the specialist's feedback.
+            </p>
+
+            {errorMessage && (
+              <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs flex items-center space-x-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{errorMessage}</span>
+              </div>
+            )}
+
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-medium text-slate-300 mb-1">Adjusted Proposed Budget ($)</label>
+                <input
+                  type="number"
+                  step="1"
+                  value={counterBudget}
+                  onChange={(e) => setCounterBudget(e.target.value)}
+                  placeholder="e.g. 750"
+                  className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-slate-300 mb-1">Counteroffer Message / Terms *</label>
+                <textarea
+                  value={counterMessage}
+                  onChange={(e) => setCounterMessage(e.target.value)}
+                  rows={4}
+                  placeholder="Explain your adjusted terms, deliverables, or pricing justification..."
+                  className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="pt-2 flex items-center justify-end space-x-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveCounterofferId(null);
+                  setCounterBudget('');
+                  setCounterMessage('');
+                }}
+                disabled={isActionLoading}
+                className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 border border-slate-700"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleCounterofferSubmit}
+                disabled={isActionLoading || !counterMessage.trim()}
+                className="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-xs font-semibold text-white shadow-lg shadow-blue-600/20"
+              >
+                {isActionLoading ? 'Submitting...' : 'Send Counteroffer'}
               </button>
             </div>
           </div>

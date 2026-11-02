@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { io } from 'socket.io-client';
 import { apiService } from '../services/api';
 import {
   ContractDto,
@@ -18,6 +19,8 @@ import {
   Lock,
   AlertTriangle,
   CreditCard,
+  ExternalLink,
+  Paperclip,
 } from 'lucide-react';
 import { ContractLifecyclePanel } from './ContractLifecyclePanel';
 
@@ -53,9 +56,12 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
   onClose,
   onRefresh,
 }) => {
+  const [detailedContract, setDetailedContract] = useState<ContractDto>(contract);
   const [activeMilestoneId, setActiveMilestoneId] = useState<string | null>(null);
   const [submissionNotes, setSubmissionNotes] = useState('');
   const [attachmentUrl, setAttachmentUrl] = useState('');
+  const [uploadFileName, setUploadFileName] = useState<string | null>(null);
+  const [isAuthorizingUpload, setIsAuthorizingUpload] = useState(false);
   const [revisionReason, setRevisionReason] = useState('');
   const [actionType, setActionType] = useState<'SUBMIT' | 'REVISE' | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -77,6 +83,18 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
     createdAt: string;
   }>>([]);
 
+  const fetchContractDetails = React.useCallback(async () => {
+    if (!contract.id) return;
+    try {
+      const res = await apiService.getContract(contract.id);
+      if (res.success && res.data) {
+        setDetailedContract(res.data);
+      }
+    } catch {
+      // Retain existing contract state
+    }
+  }, [contract.id]);
+
   const loadPayments = () => {
     if (contract.id) {
       apiService.listPaymentTransactions({ contractId: contract.id }).then((res) => {
@@ -91,6 +109,8 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
 
   useEffect(() => {
     if (isOpen && contract.id) {
+      setDetailedContract(contract);
+      fetchContractDetails();
       apiService.getContractEscrow(contract.id).then((res) => {
         if (res.success && res.data) {
           setEscrowRecord(res.data);
@@ -100,7 +120,33 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
       });
       loadPayments();
     }
-  }, [isOpen, contract.id]);
+  }, [isOpen, contract, fetchContractDetails]);
+
+  // Real-Time Socket.IO event subscription for live contract lifecycle updates
+  useEffect(() => {
+    if (!isOpen || !contract.id) return;
+    const socketServerUrl = import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http://localhost:5000';
+    const socket = io(socketServerUrl, {
+      transports: ['websocket', 'polling'],
+    });
+
+    socket.emit('join:contract', contract.id);
+
+    const handleLiveUpdate = () => {
+      fetchContractDetails();
+      onRefresh();
+    };
+
+    socket.on('contract:event', handleLiveUpdate);
+    socket.on('contract:status_updated', handleLiveUpdate);
+    socket.on('contract:activated', handleLiveUpdate);
+    socket.on('contract:fresh_acceptance_required', handleLiveUpdate);
+
+    return () => {
+      socket.emit('leave:contract', contract.id);
+      socket.disconnect();
+    };
+  }, [isOpen, contract.id, fetchContractDetails, onRefresh]);
 
   const loadCashfreeSdk = (): Promise<CashfreeConstructor> => {
     return new Promise((resolve, reject) => {
@@ -172,24 +218,24 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
 
   if (!isOpen) return null;
 
-  const isClient = contract.clientId === currentUserId;
-  const isWorker = contract.workerId === currentUserId;
+  const isClient = detailedContract.clientId === currentUserId;
+  const isWorker = detailedContract.workerId === currentUserId;
 
-  const hasUserAccepted = contract.acceptances?.some(
-    (a) => a.userId === currentUserId && a.version === contract.version,
+  const hasUserAccepted = detailedContract.acceptances?.some(
+    (a) => a.userId === currentUserId && a.version === detailedContract.version,
   );
-  const hasOtherAccepted = contract.acceptances?.some(
-    (a) => a.userId !== currentUserId && a.version === contract.version,
+  const hasOtherAccepted = detailedContract.acceptances?.some(
+    (a) => a.userId !== currentUserId && a.version === detailedContract.version,
   );
 
   const handleDownloadPdf = async () => {
     setIsDownloadingPdf(true);
     try {
-      const blob = await apiService.downloadContractPdf(contract.id);
+      const blob = await apiService.downloadContractPdf(detailedContract.id);
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `Contract-${contract.contractNumber}.pdf`;
+      a.download = `Contract-${detailedContract.contractNumber}.pdf`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -206,11 +252,12 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
     setIsAccepting(true);
     setErrorMessage(null);
     try {
-      const res = await apiService.acceptContract(contract.id, {
+      const res = await apiService.acceptContract(detailedContract.id, {
         acceptanceMethod: 'DIGITAL_CONFIRMATION',
-        expectedVersion: contract.version,
+        expectedVersion: detailedContract.version,
       });
       if (res.success) {
+        await fetchContractDetails();
         onRefresh();
       } else {
         setErrorMessage(res.error?.message || 'Failed to record digital acceptance');
@@ -222,12 +269,43 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
     }
   };
 
+  const handleDeliverableFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !activeMilestoneId) return;
+
+    setIsAuthorizingUpload(true);
+    setErrorMessage(null);
+    try {
+      const mime = file.type || 'application/octet-stream';
+      const authRes = await apiService.authorizeUpload({
+        bucket: 'agreement-attachments',
+        contractId: detailedContract.id,
+        milestoneId: activeMilestoneId,
+        fileName: file.name,
+        fileSizeBytes: file.size,
+        mimeType: mime,
+      });
+
+      if (authRes.success && authRes.data) {
+        setUploadFileName(file.name);
+        setAttachmentUrl(authRes.data.objectPath);
+      } else {
+        setErrorMessage(authRes.error?.message || 'File upload authorization rejected');
+      }
+    } catch (err: unknown) {
+      setErrorMessage(err instanceof Error ? err.message : 'Error authorizing file upload');
+    } finally {
+      setIsAuthorizingUpload(false);
+    }
+  };
+
   const handleStartMilestone = async (milestoneId: string) => {
     setIsSubmitting(true);
     setErrorMessage(null);
     try {
-      const res = await apiService.startMilestone(contract.id, milestoneId);
+      const res = await apiService.startMilestone(detailedContract.id, milestoneId);
       if (res.success) {
+        await fetchContractDetails();
         onRefresh();
       } else {
         setErrorMessage(res.error?.message || 'Failed to start milestone work');
@@ -242,8 +320,9 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
     setIsSubmitting(true);
     setErrorMessage(null);
     try {
-      const res = await apiService.approveMilestone(contract.id, milestoneId);
+      const res = await apiService.approveMilestone(detailedContract.id, milestoneId);
       if (res.success) {
+        await fetchContractDetails();
         onRefresh();
       } else {
         setErrorMessage(res.error?.message || 'Failed to approve milestone');
@@ -266,7 +345,7 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
     setErrorMessage(null);
     try {
       const urls = attachmentUrl.trim() ? [attachmentUrl.trim()] : [];
-      const res = await apiService.submitMilestone(contract.id, activeMilestoneId, {
+      const res = await apiService.submitMilestone(detailedContract.id, activeMilestoneId, {
         notes: submissionNotes.trim(),
         attachmentUrls: urls,
       });
@@ -276,6 +355,7 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
         setActionType(null);
         setSubmissionNotes('');
         setAttachmentUrl('');
+        await fetchContractDetails();
         onRefresh();
       } else {
         setErrorMessage(res.error?.message || 'Failed to submit milestone deliverable');
@@ -300,7 +380,7 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
     setErrorMessage(null);
     try {
       // Find latest submission ID
-      const targetMilestone = contract.milestones?.find((m) => m.id === activeMilestoneId);
+      const targetMilestone = detailedContract.milestones?.find((m) => m.id === activeMilestoneId);
       const submissionId = targetMilestone?.submissions?.[0]?.id;
 
       if (!submissionId) {
@@ -309,7 +389,7 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
         return;
       }
 
-      const res = await apiService.requestRevision(contract.id, activeMilestoneId, {
+      const res = await apiService.requestRevision(detailedContract.id, activeMilestoneId, {
         submissionId,
         reason: revisionReason.trim(),
       });
@@ -318,6 +398,7 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
         setActiveMilestoneId(null);
         setActionType(null);
         setRevisionReason('');
+        await fetchContractDetails();
         onRefresh();
       } else {
         setErrorMessage(res.error?.message || 'Failed to submit revision request');
@@ -354,13 +435,13 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
           <div>
             <div className="flex items-center space-x-3">
               <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300">
-                {contract.contractNumber}
+                {detailedContract.contractNumber}
               </span>
-              <span className="text-xs text-slate-400 font-medium">v{contract.version}</span>
-              {getStatusBadge(contract.status)}
+              <span className="text-xs text-slate-400 font-medium">v{detailedContract.version}</span>
+              {getStatusBadge(detailedContract.status)}
             </div>
-            <h3 className="text-xl font-bold text-white mt-1.5">{contract.title}</h3>
-            <p className="text-xs text-slate-400 mt-0.5">{contract.description}</p>
+            <h3 className="text-xl font-bold text-white mt-1.5">{detailedContract.title}</h3>
+            <p className="text-xs text-slate-400 mt-0.5">{detailedContract.description}</p>
           </div>
 
           <div className="flex items-center space-x-2">
@@ -390,7 +471,7 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
         )}
 
         {/* Dispute Warning Banner (Phase 6) */}
-        {(contract.status === ContractStatus.DISPUTED || escrowRecord?.disputeHold) && (
+        {(detailedContract.status === ContractStatus.DISPUTED || escrowRecord?.disputeHold) && (
           <div className="p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs flex items-center space-x-2">
             <AlertTriangle className="w-4 h-4 shrink-0 text-rose-400" />
             <span>
@@ -597,7 +678,7 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
         </div>
 
         {/* Digital Sign-off Banner */}
-        {contract.status === ContractStatus.PENDING_ACCEPTANCE && (
+        {detailedContract.status === ContractStatus.PENDING_ACCEPTANCE && (
           <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
             <div className="space-y-0.5">
               <span className="font-bold text-amber-300 flex items-center space-x-1">
@@ -631,14 +712,14 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
           <div className="p-3.5 rounded-xl bg-slate-800/30 border border-slate-800 space-y-1">
             <span className="font-semibold text-slate-300">Scope of Work</span>
             <p className="text-slate-400 leading-relaxed text-[11px]">
-              {contract.scopeOfWork || contract.description}
+              {detailedContract.scopeOfWork || detailedContract.description}
             </p>
           </div>
 
           <div className="p-3.5 rounded-xl bg-slate-800/30 border border-slate-800 space-y-1">
             <span className="font-semibold text-slate-300">Terms &amp; Cancellation Policy</span>
             <p className="text-slate-400 leading-relaxed text-[11px]">
-              {contract.termsAndConditions || 'Standard TrustPay Enterprise digital contract terms apply.'}
+              {detailedContract.termsAndConditions || 'Standard TrustPay Enterprise digital contract terms apply.'}
             </p>
           </div>
         </div>
@@ -647,106 +728,188 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-              Contract Milestones ({contract.milestones?.length || 0})
+              Contract Milestones ({detailedContract.milestones?.length || 0})
             </h4>
           </div>
 
-          <div className="space-y-2">
-            {contract.milestones?.map((m) => (
+          <div className="space-y-3">
+            {detailedContract.milestones?.map((m) => (
               <div
                 key={m.id}
-                className="p-4 rounded-xl bg-slate-800/50 border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs"
+                className="p-4 rounded-xl bg-slate-800/50 border border-slate-800 space-y-3 text-xs"
               >
-                <div className="space-y-1 max-w-lg">
-                  <div className="flex items-center space-x-2">
-                    <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-700 text-slate-300 font-semibold">
-                      #{m.order}
-                    </span>
-                    <span className="font-semibold text-white">{m.title}</span>
-                    <span
-                      className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
-                        m.status === MilestoneStatus.APPROVED
-                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                          : m.status === MilestoneStatus.SUBMITTED
-                            ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
-                            : m.status === MilestoneStatus.IN_PROGRESS
-                              ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                              : m.status === MilestoneStatus.IN_REVISION
-                                ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-                                : 'bg-slate-800 text-slate-400 border border-slate-700'
-                      }`}
-                    >
-                      {m.status}
-                    </span>
-                  </div>
-                  <p className="text-slate-400 text-[11px]">{m.description}</p>
-                </div>
-
-                <div className="flex items-center space-x-4 shrink-0">
-                  <div className="text-right">
-                    <span className="text-sm font-bold text-emerald-400">${Number(m.amount).toLocaleString()}</span>
-                    {m.dueDate && (
-                      <p className="text-[10px] text-slate-500">
-                        Due {new Date(m.dueDate).toLocaleDateString()}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Actions depending on role and milestone status */}
-                  <div className="flex items-center space-x-2">
-                    {/* Worker: Start work on pending milestone */}
-                    {isWorker && contract.status === ContractStatus.ACTIVE && m.status === MilestoneStatus.PENDING && (
-                      <button
-                        onClick={() => handleStartMilestone(m.id)}
-                        disabled={isSubmitting}
-                        className="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-xs font-semibold text-white"
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                  <div className="space-y-1 max-w-lg">
+                    <div className="flex items-center space-x-2">
+                      <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-700 text-slate-300 font-semibold">
+                        #{m.order}
+                      </span>
+                      <span className="font-semibold text-white">{m.title}</span>
+                      <span
+                        className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
+                          m.status === MilestoneStatus.APPROVED
+                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                            : m.status === MilestoneStatus.SUBMITTED
+                              ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
+                              : m.status === MilestoneStatus.IN_PROGRESS
+                                ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                                : m.status === MilestoneStatus.IN_REVISION
+                                  ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                                  : 'bg-slate-800 text-slate-400 border border-slate-700'
+                        }`}
                       >
-                        Start Work
-                      </button>
-                    )}
+                        {m.status}
+                      </span>
+                    </div>
+                    <p className="text-slate-400 text-[11px]">{m.description}</p>
+                  </div>
 
-                    {/* Worker: Submit deliverable */}
-                    {isWorker &&
-                      contract.status === ContractStatus.ACTIVE &&
-                      (m.status === MilestoneStatus.IN_PROGRESS || m.status === MilestoneStatus.IN_REVISION) && (
+                  <div className="flex items-center space-x-4 shrink-0">
+                    <div className="text-right">
+                      <span className="text-sm font-bold text-emerald-400">${Number(m.amount).toLocaleString()}</span>
+                      {m.dueDate && (
+                        <p className="text-[10px] text-slate-500">
+                          Due {new Date(m.dueDate).toLocaleDateString()}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Actions depending on role and milestone status */}
+                    <div className="flex items-center space-x-2">
+                      {/* Worker: Start work on pending milestone */}
+                      {isWorker && detailedContract.status === ContractStatus.ACTIVE && m.status === MilestoneStatus.PENDING && (
                         <button
-                          onClick={() => {
-                            setActiveMilestoneId(m.id);
-                            setActionType('SUBMIT');
-                            setSubmissionNotes('');
-                            setAttachmentUrl('');
-                          }}
-                          className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white flex items-center space-x-1"
+                          onClick={() => handleStartMilestone(m.id)}
+                          disabled={isSubmitting}
+                          className="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-xs font-semibold text-white"
                         >
-                          <Upload className="w-3.5 h-3.5" />
-                          <span>Submit Deliverable</span>
+                          Start Work
                         </button>
                       )}
 
-                    {/* Client: Review and approve or request revision */}
-                    {isClient && m.status === MilestoneStatus.SUBMITTED && (
-                      <>
-                        <button
-                          onClick={() => handleApproveMilestone(m.id)}
-                          disabled={isSubmitting}
-                          className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white"
-                        >
-                          Approve Deliverable
-                        </button>
-                        <button
-                          onClick={() => {
-                            setActiveMilestoneId(m.id);
-                            setActionType('REVISE');
-                            setRevisionReason('');
-                          }}
-                          className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-rose-500/10 hover:text-rose-400 border border-slate-700 text-xs font-medium text-slate-300"
-                        >
-                          Request Revision
-                        </button>
-                      </>
-                    )}
+                      {/* Worker: Submit deliverable */}
+                      {isWorker &&
+                        detailedContract.status === ContractStatus.ACTIVE &&
+                        (m.status === MilestoneStatus.IN_PROGRESS || m.status === MilestoneStatus.IN_REVISION) && (
+                          <button
+                            onClick={() => {
+                              setActiveMilestoneId(m.id);
+                              setActionType('SUBMIT');
+                              setSubmissionNotes('');
+                              setAttachmentUrl('');
+                            }}
+                            className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white flex items-center space-x-1"
+                          >
+                            <Upload className="w-3.5 h-3.5" />
+                            <span>Submit Deliverable</span>
+                          </button>
+                        )}
+
+                      {/* Client: Review and approve or request revision */}
+                      {isClient && m.status === MilestoneStatus.SUBMITTED && (
+                        <>
+                          <button
+                            onClick={() => handleApproveMilestone(m.id)}
+                            disabled={isSubmitting}
+                            className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white shadow-sm"
+                          >
+                            Approve Deliverable
+                          </button>
+                          <button
+                            onClick={() => {
+                              setActiveMilestoneId(m.id);
+                              setActionType('REVISE');
+                              setRevisionReason('');
+                            }}
+                            className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-rose-500/10 hover:text-rose-400 border border-slate-700 text-xs font-medium text-slate-300"
+                          >
+                            Request Revision
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
+
+                {/* Submissions & Deliverables Review */}
+                {m.submissions && m.submissions.length > 0 && (
+                  <div className="mt-3 pt-3 border-t border-slate-800/80 space-y-2">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                      Submitted Deliverables &amp; Evidence ({m.submissions.length})
+                    </span>
+                    <div className="space-y-2">
+                      {m.submissions.map((sub, sIdx) => {
+                        const subNumber = m.submissions ? m.submissions.length - sIdx : 1;
+                        const workerName = sub.worker ? `${sub.worker.firstName || ''} ${sub.worker.lastName || ''}`.trim() : 'Specialist';
+                        return (
+                          <div key={sub.id || sIdx} className="p-3 rounded-lg bg-slate-900/80 border border-slate-800 space-y-2">
+                            <div className="flex items-center justify-between text-[11px]">
+                              <span className="font-semibold text-white">
+                                Submission #{subNumber} by <span className="text-emerald-400">{workerName}</span>
+                              </span>
+                              <div className="flex items-center space-x-2">
+                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                                  sub.status === 'APPROVED' ? 'bg-emerald-500/20 text-emerald-300' :
+                                  sub.status === 'REJECTED' ? 'bg-rose-500/20 text-rose-300' :
+                                  'bg-blue-500/20 text-blue-300'
+                                }`}>
+                                  {sub.status}
+                                </span>
+                                <span className="text-[10px] text-slate-500">
+                                  {new Date(sub.submittedAt || sub.createdAt || Date.now()).toLocaleString()}
+                                </span>
+                              </div>
+                            </div>
+
+                            <p className="text-slate-300 text-xs bg-slate-950/60 p-2.5 rounded border border-slate-800/80 leading-relaxed">
+                              {sub.notes}
+                            </p>
+
+                            {sub.attachmentUrls && sub.attachmentUrls.length > 0 && (
+                              <div className="space-y-1">
+                                <span className="text-[10px] text-slate-400 font-medium">Deliverable Files / Links:</span>
+                                <div className="flex flex-wrap gap-2">
+                                  {sub.attachmentUrls.map((url, uIdx) => (
+                                    <a
+                                      key={uIdx}
+                                      href={url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-emerald-400 hover:text-emerald-300 text-[11px] border border-slate-700 transition"
+                                    >
+                                      <ExternalLink className="w-3 h-3 shrink-0" />
+                                      <span className="truncate max-w-[240px]">{url}</span>
+                                    </a>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Revision Requests on this submission */}
+                            {sub.revisionRequests && sub.revisionRequests.length > 0 && (
+                              <div className="mt-2 pt-2 border-t border-slate-800 space-y-1.5">
+                                <span className="text-[10px] font-semibold text-rose-400">Revision Request History:</span>
+                                {sub.revisionRequests.map((rev) => (
+                                  <div key={rev.id} className="p-2 rounded bg-rose-950/20 border border-rose-900/30 text-[11px] space-y-0.5">
+                                    <div className="flex items-center justify-between text-slate-400">
+                                      <span className="font-medium text-rose-300">
+                                        Requested by {rev.requestedBy ? `${rev.requestedBy.firstName || ''} ${rev.requestedBy.lastName || ''}`.trim() : 'Client'}:
+                                      </span>
+                                      <span className="text-[10px] text-slate-500">
+                                        {new Date(rev.createdAt).toLocaleString()}
+                                      </span>
+                                    </div>
+                                    <p className="text-slate-300">{rev.reason}</p>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -773,15 +936,42 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
                   />
                 </div>
 
-                <div>
-                  <label className="block text-slate-300 font-medium mb-1">Attachment or Repository URL (Optional)</label>
-                  <input
-                    type="url"
-                    value={attachmentUrl}
-                    onChange={(e) => setAttachmentUrl(e.target.value)}
-                    placeholder="https://github.com/... or https://storage..."
-                    className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-slate-200 focus:outline-none focus:border-emerald-500"
-                  />
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-slate-300 font-medium">Deliverable Evidence Files / Links</label>
+                    {isAuthorizingUpload && (
+                      <span className="text-[10px] text-emerald-400 animate-pulse">Authorizing upload...</span>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                      <label className="text-[10px] text-slate-400 block mb-1">Upload File (PDF, ZIP, Images, Docs)</label>
+                      <label className="flex items-center justify-center space-x-2 px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 hover:border-emerald-500 cursor-pointer text-slate-300 hover:text-white transition">
+                        <Paperclip className="w-3.5 h-3.5 text-emerald-400" />
+                        <span className="truncate max-w-[150px] text-[11px]">
+                          {uploadFileName || 'Choose Local File'}
+                        </span>
+                        <input
+                          type="file"
+                          onChange={handleDeliverableFileUpload}
+                          disabled={isAuthorizingUpload}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+
+                    <div>
+                      <label className="text-[10px] text-slate-400 block mb-1">Or Direct Attachment / Repo URL</label>
+                      <input
+                        type="url"
+                        value={attachmentUrl}
+                        onChange={(e) => setAttachmentUrl(e.target.value)}
+                        placeholder="https://github.com/... or https://..."
+                        className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-slate-200 focus:outline-none focus:border-emerald-500"
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div className="flex items-center justify-end space-x-2 pt-1">
@@ -790,6 +980,7 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
                     onClick={() => {
                       setActiveMilestoneId(null);
                       setActionType(null);
+                      setUploadFileName(null);
                     }}
                     className="px-3 py-1.5 rounded-lg bg-slate-700 text-slate-300"
                   >
@@ -845,21 +1036,24 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
 
         {/* Advanced Escrow, Disputes & Contract Lifecycle (Phase 6) */}
         <ContractLifecyclePanel
-          contract={contract}
+          contract={detailedContract}
           currentUserId={currentUserId}
           isClient={isClient}
           isWorker={isWorker}
-          onRefresh={onRefresh}
+          onRefresh={() => {
+            fetchContractDetails();
+            onRefresh();
+          }}
         />
 
         {/* Digital Acceptance Audit Trail */}
-        {contract.acceptances && contract.acceptances.length > 0 && (
+        {detailedContract.acceptances && detailedContract.acceptances.length > 0 && (
           <div className="space-y-2 pt-2 border-t border-slate-800 text-xs">
             <span className="font-semibold text-slate-400 uppercase tracking-wider text-[10px]">
               Digital Acceptance Audit Trail
             </span>
             <div className="space-y-1">
-              {contract.acceptances.map((acc) => (
+              {detailedContract.acceptances.map((acc) => (
                 <div key={acc.id} className="p-2.5 rounded-lg bg-slate-800/40 border border-slate-800 flex items-center justify-between">
                   <span className="text-emerald-400 font-medium">
                     ✓ {acc.role}: {acc.user?.firstName || ''} {acc.user?.lastName || ''} ({acc.user?.email})

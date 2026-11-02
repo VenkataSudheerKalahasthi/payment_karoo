@@ -48,8 +48,18 @@ export const MilestoneStatus = {
   IN_REVISION: 'IN_REVISION',
   APPROVED: 'APPROVED',
   CANCELLED: 'CANCELLED',
+  DISPUTED: 'DISPUTED',
 } as const;
 export type MilestoneStatus = (typeof MilestoneStatus)[keyof typeof MilestoneStatus];
+
+export const ProjectStatus = {
+  PLANNING: 'PLANNING',
+  ACTIVE: 'ACTIVE',
+  ON_HOLD: 'ON_HOLD',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED',
+} as const;
+export type ProjectStatus = (typeof ProjectStatus)[keyof typeof ProjectStatus];
 
 export const SubmissionStatus = {
   SUBMITTED: 'SUBMITTED',
@@ -394,14 +404,17 @@ export interface UserDto {
 export interface ContractMilestoneDto {
   id: string;
   contractId: string;
+  projectId?: string | null;
   title: string;
   description: string;
   amount: number;
+  amountMinor?: string | null;
   order: number;
   status: MilestoneStatus;
   dueDate?: string | null;
   submissionsCount?: number;
-  submissions?: { id: string }[];
+  submissions?: MilestoneSubmissionDto[];
+  activities?: MilestoneActivityDto[];
   createdAt: string;
 }
 
@@ -456,8 +469,64 @@ export interface ContractDto {
   endDate?: string | null;
   milestones?: ContractMilestoneDto[];
   acceptances?: ContractAcceptanceDto[];
+  versions?: ContractVersionDto[];
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ContractVersionDto {
+  id: string;
+  contractId: string;
+  version: number;
+  title: string;
+  description: string;
+  totalAmount: number;
+  currency: string;
+  scopeOfWork?: string | null;
+  termsAndConditions?: string | null;
+  cancellationTerms?: string | null;
+  revisionTerms?: string | null;
+  documentHash: string;
+  milestonesSnapshot: unknown;
+  versionReason: string;
+  createdById?: string | null;
+  contractStatusAtCreation: ContractStatus;
+  isAccepted: boolean;
+  createdAt: string;
+}
+
+export interface ContractIntegrityReportDto {
+  contractId: string;
+  contractNumber: string;
+  currentVersion: number;
+  storedDocumentHash: string | null;
+  recalculatedCanonicalHash: string;
+  isTamperFree: boolean;
+  mismatchDetected: boolean;
+  lastVerifiedAt: string;
+  versionsCount: number;
+  acceptancesCount: number;
+  allAcceptancesValid: boolean;
+  details: {
+    clientAccepted: boolean;
+    workerAccepted: boolean;
+    milestoneCount: number;
+    totalMilestoneAmount: number;
+    contractTotalAmount: number;
+    amountsMatch: boolean;
+  };
+}
+
+export interface ContractActivityHistoryDto {
+  id: string;
+  contractId: string;
+  action: string;
+  actorId?: string | null;
+  actorRole?: string | null;
+  actorEmail?: string | null;
+  version?: number | null;
+  details?: Record<string, unknown> | null;
+  createdAt: string;
 }
 
 export interface HiringRequestDto {
@@ -514,6 +583,10 @@ export interface DashboardMetricsDto {
   unreadNotifications: number;
   openDisputes?: number;
   revisionRequests?: number;
+  totalProjectValue?: number;
+  approvedMilestoneAmount?: number;
+  pendingMilestoneAmount?: number;
+  disputedMilestoneAmount?: number;
   recentActivities: {
     id: string;
     title: string;
@@ -531,12 +604,14 @@ export interface MilestoneSubmissionDto {
   attachmentUrls: string[];
   status: SubmissionStatus;
   submittedAt: string;
+  createdAt?: string;
   worker?: {
     id: string;
     firstName?: string | null;
     lastName?: string | null;
   };
   revisionsCount?: number;
+  revisionRequests?: RevisionRequestDto[];
 }
 
 export interface RevisionRequestDto {
@@ -584,6 +659,9 @@ export interface AuthSyncRequest {
 }
 
 export interface UpdateUserProfileRequest {
+  firstName?: string;
+  lastName?: string;
+  avatarUrl?: string;
   bio?: string;
   phoneNumber?: string;
   companyName?: string;
@@ -655,6 +733,16 @@ export interface CreateHiringRequestRequest {
 export interface RespondHiringRequestRequest {
   status: 'ACCEPTED' | 'DECLINED' | 'NEGOTIATION';
   workerResponse?: string;
+  proposedBudget?: number;
+  proposedStartDate?: string;
+  expectedCompletionDate?: string;
+}
+
+export interface CounterofferHiringRequestRequest {
+  proposedBudget?: number;
+  proposedStartDate?: string;
+  expectedCompletionDate?: string;
+  clientMessage: string;
 }
 
 export interface CreateShortlistRequest {
@@ -1133,4 +1221,112 @@ export interface EscrowActivityDto {
   metadata?: Record<string, unknown> | null;
   isLiveFinancialMovement: boolean;
   createdAt: string;
+}
+
+export interface ProjectDto {
+  id: string;
+  contractId: string;
+  clientId: string;
+  workerId: string;
+  title: string;
+  description: string;
+  scope?: string | null;
+  startDate?: string | null;
+  expectedCompletionDate?: string | null;
+  status: ProjectStatus;
+  progressPercentage: number;
+  totalMilestonesCount?: number;
+  approvedMilestonesCount?: number;
+  totalBudgetMinor?: string;
+  approvedBudgetMinor?: string;
+  pendingBudgetMinor?: string;
+  currency?: string;
+  client?: {
+    id: string;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+  };
+  worker?: {
+    id: string;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+  };
+  contract?: ContractDto;
+  milestones?: ContractMilestoneDto[];
+  activities?: MilestoneActivityDto[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface MilestoneActivityDto {
+  id: string;
+  contractId: string;
+  projectId?: string | null;
+  milestoneId?: string | null;
+  actorId: string;
+  actorRole: UserRole;
+  action: string;
+  previousState?: string | null;
+  newState?: string | null;
+  version?: number | null;
+  metadata?: Record<string, unknown> | null;
+  requestId?: string | null;
+  createdAt: string;
+  actor?: {
+    id: string;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    role?: { name: UserRole };
+  };
+}
+
+export interface ProjectProgressSummaryDto {
+  projectId: string;
+  contractId: string;
+  totalMilestones: number;
+  completedMilestones: number;
+  inProgressMilestones: number;
+  pendingMilestones: number;
+  inRevisionMilestones: number;
+  progressPercentage: number;
+  totalValueMinor: string;
+  approvedValueMinor: string;
+  pendingValueMinor: string;
+  disputedValueMinor: string;
+  remainingUnapprovedValueMinor: string;
+  currency: string;
+}
+
+export interface CreateProjectRequest {
+  contractId: string;
+  title?: string;
+  description?: string;
+  scope?: string;
+  startDate?: string;
+  expectedCompletionDate?: string;
+}
+
+export interface UpdateProjectRequest {
+  title?: string;
+  description?: string;
+  scope?: string;
+  status?: ProjectStatus;
+  startDate?: string;
+  expectedCompletionDate?: string;
+}
+
+export interface CreateMilestoneRequest {
+  title: string;
+  description: string;
+  amount: number;
+  order?: number;
+  dueDate?: string;
+}
+
+export interface MilestoneTransitionRequest {
+  targetStatus: MilestoneStatus;
+  reason?: string;
 }

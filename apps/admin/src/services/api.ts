@@ -13,6 +13,10 @@ import {
   EscrowActivityDto,
   ContractDto,
   ContractAmendmentDto,
+  ContractVersionDto,
+  ContractIntegrityReportDto,
+  ContractActivityHistoryDto,
+  NotificationDto,
 } from '@trustpay/shared';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
@@ -56,8 +60,14 @@ export const apiService = {
     return res.data;
   },
 
-  getCurrentUser: async (): Promise<ApiResponse<unknown>> => {
-    const res = await apiClient.get<ApiResponse<unknown>>('/auth/me');
+  getCurrentUser: async (token?: string): Promise<ApiResponse<unknown>> => {
+    const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
+    const res = await apiClient.get<ApiResponse<unknown>>('/auth/me', { headers });
+    return res.data;
+  },
+
+  getUserById: async (id: string): Promise<ApiResponse<unknown>> => {
+    const res = await apiClient.get<ApiResponse<unknown>>(`/users/${id}`);
     return res.data;
   },
 
@@ -159,8 +169,38 @@ export const apiService = {
     return res.data;
   },
 
+  getContractVersions: async (contractId: string): Promise<ApiResponse<ContractVersionDto[]>> => {
+    const res = await apiClient.get<ApiResponse<ContractVersionDto[]>>(`/contracts/${contractId}/versions`);
+    return res.data;
+  },
+
+  verifyContractIntegrity: async (contractId: string): Promise<ApiResponse<ContractIntegrityReportDto>> => {
+    const res = await apiClient.get<ApiResponse<ContractIntegrityReportDto>>(`/contracts/${contractId}/integrity`);
+    return res.data;
+  },
+
+  getContractActivityHistory: async (contractId: string): Promise<ApiResponse<ContractActivityHistoryDto[]>> => {
+    const res = await apiClient.get<ApiResponse<ContractActivityHistoryDto[]>>(`/contracts/${contractId}/activity-history`);
+    return res.data;
+  },
+
   listContractAmendments: async (contractId: string): Promise<ApiResponse<ContractAmendmentDto[]>> => {
     const res = await apiClient.get<ApiResponse<ContractAmendmentDto[]>>(`/contracts/${contractId}/amendments`);
+    return res.data;
+  },
+
+  listNotifications: async (): Promise<ApiResponse<{ items: NotificationDto[]; unreadCount: number }>> => {
+    const res = await apiClient.get<ApiResponse<{ items: NotificationDto[]; unreadCount: number }>>('/notifications');
+    return res.data;
+  },
+
+  markNotificationRead: async (id: string): Promise<ApiResponse<unknown>> => {
+    const res = await apiClient.patch<ApiResponse<unknown>>(`/notifications/${id}/read`);
+    return res.data;
+  },
+
+  markAllNotificationsRead: async (): Promise<ApiResponse<unknown>> => {
+    const res = await apiClient.patch<ApiResponse<unknown>>('/notifications/mark-all-read');
     return res.data;
   },
 };

@@ -7,10 +7,10 @@ export const syncUserSchema = z.object({
       message: 'Self-registration only permits CLIENT or WORKER roles. Administrative roles require provisioning.',
     })
     .default(UserRole.CLIENT),
-  email: z.string().email('Valid email address required').optional(),
-  firstName: z.string().max(50).optional(),
-  lastName: z.string().max(50).optional(),
-  avatarUrl: z.string().url('Avatar must be a valid URL').optional().or(z.literal('')),
+  email: z.string().email('Valid email address required').optional().nullable(),
+  firstName: z.string().max(100).optional().nullable(),
+  lastName: z.string().max(100).optional().nullable(),
+  avatarUrl: z.string().max(2048).optional().nullable().or(z.literal('')),
 });
 
 export type SyncUserInput = z.infer<typeof syncUserSchema>;

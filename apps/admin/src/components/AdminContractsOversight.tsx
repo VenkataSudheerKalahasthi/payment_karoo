@@ -3,22 +3,21 @@ import {
   Search,
   Filter,
   FileText,
-  AlertTriangle,
-  CheckCircle2,
-  Lock,
   RefreshCw,
   Scale,
   Eye,
-  History,
   Download,
-  Calendar,
+  ShieldCheck,
+  CheckCircle2,
+  AlertTriangle,
 } from 'lucide-react';
 import { apiService } from '../services/api';
 import {
   ContractDto,
   ContractAmendmentDto,
   EscrowActivityDto,
-  formatCurrencyMinor,
+  ContractVersionDto,
+  ContractIntegrityReportDto,
 } from '@trustpay/shared';
 
 interface AdminContractsOversightProps {
@@ -35,7 +34,9 @@ export const AdminContractsOversight: React.FC<AdminContractsOversightProps> = (
   const [selectedContract, setSelectedContract] = useState<ContractDto | null>(null);
   const [contractAmendments, setContractAmendments] = useState<ContractAmendmentDto[]>([]);
   const [contractActivities, setContractActivities] = useState<EscrowActivityDto[]>([]);
-  const [detailTab, setDetailTab] = useState<'milestones' | 'amendments' | 'activities'>('milestones');
+  const [contractVersions, setContractVersions] = useState<ContractVersionDto[]>([]);
+  const [integrityReport, setIntegrityReport] = useState<ContractIntegrityReportDto | null>(null);
+  const [detailTab, setDetailTab] = useState<'milestones' | 'amendments' | 'activities' | 'versions' | 'integrity'>('milestones');
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
 
   const loadContracts = useCallback(async () => {
@@ -59,9 +60,11 @@ export const AdminContractsOversight: React.FC<AdminContractsOversightProps> = (
     setIsLoadingDetails(true);
     setDetailTab('milestones');
     try {
-      const [amendRes, actRes] = await Promise.allSettled([
+      const [amendRes, actRes, verRes, intRes] = await Promise.allSettled([
         apiService.listContractAmendments(c.id),
         apiService.listEscrowActivities(c.id),
+        apiService.getContractVersions(c.id),
+        apiService.verifyContractIntegrity(c.id),
       ]);
       if (amendRes.status === 'fulfilled' && amendRes.value.success && amendRes.value.data) {
         setContractAmendments(amendRes.value.data);
@@ -72,6 +75,16 @@ export const AdminContractsOversight: React.FC<AdminContractsOversightProps> = (
         setContractActivities(actRes.value.data);
       } else {
         setContractActivities([]);
+      }
+      if (verRes.status === 'fulfilled' && verRes.value.success && verRes.value.data) {
+        setContractVersions(verRes.value.data);
+      } else {
+        setContractVersions([]);
+      }
+      if (intRes.status === 'fulfilled' && intRes.value.success && intRes.value.data) {
+        setIntegrityReport(intRes.value.data);
+      } else {
+        setIntegrityReport(null);
       }
     } finally {
       setIsLoadingDetails(false);
@@ -256,6 +269,9 @@ export const AdminContractsOversight: React.FC<AdminContractsOversightProps> = (
                   </span>
                   <span className="text-xs text-slate-400">v{selectedContract.version}</span>
                   {getStatusBadge(selectedContract.status)}
+                  {isLoadingDetails && (
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-emerald-400 inline" />
+                  )}
                 </div>
                 <h3 className="text-lg font-bold text-white mt-1">{selectedContract.title}</h3>
               </div>
@@ -310,6 +326,26 @@ export const AdminContractsOversight: React.FC<AdminContractsOversightProps> = (
                 Amendments History ({contractAmendments.length})
               </button>
               <button
+                onClick={() => setDetailTab('versions')}
+                className={`pb-2 transition ${
+                  detailTab === 'versions'
+                    ? 'text-emerald-400 border-b-2 border-emerald-400'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                Versions ({contractVersions.length})
+              </button>
+              <button
+                onClick={() => setDetailTab('integrity')}
+                className={`pb-2 transition ${
+                  detailTab === 'integrity'
+                    ? 'text-emerald-400 border-b-2 border-emerald-400'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                Integrity & Hash
+              </button>
+              <button
                 onClick={() => setDetailTab('activities')}
                 className={`pb-2 transition ${
                   detailTab === 'activities'
@@ -355,6 +391,69 @@ export const AdminContractsOversight: React.FC<AdminContractsOversightProps> = (
                       <p className="text-slate-400 text-[11px]">{a.reason}</p>
                     </div>
                   ))
+                )}
+              </div>
+            )}
+
+            {/* Tab 3: Versions */}
+            {detailTab === 'versions' && (
+              <div className="space-y-2">
+                {contractVersions.length === 0 ? (
+                  <p className="text-xs text-slate-500 italic text-center py-4">Current version: v{selectedContract.version}</p>
+                ) : (
+                  contractVersions.map((ver) => (
+                    <div key={ver.id} className="p-3 rounded-lg bg-slate-800/50 border border-slate-800 text-xs space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono font-bold text-emerald-400">Version {ver.version}</span>
+                        <span className="text-[10px] px-2 py-0.5 rounded bg-slate-700 text-slate-300">
+                          {ver.isAccepted ? 'MUTUALLY ACCEPTED' : 'PENDING'}
+                        </span>
+                      </div>
+                      <p className="text-slate-200 font-medium">{ver.title} — ${ver.totalAmount.toLocaleString()} {ver.currency}</p>
+                      <p className="text-[10px] font-mono text-slate-400 break-all">Hash: {ver.documentHash}</p>
+                      <p className="text-slate-400 text-[11px]">Reason: {ver.versionReason}</p>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+
+            {/* Tab 4: Integrity Audit */}
+            {detailTab === 'integrity' && (
+              <div className="space-y-3 p-3 bg-slate-950/60 rounded-xl border border-slate-800 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-slate-200">Cryptographic Integrity Status</span>
+                  {integrityReport?.isTamperFree ? (
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center space-x-1">
+                      <CheckCircle2 className="w-3 h-3" />
+                      <span>CRYPTOGRAPHICALLY TAMPER-FREE</span>
+                    </span>
+                  ) : (
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center space-x-1">
+                      <AlertTriangle className="w-3 h-3" />
+                      <span>HASH DIVERGENCE / COMPLIANCE VIOLATION</span>
+                    </span>
+                  )}
+                </div>
+
+                <div className="font-mono text-[10px] space-y-1">
+                  <div className="text-slate-400">Stored Document Hash:</div>
+                  <div className="p-1.5 bg-slate-900 rounded border border-slate-800 break-all text-slate-300">
+                    {integrityReport?.storedDocumentHash || selectedContract.documentHash || 'Pending bilateral sign-off'}
+                  </div>
+                  <div className="text-slate-400 mt-1">Recalculated Canonical SHA-256:</div>
+                  <div className="p-1.5 bg-slate-900 rounded border border-slate-800 break-all text-emerald-400">
+                    {integrityReport?.recalculatedCanonicalHash || 'Calculating on demand'}
+                  </div>
+                </div>
+
+                {integrityReport && (
+                  <div className="grid grid-cols-2 gap-2 text-[10px] pt-2 border-t border-slate-800">
+                    <div>Total Milestones: ${integrityReport.details.totalMilestoneAmount.toLocaleString()}</div>
+                    <div>Contract Sum: ${integrityReport.details.contractTotalAmount.toLocaleString()}</div>
+                    <div>Client Signed: {integrityReport.details.clientAccepted ? 'Yes' : 'No'}</div>
+                    <div>Worker Signed: {integrityReport.details.workerAccepted ? 'Yes' : 'No'}</div>
+                  </div>
                 )}
               </div>
             )}

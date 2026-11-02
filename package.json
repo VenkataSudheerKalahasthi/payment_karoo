@@ -18,6 +18,8 @@
     "build:web": "npm run build --workspace=@trustpay/web",
     "build:admin": "npm run build --workspace=@trustpay/admin",
     "build:superadmin": "npm run build --workspace=@trustpay/superadmin",
+    "start": "npm run start:api",
+    "start:api": "npm run start --workspace=@trustpay/api",
     "typecheck": "npm run typecheck:shared && npm run typecheck:api && npm run typecheck:web && npm run typecheck:admin && npm run typecheck:superadmin",
     "typecheck:shared": "npm run typecheck --workspace=@trustpay/shared",
     "typecheck:api": "npm run typecheck --workspace=@trustpay/api",

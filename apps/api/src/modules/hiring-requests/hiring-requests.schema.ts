@@ -20,8 +20,19 @@ export const respondHiringRequestSchema = z.object({
     HiringRequestStatus.NEGOTIATION,
   ]),
   workerResponse: z.string().trim().max(1000).optional(),
+  proposedBudget: z.number().positive('Budget must be positive').optional(),
+  proposedStartDate: z.string().datetime().optional().nullable(),
+  expectedCompletionDate: z.string().datetime().optional().nullable(),
+});
+
+export const counterofferHiringRequestSchema = z.object({
+  proposedBudget: z.number().positive('Budget must be positive').optional(),
+  proposedStartDate: z.string().datetime().optional().nullable(),
+  expectedCompletionDate: z.string().datetime().optional().nullable(),
+  clientMessage: z.string().trim().min(5, 'Message must be at least 5 characters').max(1000),
 });
 
 export type CreateHiringRequestInput = z.infer<typeof createHiringRequestSchema>;
 export type RespondHiringRequestInput = z.infer<typeof respondHiringRequestSchema>;
+export type CounterofferHiringRequestInput = z.infer<typeof counterofferHiringRequestSchema>;
 

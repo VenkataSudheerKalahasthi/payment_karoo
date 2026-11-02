@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { prisma } from '../../config/prisma.js';
-import { UserRole } from '@prisma/client';
+import { UserRole, DisputeStatus } from '@prisma/client';
 import { sendSuccess, sendError } from '../../utils/response.js';
 import { recordAuditLog, recordAdminActivity } from '../../utils/audit.js';
 import { logger } from '../../utils/logger.js';
@@ -13,29 +13,51 @@ export async function getAdminDashboardMetrics(req: Request, res: Response): Pro
       totalClients,
       totalWorkers,
       totalAdmins,
+      totalSuperadmins,
+      activeUsers,
+      suspendedUsers,
       totalContracts,
       activeContracts,
       completedContracts,
       disputedContracts,
+      cancelledContracts,
       totalMilestones,
       totalHiringRequests,
       pendingHiringRequests,
+      totalDisputes,
+      pendingDisputes,
+      escalatedDisputes,
+      totalEscrows,
+      activeEscrowHolds,
+      totalTransactions,
+      totalAuditLogs,
     ] = await Promise.all([
       prisma.user.count(),
       prisma.user.count({ where: { role: { name: UserRole.CLIENT } } }),
       prisma.user.count({ where: { role: { name: UserRole.WORKER } } }),
-      prisma.user.count({
-        where: {
-          role: { name: { in: [UserRole.ADMIN, UserRole.SUPERADMIN] } },
-        },
-      }),
+      prisma.user.count({ where: { role: { name: UserRole.ADMIN } } }),
+      prisma.user.count({ where: { role: { name: UserRole.SUPERADMIN } } }),
+      prisma.user.count({ where: { status: 'ACTIVE' } }),
+      prisma.user.count({ where: { status: 'SUSPENDED' } }),
       prisma.contract.count(),
       prisma.contract.count({ where: { status: 'ACTIVE' } }),
       prisma.contract.count({ where: { status: 'COMPLETED' } }),
       prisma.contract.count({ where: { status: 'DISPUTED' } }),
+      prisma.contract.count({ where: { status: 'CANCELLED' } }),
       prisma.contractMilestone.count(),
       prisma.hiringRequest.count(),
       prisma.hiringRequest.count({ where: { status: 'PENDING' } }),
+      prisma.dispute.count(),
+      prisma.dispute.count({
+        where: {
+          status: { notIn: [DisputeStatus.RESOLVED, DisputeStatus.CLOSED] },
+        },
+      }),
+      prisma.dispute.count({ where: { status: DisputeStatus.ESCALATED } }),
+      prisma.escrowRecord.count(),
+      prisma.escrowRecord.count({ where: { disputeHold: true } }),
+      prisma.ledgerTransaction.count(),
+      prisma.auditLog.count(),
     ]);
 
     sendSuccess(res, 200, {
@@ -44,12 +66,16 @@ export async function getAdminDashboardMetrics(req: Request, res: Response): Pro
         clients: totalClients,
         workers: totalWorkers,
         admins: totalAdmins,
+        superadmins: totalSuperadmins,
+        active: activeUsers,
+        suspended: suspendedUsers,
       },
       contracts: {
         total: totalContracts,
         active: activeContracts,
         completed: completedContracts,
         disputed: disputedContracts,
+        cancelled: cancelledContracts,
       },
       milestones: {
         total: totalMilestones,
@@ -57,6 +83,21 @@ export async function getAdminDashboardMetrics(req: Request, res: Response): Pro
       hiringRequests: {
         total: totalHiringRequests,
         pending: pendingHiringRequests,
+      },
+      disputes: {
+        total: totalDisputes,
+        pending: pendingDisputes,
+        escalated: escalatedDisputes,
+      },
+      escrow: {
+        total: totalEscrows,
+        activeHolds: activeEscrowHolds,
+      },
+      ledger: {
+        totalTransactions,
+      },
+      security: {
+        totalAuditLogs,
       },
     });
   } catch (error) {

@@ -48,6 +48,15 @@ enum MilestoneStatus {
   IN_REVISION
   APPROVED
   CANCELLED
+  DISPUTED
+}
+
+enum ProjectStatus {
+  PLANNING
+  ACTIVE
+  ON_HOLD
+  COMPLETED
+  CANCELLED
 }
 
 enum SubmissionStatus {
@@ -300,7 +309,11 @@ model User {
   disputeNotes             DisputeInternalNote[]
   proposedAmendments       ContractAmendment[]       @relation("ProposedAmendments")
   initiatedTerminations    ContractTerminationRequest[] @relation("InitiatedTerminations")
+  createdContractVersions  ContractVersion[]            @relation("CreatedContractVersions")
   escrowActivities         EscrowActivity[]
+  clientProjects           Project[]                    @relation("ClientProjects")
+  workerProjects           Project[]                    @relation("WorkerProjects")
+  milestoneActivities      MilestoneActivity[]
 
   @@index([clerkId])
   @@index([email])
@@ -426,6 +439,9 @@ model Contract {
   disputes           Dispute[]
   amendments         ContractAmendment[]
   terminationRequests ContractTerminationRequest[]
+  versions           ContractVersion[]
+  project            Project?
+  milestoneActivities MilestoneActivity[]
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
 
@@ -437,24 +453,84 @@ model Contract {
 }
 
 model ContractMilestone {
-  id          String                @id @default(uuid())
-  contractId  String
-  title       String
-  description String
-  amount      Decimal               @db.Decimal(12, 2)
-  order       Int                   @default(1)
-  status      MilestoneStatus       @default(PENDING)
-  dueDate     DateTime?
-  contract    Contract              @relation(fields: [contractId], references: [id], onDelete: Cascade)
-  submissions MilestoneSubmission[]
+  id               String                     @id @default(uuid())
+  contractId       String
+  projectId        String?
+  title            String
+  description      String
+  amount           Decimal                    @db.Decimal(12, 2)
+  order            Int                        @default(1)
+  status           MilestoneStatus            @default(PENDING)
+  dueDate          DateTime?
+  contract         Contract                   @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  project          Project?                   @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  submissions      MilestoneSubmission[]
   escrowAllocation EscrowMilestoneAllocation?
   disputes         Dispute[]
-  createdAt   DateTime              @default(now())
-  updatedAt   DateTime              @updatedAt
+  activities       MilestoneActivity[]
+  createdAt        DateTime                   @default(now())
+  updatedAt        DateTime                   @updatedAt
 
   @@index([contractId])
+  @@index([projectId])
   @@index([status])
   @@map("contract_milestones")
+}
+
+model Project {
+  id                     String              @id @default(uuid())
+  contractId             String              @unique
+  clientId               String
+  workerId               String
+  title                  String
+  description            String
+  scope                  String?
+  startDate              DateTime?
+  expectedCompletionDate DateTime?
+  status                 ProjectStatus       @default(ACTIVE)
+  progressPercentage     Int                 @default(0)
+  createdAt              DateTime            @default(now())
+  updatedAt              DateTime            @updatedAt
+
+  contract               Contract            @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  client                 User                @relation("ClientProjects", fields: [clientId], references: [id])
+  worker                 User                @relation("WorkerProjects", fields: [workerId], references: [id])
+  milestones             ContractMilestone[]
+  activities             MilestoneActivity[]
+
+  @@index([contractId])
+  @@index([clientId])
+  @@index([workerId])
+  @@index([status])
+  @@map("projects")
+}
+
+model MilestoneActivity {
+  id            String             @id @default(uuid())
+  contractId    String
+  projectId     String?
+  milestoneId   String?
+  actorId       String
+  actorRole     UserRole
+  action        String
+  previousState String?
+  newState      String?
+  version       Int?               @default(1)
+  metadata      Json?
+  requestId     String?
+  createdAt     DateTime           @default(now())
+
+  contract      Contract           @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  project       Project?           @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  milestone     ContractMilestone? @relation(fields: [milestoneId], references: [id], onDelete: SetNull)
+  actor         User               @relation(fields: [actorId], references: [id])
+
+  @@index([contractId])
+  @@index([projectId])
+  @@index([milestoneId])
+  @@index([actorId])
+  @@index([createdAt])
+  @@map("milestone_activities")
 }
 
 model MilestoneSubmission {
@@ -561,6 +637,35 @@ model ContractAcceptance {
   @@index([userId])
   @@index([version])
   @@map("contract_acceptances")
+}
+
+model ContractVersion {
+  id                        String         @id @default(uuid())
+  contractId                String
+  version                   Int
+  title                     String
+  description               String
+  totalAmount               Decimal        @db.Decimal(12, 2)
+  currency                  String         @default("USD")
+  scopeOfWork               String?
+  termsAndConditions        String?
+  cancellationTerms         String?
+  revisionTerms             String?
+  documentHash              String
+  milestonesSnapshot        Json
+  versionReason             String         @default("INITIAL_CONTRACT")
+  createdById               String?
+  contractStatusAtCreation  ContractStatus @default(PENDING_ACCEPTANCE)
+  isAccepted                Boolean        @default(false)
+  createdAt                 DateTime       @default(now())
+
+  contract                  Contract       @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  createdBy                 User?          @relation("CreatedContractVersions", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@unique([contractId, version])
+  @@index([contractId])
+  @@index([version])
+  @@map("contract_versions")
 }
 
 // ==============================================================================

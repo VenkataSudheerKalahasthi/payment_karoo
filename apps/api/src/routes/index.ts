@@ -19,6 +19,7 @@ import { paymentsRoutes } from '../modules/payments/payments.routes.js';
 import { webhooksRoutes } from '../modules/webhooks/webhooks.routes.js';
 import { storageRoutes } from '../modules/storage/storage.routes.js';
 import disputesRoutes from '../modules/disputes/disputes.routes.js';
+import { projectsRoutes } from '../modules/projects/projects.routes.js';
 
 const apiRouter = Router();
 
@@ -81,5 +82,8 @@ apiRouter.use('/storage', storageRoutes);
 
 // 20. Advanced Dispute Management & Arbitration Module (Phase 6)
 apiRouter.use('/disputes', disputesRoutes);
+
+// 21. Projects & Milestone Management Module (Phase 9)
+apiRouter.use('/projects', projectsRoutes);
 
 export { apiRouter };

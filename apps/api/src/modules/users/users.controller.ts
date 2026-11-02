@@ -119,13 +119,27 @@ export async function updateUserStatus(req: Request, res: Response): Promise<voi
       return;
     }
 
-    // Protection: ADMIN cannot modify SUPERADMIN status
-    if (target.role.name === UserRole.SUPERADMIN && admin.role.name !== UserRole.SUPERADMIN) {
+    // Protection: Disallow self-suspension / self-deactivation
+    if (admin.id === target.id && input.status !== 'ACTIVE') {
+      sendError(
+        res,
+        400,
+        'SELF_SUSPENSION_PROHIBITED',
+        'Administrators cannot suspend or deactivate their own account.',
+      );
+      return;
+    }
+
+    // Protection: Only Superadmins can modify the status of an Admin or Superadmin
+    if (
+      (target.role.name === UserRole.ADMIN || target.role.name === UserRole.SUPERADMIN) &&
+      admin.role.name !== UserRole.SUPERADMIN
+    ) {
       sendError(
         res,
         403,
         'FORBIDDEN',
-        'Only Superadmins can modify the status of another Superadmin.',
+        'Only Superadmins can modify the status of an Administrator or Superadmin account.',
       );
       return;
     }

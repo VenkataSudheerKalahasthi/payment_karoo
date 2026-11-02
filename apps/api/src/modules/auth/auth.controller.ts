@@ -45,55 +45,8 @@ export async function syncUser(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { clerkId: clerkAuth.clerkId },
-      include: {
-        role: true,
-        profile: true,
-        workerProfile: {
-          include: {
-            skills: { include: { skill: true } },
-            portfolioItems: true,
-          },
-        },
-      },
-    });
-
-    if (existingUser) {
-      // Update existing user profile info if provided
-      const updatedUser = await prisma.user.update({
-        where: { id: existingUser.id },
-        data: {
-          email,
-          firstName: firstName ?? existingUser.firstName,
-          lastName: lastName ?? existingUser.lastName,
-          avatarUrl: avatarUrl ?? existingUser.avatarUrl,
-        },
-        include: {
-          role: true,
-          profile: true,
-          workerProfile: {
-            include: {
-              skills: { include: { skill: true } },
-              portfolioItems: true,
-            },
-          },
-        },
-      });
-
-      await recordAuditLog({
-        actorId: updatedUser.id,
-        action: 'USER_SYNC_LOGIN',
-        resource: 'User',
-        resourceId: updatedUser.id,
-        details: { email: updatedUser.email },
-        req,
-      });
-
-      sendSuccess(res, 200, updatedUser);
-      return;
-    }
+    // Check if user already exists by clerkId or email
+    const normalizedEmail = email.toLowerCase().trim();
 
     // Role verification: strictly ensure public users cannot self-assign ADMIN or SUPERADMIN
     const requestedRole = input.role || UserRole.CLIENT;
@@ -114,6 +67,70 @@ export async function syncUser(req: Request, res: Response): Promise<void> {
 
     if (!dbRole) {
       sendError(res, 500, 'ROLE_NOT_CONFIGURED', `Role ${requestedRole} not found in database`);
+      return;
+    }
+
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [{ clerkId: clerkAuth.clerkId }, { email: normalizedEmail }],
+      },
+      include: {
+        role: true,
+        profile: true,
+        workerProfile: {
+          include: {
+            skills: { include: { skill: true } },
+            portfolioItems: true,
+          },
+        },
+      },
+    });
+
+    if (existingUser) {
+      const isPrivileged =
+        existingUser.role.name === UserRole.ADMIN ||
+        existingUser.role.name === UserRole.SUPERADMIN;
+
+      // Update existing user profile info and synchronize clerkId & role if appropriate
+      const updatedUser = await prisma.user.update({
+        where: { id: existingUser.id },
+        data: {
+          clerkId: clerkAuth.clerkId,
+          email: normalizedEmail,
+          firstName: firstName ?? existingUser.firstName,
+          lastName: lastName ?? existingUser.lastName,
+          avatarUrl: avatarUrl ?? existingUser.avatarUrl,
+          ...(!isPrivileged && input.role ? { roleId: dbRole.id } : {}),
+          ...(requestedRole === UserRole.WORKER && !existingUser.workerProfile
+            ? {
+                workerProfile: {
+                  create: {},
+                },
+              }
+            : {}),
+        },
+        include: {
+          role: true,
+          profile: true,
+          workerProfile: {
+            include: {
+              skills: { include: { skill: true } },
+              portfolioItems: true,
+            },
+          },
+        },
+      });
+
+      await recordAuditLog({
+        actorId: updatedUser.id,
+        action: 'USER_SYNC_LOGIN',
+        resource: 'User',
+        resourceId: updatedUser.id,
+        details: { email: updatedUser.email, role: updatedUser.role.name },
+        req,
+      });
+
+      sendSuccess(res, 200, updatedUser);
       return;
     }
 

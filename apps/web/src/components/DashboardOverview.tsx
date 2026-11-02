@@ -12,6 +12,8 @@ import {
   Users,
   Scale,
   RotateCcw,
+  DollarSign,
+  ShieldAlert,
 } from 'lucide-react';
 
 interface DashboardOverviewProps {
@@ -224,6 +226,64 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
           </div>
         </div>
       )}
+
+      {/* Contractual Financial Telemetry Grid */}
+      <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-900/90 via-slate-900/60 to-emerald-950/20 border border-slate-800 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+          <div className="flex items-center space-x-2">
+            <DollarSign className="w-4 h-4 text-emerald-400" />
+            <h3 className="text-sm font-bold text-white">
+              {isWorker ? 'Contractual Specialist Earnings Telemetry' : 'Contractual Client Volume & Escrow Overview'}
+            </h3>
+          </div>
+          <div className="flex items-center space-x-1.5 text-[10px] text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20 font-mono">
+            <ShieldAlert className="w-3 h-3" />
+            <span>CASHFREE PHASE 5 DEFERRED • NON-CUSTODIAL ESCROW</span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 space-y-1">
+            <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+              {isWorker ? 'Total Contracted Value' : 'Total Agreement Volume'}
+            </span>
+            <div className="text-xl font-extrabold text-white">
+              ${(metrics?.totalProjectValue ?? 0).toLocaleString()}
+            </div>
+            <span className="text-[10px] text-slate-500">Active &amp; completed agreements</span>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 space-y-1">
+            <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-wider">
+              Approved Milestones
+            </span>
+            <div className="text-xl font-extrabold text-emerald-400">
+              ${(metrics?.approvedMilestoneAmount ?? 0).toLocaleString()}
+            </div>
+            <span className="text-[10px] text-slate-500">Verified deliverable sign-offs</span>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 space-y-1">
+            <span className="text-[10px] uppercase font-bold text-amber-400 tracking-wider">
+              Pipeline Deliverables
+            </span>
+            <div className="text-xl font-extrabold text-amber-300">
+              ${(metrics?.pendingMilestoneAmount ?? 0).toLocaleString()}
+            </div>
+            <span className="text-[10px] text-slate-500">In progress / under review</span>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 space-y-1">
+            <span className="text-[10px] uppercase font-bold text-rose-400 tracking-wider">
+              Disputed Escrow Holds
+            </span>
+            <div className="text-xl font-extrabold text-rose-400">
+              ${(metrics?.disputedMilestoneAmount ?? 0).toLocaleString()}
+            </div>
+            <span className="text-[10px] text-slate-500">Operational dispute holds</span>
+          </div>
+        </div>
+      </div>
 
       {/* Recent Activity Telemetry */}
       <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-6 space-y-4">
