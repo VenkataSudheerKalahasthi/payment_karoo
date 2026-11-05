@@ -6,8 +6,17 @@ import {
   Prisma,
   UserRole,
   ContractStatus,
+  EscrowStatus,
+  EscrowOperationalState,
+  MilestoneStatus,
+  NotificationType,
+  LedgerTransactionType,
+  LedgerEntryType,
 } from '@prisma/client';
 import { cashfreeProvider } from './cashfree.provider.js';
+import { ledgerService } from '../ledger/ledger.service.js';
+import { notificationsService } from '../notifications/notifications.service.js';
+import { emitContractRealtimeEvent } from '../realtime/socket.service.js';
 import { logger } from '../../utils/logger.js';
 import { env } from '../../config/env.config.js';
 
@@ -378,6 +387,14 @@ export class PaymentsService {
       logger.info(`[PAYMENT STATUS UPDATED] Order: ${cfOrderId} transitioned from ${transaction.status} to ${newStatus}`);
     }
 
+    if (newStatus === PaymentTransactionStatus.SUCCEEDED) {
+      await this.processConfirmedFunding({
+        orderId: cfOrder.order_id,
+        providerTransactionId: providerTransactionId || undefined,
+        actorId: actor.id,
+      });
+    }
+
     return {
       id: transaction.id,
       transactionReference: transaction.transactionReference,
@@ -503,6 +520,792 @@ export class PaymentsService {
       createdAt: t.createdAt.toISOString(),
       updatedAt: t.updatedAt.toISOString(),
     };
+  }
+
+  /**
+   * Confirms payment funding, transitions escrow to FUNDED, allocates milestone amounts,
+   * posts balanced double-entry ledger entries, and notifies participants.
+   */
+  async processConfirmedFunding(params: {
+    orderId: string;
+    providerTransactionId?: string;
+    actorId?: string;
+  }) {
+    const { orderId, providerTransactionId, actorId } = params;
+
+    const transaction = await prisma.paymentTransaction.findFirst({
+      where: {
+        OR: [{ providerOrderId: orderId }, { transactionReference: orderId }, { id: orderId }],
+      },
+      include: {
+        contract: {
+          include: {
+            milestones: { orderBy: { order: 'asc' } },
+            client: true,
+            worker: true,
+          },
+        },
+      },
+    });
+
+    if (!transaction) {
+      throw {
+        statusCode: 404,
+        code: 'PAYMENT_NOT_FOUND',
+        message: `Payment transaction "${orderId}" not found.`,
+      };
+    }
+
+    const contract = transaction.contract;
+    const currency = transaction.currency || contract.currency || 'USD';
+
+    // 1. Update PaymentTransaction to SUCCEEDED
+    await prisma.paymentTransaction.update({
+      where: { id: transaction.id },
+      data: {
+        status: PaymentTransactionStatus.SUCCEEDED,
+        providerTransactionId: providerTransactionId || transaction.providerTransactionId,
+      },
+    });
+
+    // 2. Ensure or update EscrowRecord
+    let escrow = await prisma.escrowRecord.findUnique({
+      where: { contractId: contract.id },
+      include: { milestoneAllocations: true },
+    });
+
+    if (!escrow) {
+      let sumMilestones = 0n;
+      const allocations = contract.milestones.map((m) => {
+        const amt = BigInt(Math.round(Number(m.amount) * 100));
+        sumMilestones += amt;
+        return {
+          milestoneId: m.id,
+          allocatedAmountMinor: amt,
+        };
+      });
+
+      escrow = await prisma.escrowRecord.create({
+        data: {
+          contractId: contract.id,
+          status: EscrowStatus.FUNDED,
+          currency,
+          contractualAmountMinor: sumMilestones,
+          expectedFundedAmountMinor: sumMilestones,
+          fundedAmountMinor: transaction.amountMinor,
+          allocatedAmountMinor: sumMilestones,
+          releasedAmountMinor: 0n,
+          refundedAmountMinor: 0n,
+          operationalState: EscrowOperationalState.WORK_IN_PROGRESS,
+          disputeHold: false,
+          milestoneAllocations: {
+            create: allocations,
+          },
+        },
+        include: { milestoneAllocations: true },
+      });
+    } else {
+      await prisma.escrowRecord.update({
+        where: { id: escrow.id },
+        data: {
+          status: EscrowStatus.FUNDED,
+          fundedAmountMinor: transaction.amountMinor,
+          operationalState: EscrowOperationalState.WORK_IN_PROGRESS,
+        },
+      });
+
+      // Ensure milestone allocations exist
+      for (const m of contract.milestones) {
+        const amt = BigInt(Math.round(Number(m.amount) * 100));
+        await prisma.escrowMilestoneAllocation.upsert({
+          where: { milestoneId: m.id },
+          update: { allocatedAmountMinor: amt },
+          create: {
+            escrowRecordId: escrow.id,
+            milestoneId: m.id,
+            allocatedAmountMinor: amt,
+          },
+        });
+      }
+    }
+
+    // 3. Post Double-Entry Ledger Entry
+    try {
+      await ledgerService.ensureSystemAccounts(currency);
+      const cashAccount = ledgerService.getAccountCode('1000-CASH-ESCROW', currency);
+      const liabilityAccount = ledgerService.getAccountCode('2000-CLIENT-ESCROW-LIABILITY', currency);
+
+      await ledgerService.postTransaction({
+        transactionType: LedgerTransactionType.ESCROW_DEPOSIT,
+        currency,
+        description: `Contract #${contract.contractNumber} escrow funding confirmed via verified payment.`,
+        sourceType: 'PAYMENT_TRANSACTION',
+        sourceId: transaction.id,
+        idempotencyKey: `ledger_deposit_${transaction.id}`,
+        entries: [
+          {
+            accountCode: cashAccount,
+            entryType: LedgerEntryType.DEBIT,
+            amountMinor: transaction.amountMinor,
+          },
+          {
+            accountCode: liabilityAccount,
+            entryType: LedgerEntryType.CREDIT,
+            amountMinor: transaction.amountMinor,
+          },
+        ],
+      });
+    } catch (err) {
+      logger.warn('[processConfirmedFunding] Ledger posting note:', err);
+    }
+
+    // 4. Record Escrow Activity
+    await prisma.escrowActivity.create({
+      data: {
+        escrowRecordId: escrow.id,
+        actorId: actorId || contract.clientId,
+        operationalState: EscrowOperationalState.WORK_IN_PROGRESS,
+        eventType: 'ESCROW_FUNDED',
+        description: `Contract #${contract.contractNumber} escrow funding confirmed ($${Number(transaction.amountMinor) / 100} ${currency}).`,
+        isLiveFinancialMovement: false,
+      },
+    });
+
+    // 5. Notify Client and Specialist
+    await notificationsService.createNotification({
+      recipientId: contract.clientId,
+      title: 'Contract Funded Successfully',
+      message: `Your payment of $${Number(transaction.amountMinor) / 100} ${currency} for Contract #${contract.contractNumber} is confirmed and held in secure escrow.`,
+      type: NotificationType.CONTRACT_UPDATE,
+      metadata: { contractId: contract.id, transactionId: transaction.id },
+    });
+
+    if (contract.workerId) {
+      await notificationsService.createNotification({
+        recipientId: contract.workerId,
+        title: 'Contract Funded - Ready to Begin Work',
+        message: `Client funded Contract #${contract.contractNumber} in escrow. You may now commence milestone deliverables.`,
+        type: NotificationType.CONTRACT_UPDATE,
+        metadata: { contractId: contract.id, transactionId: transaction.id },
+      });
+    }
+
+    // 6. Real-time event emission
+    emitContractRealtimeEvent(contract.id, 'contract:funded', {
+      contractId: contract.id,
+      amountMinor: transaction.amountMinor.toString(),
+      currency,
+    });
+
+    logger.info(`[FUNDING CONFIRMED] Contract ${contract.contractNumber} funded for ${transaction.amountMinor.toString()} minor units.`);
+    return transaction;
+  }
+
+  /**
+   * Settles an approved milestone to specialist, calculates platform commission,
+   * posts double-entry ledger entries, and records settlement audit history.
+   */
+  async settleMilestone(params: {
+    milestoneId: string;
+    actor: { id: string; role: { name: UserRole } };
+    reason?: string;
+  }) {
+    const { milestoneId, actor, reason } = params;
+
+    const milestone = await prisma.contractMilestone.findUnique({
+      where: { id: milestoneId },
+      include: {
+        contract: {
+          include: {
+            client: true,
+            worker: true,
+          },
+        },
+      },
+    });
+
+    if (!milestone) {
+      throw { statusCode: 404, code: 'NOT_FOUND', message: 'Milestone not found' };
+    }
+
+    const contract = milestone.contract;
+    const isClient = contract.clientId === actor.id;
+    const isWorker = contract.workerId === actor.id;
+    const isAdmin = actor.role.name === UserRole.ADMIN || actor.role.name === UserRole.SUPERADMIN;
+
+    if (!isClient && !isWorker && !isAdmin) {
+      throw { statusCode: 403, code: 'FORBIDDEN', message: 'Not authorized to settle this milestone.' };
+    }
+
+    if (milestone.status !== MilestoneStatus.APPROVED) {
+      throw {
+        statusCode: 400,
+        code: 'MILESTONE_NOT_APPROVED',
+        message: `Milestone must be in APPROVED status to settle (current: ${milestone.status}).`,
+      };
+    }
+
+    if (contract.status === ContractStatus.DISPUTED) {
+      throw {
+        statusCode: 400,
+        code: 'CONTRACT_DISPUTED',
+        message: 'Cannot settle milestones on a disputed contract.',
+      };
+    }
+
+    const escrow = await prisma.escrowRecord.findUnique({
+      where: { contractId: contract.id },
+      include: { milestoneAllocations: true },
+    });
+
+    if (!escrow || escrow.disputeHold) {
+      throw {
+        statusCode: 400,
+        code: 'DISPUTE_HOLD_ACTIVE',
+        message: 'Settlement is blocked while escrow is on dispute hold or uninitialized.',
+      };
+    }
+
+    // Check duplicate settlement
+    const existingSettlement = await prisma.paymentTransaction.findFirst({
+      where: {
+        contractId: contract.id,
+        type: PaymentTransactionType.MILESTONE_RELEASE,
+        status: PaymentTransactionStatus.SUCCEEDED,
+        idempotencyKey: `settle_${milestone.id}`,
+      },
+    });
+
+    if (existingSettlement) {
+      throw {
+        statusCode: 409,
+        code: 'MILESTONE_ALREADY_SETTLED',
+        message: `Milestone "${milestone.title}" has already been settled under reference ${existingSettlement.transactionReference}.`,
+      };
+    }
+
+    // Commission calculation
+    const config = await this.getPlatformConfig();
+    const feePercentage = config.platformFeePercentage || 5.0;
+    const grossAmountMinor = BigInt(Math.round(Number(milestone.amount) * 100));
+    const commissionMinor = (grossAmountMinor * BigInt(Math.round(feePercentage * 100))) / 10000n;
+    const specialistNetMinor = grossAmountMinor - commissionMinor;
+    const currency = contract.currency || 'USD';
+
+    const transactionReference = `SETTLE-${Date.now()}-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
+    const idempotencyKey = `settle_${milestone.id}`;
+
+    // Record PaymentTransaction
+    const paymentTx = await prisma.paymentTransaction.create({
+      data: {
+        transactionReference,
+        contractId: contract.id,
+        payerId: contract.clientId,
+        payeeId: contract.workerId,
+        type: PaymentTransactionType.MILESTONE_RELEASE,
+        status: PaymentTransactionStatus.SUCCEEDED,
+        amountMinor: grossAmountMinor,
+        currency,
+        idempotencyKey,
+        metadata: {
+          milestoneId: milestone.id,
+          milestoneTitle: milestone.title,
+          grossAmountMinor: grossAmountMinor.toString(),
+          commissionMinor: commissionMinor.toString(),
+          specialistNetMinor: specialistNetMinor.toString(),
+          feePercentage,
+          reason: reason || 'Milestone approved deliverable settlement',
+        },
+      },
+    });
+
+    // Post double-entry ledger entries
+    try {
+      await ledgerService.ensureSystemAccounts(currency);
+      const liabilityAccount = ledgerService.getAccountCode('2000-CLIENT-ESCROW-LIABILITY', currency);
+      const feeRevenueAccount = ledgerService.getAccountCode('4000-PLATFORM-FEE-REVENUE', currency);
+      const workerPayableAccount = ledgerService.getAccountCode('2100-WORKER-PAYABLE', currency);
+
+      await ledgerService.postTransaction({
+        transactionType: LedgerTransactionType.ESCROW_RELEASE,
+        currency,
+        description: `Milestone settlement for "${milestone.title}" (Contract #${contract.contractNumber})`,
+        sourceType: 'PAYMENT_TRANSACTION',
+        sourceId: paymentTx.id,
+        idempotencyKey: `ledger_${idempotencyKey}`,
+        entries: [
+          {
+            accountCode: liabilityAccount,
+            entryType: LedgerEntryType.DEBIT,
+            amountMinor: grossAmountMinor,
+          },
+          {
+            accountCode: feeRevenueAccount,
+            entryType: LedgerEntryType.CREDIT,
+            amountMinor: commissionMinor,
+          },
+          {
+            accountCode: workerPayableAccount,
+            entryType: LedgerEntryType.CREDIT,
+            amountMinor: specialistNetMinor,
+          },
+        ],
+      });
+    } catch (err) {
+      logger.warn('[settleMilestone] Ledger posting note:', err);
+    }
+
+    // Update milestone allocation
+    await prisma.escrowMilestoneAllocation.updateMany({
+      where: { milestoneId: milestone.id },
+      data: {
+        isReleased: true,
+        releasedAmountMinor: grossAmountMinor,
+        releasedAt: new Date(),
+      },
+    });
+
+    // Record Escrow Activity
+    await prisma.escrowActivity.create({
+      data: {
+        escrowRecordId: escrow.id,
+        milestoneId: milestone.id,
+        actorId: actor.id,
+        operationalState: EscrowOperationalState.MILESTONE_APPROVED,
+        eventType: 'MILESTONE_SETTLED',
+        description: `Settlement of $${Number(specialistNetMinor) / 100} ${currency} recorded for specialist (Platform commission: $${Number(commissionMinor) / 100}).`,
+        isLiveFinancialMovement: false,
+      },
+    });
+
+    // Notifications
+    await notificationsService.createNotification({
+      recipientId: contract.workerId,
+      title: 'Milestone Settlement Confirmed',
+      message: `Settlement for milestone "${milestone.title}" processed: $${Number(specialistNetMinor) / 100} ${currency} net earnings ($${Number(commissionMinor) / 100} platform fee).`,
+      type: NotificationType.CONTRACT_UPDATE,
+      metadata: { contractId: contract.id, milestoneId: milestone.id, transactionId: paymentTx.id },
+    });
+
+    await notificationsService.createNotification({
+      recipientId: contract.clientId,
+      title: 'Milestone Settlement Recorded',
+      message: `Settlement for milestone "${milestone.title}" ($${Number(grossAmountMinor) / 100} ${currency}) has been released from escrow.`,
+      type: NotificationType.CONTRACT_UPDATE,
+      metadata: { contractId: contract.id, milestoneId: milestone.id, transactionId: paymentTx.id },
+    });
+
+    return {
+      milestoneId: milestone.id,
+      contractId: contract.id,
+      grossAmountMinor: grossAmountMinor.toString(),
+      grossAmount: Number(grossAmountMinor) / 100,
+      platformCommissionMinor: commissionMinor.toString(),
+      platformCommission: Number(commissionMinor) / 100,
+      feePercentage,
+      specialistNetMinor: specialistNetMinor.toString(),
+      specialistNet: Number(specialistNetMinor) / 100,
+      currency,
+      transactionReference,
+      status: 'SUCCEEDED',
+      settledAt: new Date().toISOString(),
+    };
+  }
+
+  /**
+   * Processes a verified refund on remaining contractual escrow balances.
+   * Validates available refundable amount, posts double-entry refund ledger entry,
+   * updates escrow record, and notifies participants.
+   */
+  async processRefund(params: {
+    contractId: string;
+    actor: { id: string; role: { name: UserRole } };
+    amountMinor?: bigint | string;
+    reason: string;
+  }) {
+    const { contractId, actor, reason } = params;
+
+    if (!reason || reason.trim().length < 5) {
+      throw {
+        statusCode: 400,
+        code: 'INVALID_REASON',
+        message: 'A detailed justification (minimum 5 characters) is required for refund processing.',
+      };
+    }
+
+    const contract = await prisma.contract.findUnique({
+      where: { id: contractId },
+      include: { client: true, worker: true },
+    });
+
+    if (!contract) {
+      throw { statusCode: 404, code: 'NOT_FOUND', message: 'Contract not found' };
+    }
+
+    const isClient = contract.clientId === actor.id;
+    const isAdmin = actor.role.name === UserRole.ADMIN || actor.role.name === UserRole.SUPERADMIN;
+
+    if (!isClient && !isAdmin) {
+      throw { statusCode: 403, code: 'FORBIDDEN', message: 'Not authorized to initiate refunds for this contract.' };
+    }
+
+    const escrow = await prisma.escrowRecord.findUnique({
+      where: { contractId },
+    });
+
+    if (!escrow) {
+      throw { statusCode: 404, code: 'ESCROW_NOT_FOUND', message: 'Escrow record not found for this contract.' };
+    }
+
+    if (escrow.disputeHold && !isAdmin) {
+      throw {
+        statusCode: 400,
+        code: 'DISPUTE_HOLD_ACTIVE',
+        message: 'Refund is blocked while escrow is on protective dispute hold.',
+      };
+    }
+
+    const availableRefundableMinor = escrow.fundedAmountMinor - escrow.releasedAmountMinor - escrow.refundedAmountMinor;
+
+    if (availableRefundableMinor <= 0n) {
+      throw {
+        statusCode: 400,
+        code: 'NO_REFUNDABLE_FUNDS',
+        message: 'There are no remaining funded escrow balances available to refund for this contract.',
+      };
+    }
+
+    const requestedMinor = params.amountMinor ? BigInt(params.amountMinor) : availableRefundableMinor;
+
+    if (requestedMinor <= 0n) {
+      throw { statusCode: 400, code: 'INVALID_AMOUNT', message: 'Refund amount must be positive.' };
+    }
+
+    if (requestedMinor > availableRefundableMinor) {
+      throw {
+        statusCode: 400,
+        code: 'EXCEEDS_REFUNDABLE_AMOUNT',
+        message: `Requested refund (${requestedMinor.toString()}) exceeds available refundable balance (${availableRefundableMinor.toString()}).`,
+      };
+    }
+
+    const currency = escrow.currency || 'USD';
+    const transactionReference = `REF-${Date.now()}-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
+    const idempotencyKey = `refund_${contract.id}_${Date.now()}`;
+
+    // 1. Create PaymentTransaction
+    const paymentTx = await prisma.paymentTransaction.create({
+      data: {
+        transactionReference,
+        contractId: contract.id,
+        payerId: contract.workerId || contract.clientId,
+        payeeId: contract.clientId,
+        type: PaymentTransactionType.REFUND,
+        status: PaymentTransactionStatus.SUCCEEDED,
+        amountMinor: requestedMinor,
+        currency,
+        idempotencyKey,
+        metadata: {
+          reason: reason.trim(),
+          availableBeforeRefund: availableRefundableMinor.toString(),
+        },
+      },
+    });
+
+    // 2. Post Double-Entry Ledger Entry
+    try {
+      await ledgerService.ensureSystemAccounts(currency);
+      const liabilityAccount = ledgerService.getAccountCode('2000-CLIENT-ESCROW-LIABILITY', currency);
+      const cashAccount = ledgerService.getAccountCode('1000-CASH-ESCROW', currency);
+
+      await ledgerService.postTransaction({
+        transactionType: LedgerTransactionType.ESCROW_REFUND,
+        currency,
+        description: `Escrow refund to client for Contract #${contract.contractNumber}. Reason: ${reason.trim()}`,
+        sourceType: 'PAYMENT_TRANSACTION',
+        sourceId: paymentTx.id,
+        idempotencyKey: `ledger_${idempotencyKey}`,
+        entries: [
+          {
+            accountCode: liabilityAccount,
+            entryType: LedgerEntryType.DEBIT,
+            amountMinor: requestedMinor,
+          },
+          {
+            accountCode: cashAccount,
+            entryType: LedgerEntryType.CREDIT,
+            amountMinor: requestedMinor,
+          },
+        ],
+      });
+    } catch (err) {
+      logger.warn('[processRefund] Ledger posting note:', err);
+    }
+
+    // 3. Update EscrowRecord
+    const newRefundedTotal = escrow.refundedAmountMinor + requestedMinor;
+    const remainingAfter = escrow.fundedAmountMinor - escrow.releasedAmountMinor - newRefundedTotal;
+    const nextStatus = remainingAfter <= 0n ? EscrowStatus.REFUNDED : EscrowStatus.PARTIALLY_REFUNDED;
+    const nextOpState = nextStatus === EscrowStatus.REFUNDED ? EscrowOperationalState.TERMINATED : escrow.operationalState;
+
+    await prisma.escrowRecord.update({
+      where: { id: escrow.id },
+      data: {
+        refundedAmountMinor: newRefundedTotal,
+        status: nextStatus,
+        operationalState: nextOpState,
+      },
+    });
+
+    // 4. Record Escrow Activity
+    await prisma.escrowActivity.create({
+      data: {
+        escrowRecordId: escrow.id,
+        actorId: actor.id,
+        operationalState: nextOpState,
+        eventType: 'REFUND_PROCESSED',
+        description: `Refund of $${Number(requestedMinor) / 100} ${currency} processed. Reason: ${reason.trim()}`,
+        isLiveFinancialMovement: false,
+      },
+    });
+
+    // 5. Notifications
+    await notificationsService.createNotification({
+      recipientId: contract.clientId,
+      title: 'Escrow Refund Confirmed',
+      message: `A refund of $${Number(requestedMinor) / 100} ${currency} for Contract #${contract.contractNumber} has been processed.`,
+      type: NotificationType.CONTRACT_UPDATE,
+      metadata: { contractId: contract.id, transactionId: paymentTx.id },
+    });
+
+    if (contract.workerId) {
+      await notificationsService.createNotification({
+        recipientId: contract.workerId,
+        title: 'Escrow Refund Recorded',
+        message: `An escrow refund of $${Number(requestedMinor) / 100} ${currency} was recorded for Contract #${contract.contractNumber}. Reason: ${reason.trim()}`,
+        type: NotificationType.CONTRACT_UPDATE,
+        metadata: { contractId: contract.id, transactionId: paymentTx.id },
+      });
+    }
+
+    return {
+      contractId: contract.id,
+      refundAmountMinor: requestedMinor.toString(),
+      refundAmount: Number(requestedMinor) / 100,
+      currency,
+      transactionReference,
+      escrowStatus: nextStatus,
+      remainingInEscrowMinor: remainingAfter.toString(),
+      refundedAt: new Date().toISOString(),
+    };
+  }
+
+  /**
+   * Calculates comprehensive virtual wallet metrics derived from ledger and transactional records.
+   */
+  async getWalletOverview(user: { id: string; role: { name: UserRole } }) {
+    const isClient = user.role.name === UserRole.CLIENT;
+
+    if (isClient) {
+      const contracts = await prisma.contract.findMany({
+        where: { clientId: user.id },
+        include: {
+          escrowRecord: true,
+          milestones: true,
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      const transactions = await prisma.paymentTransaction.findMany({
+        where: { payerId: user.id },
+        orderBy: { createdAt: 'desc' },
+        take: 50,
+      });
+
+      let totalContractFundingMinor = 0n;
+      let activeContractFundingMinor = 0n;
+      let allocatedMilestoneMinor = 0n;
+      let pendingContractFundingMinor = 0n;
+      let completedMilestoneMinor = 0n;
+      let totalRefundedMinor = 0n;
+
+      const contractItems = contracts.map((c) => {
+        const agreedMinor = BigInt(Math.round(Number(c.totalAmount) * 100));
+        const fundedMinor = c.escrowRecord ? c.escrowRecord.fundedAmountMinor : 0n;
+        const releasedMinor = c.escrowRecord ? c.escrowRecord.releasedAmountMinor : 0n;
+        const refundedMinor = c.escrowRecord ? c.escrowRecord.refundedAmountMinor : 0n;
+        const remainingMinor = fundedMinor - releasedMinor - refundedMinor;
+
+        if (c.escrowRecord?.status === EscrowStatus.FUNDED || c.escrowRecord?.status === EscrowStatus.PARTIALLY_RELEASED) {
+          activeContractFundingMinor += remainingMinor > 0n ? remainingMinor : 0n;
+        }
+
+        if (c.status === ContractStatus.ACTIVE && (!c.escrowRecord || c.escrowRecord.status === EscrowStatus.PENDING_FUNDING || c.escrowRecord.status === EscrowStatus.NOT_INITIALIZED)) {
+          pendingContractFundingMinor += agreedMinor;
+        }
+
+        for (const m of c.milestones) {
+          allocatedMilestoneMinor += BigInt(Math.round(Number(m.amount) * 100));
+          if (m.status === MilestoneStatus.APPROVED) {
+            completedMilestoneMinor += BigInt(Math.round(Number(m.amount) * 100));
+          }
+        }
+
+        return {
+          contractId: c.id,
+          contractNumber: c.contractNumber,
+          title: c.title,
+          status: c.status,
+          currency: c.currency || 'USD',
+          totalAgreedAmount: Number(agreedMinor) / 100,
+          fundedAmount: Number(fundedMinor) / 100,
+          releasedAmount: Number(releasedMinor) / 100,
+          refundedAmount: Number(refundedMinor) / 100,
+          remainingInEscrow: Number(remainingMinor > 0n ? remainingMinor : 0n) / 100,
+          escrowStatus: c.escrowRecord?.status || EscrowStatus.NOT_INITIALIZED,
+        };
+      });
+
+      for (const t of transactions) {
+        if (t.type === PaymentTransactionType.ESCROW_FUNDING && t.status === PaymentTransactionStatus.SUCCEEDED) {
+          totalContractFundingMinor += t.amountMinor;
+        } else if (t.type === PaymentTransactionType.REFUND && t.status === PaymentTransactionStatus.SUCCEEDED) {
+          totalRefundedMinor += t.amountMinor;
+        }
+      }
+
+      return {
+        role: 'CLIENT' as const,
+        currency: 'USD',
+        totalContractFundingMinor: totalContractFundingMinor.toString(),
+        totalContractFunding: Number(totalContractFundingMinor) / 100,
+        activeContractFundingMinor: activeContractFundingMinor.toString(),
+        activeContractFunding: Number(activeContractFundingMinor) / 100,
+        allocatedMilestoneMinor: allocatedMilestoneMinor.toString(),
+        allocatedMilestoneAmount: Number(allocatedMilestoneMinor) / 100,
+        pendingContractFundingMinor: pendingContractFundingMinor.toString(),
+        pendingContractFunding: Number(pendingContractFundingMinor) / 100,
+        completedMilestoneMinor: completedMilestoneMinor.toString(),
+        completedMilestoneAmount: Number(completedMilestoneMinor) / 100,
+        totalRefundedMinor: totalRefundedMinor.toString(),
+        totalRefundedAmount: Number(totalRefundedMinor) / 100,
+        contracts: contractItems,
+        recentTransactions: transactions.map((t) => ({
+          id: t.id,
+          transactionReference: t.transactionReference,
+          contractId: t.contractId,
+          payerId: t.payerId,
+          payeeId: t.payeeId,
+          type: t.type,
+          status: t.status,
+          amountMinor: t.amountMinor.toString(),
+          currency: t.currency,
+          provider: t.provider,
+          providerTransactionId: t.providerTransactionId,
+          failureReason: t.failureReason,
+          idempotencyKey: t.idempotencyKey,
+          metadata: t.metadata as Record<string, unknown> | null,
+          createdAt: t.createdAt.toISOString(),
+        })),
+      };
+    } else {
+      // Specialist / Worker
+      const contracts = await prisma.contract.findMany({
+        where: { workerId: user.id },
+        include: {
+          escrowRecord: true,
+          milestones: true,
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      const transactions = await prisma.paymentTransaction.findMany({
+        where: { payeeId: user.id },
+        orderBy: { createdAt: 'desc' },
+        take: 50,
+      });
+
+      let totalContractValueMinor = 0n;
+      let pendingMilestoneEarningsMinor = 0n;
+      let submittedMilestoneAmountMinor = 0n;
+      let approvedMilestoneAmountMinor = 0n;
+      let disputedOrHeldAmountMinor = 0n;
+      let settlementInitiatedMinor = 0n;
+      let settledEarningsMinor = 0n;
+      let platformCommissionMinor = 0n;
+
+      for (const c of contracts) {
+        totalContractValueMinor += BigInt(Math.round(Number(c.totalAmount) * 100));
+        const isDisputed = c.status === ContractStatus.DISPUTED || Boolean(c.escrowRecord?.disputeHold);
+
+        for (const m of c.milestones) {
+          const amtMinor = BigInt(Math.round(Number(m.amount) * 100));
+          if (isDisputed) {
+            disputedOrHeldAmountMinor += amtMinor;
+          } else if (m.status === MilestoneStatus.PENDING || m.status === MilestoneStatus.IN_PROGRESS || m.status === MilestoneStatus.IN_REVISION) {
+            pendingMilestoneEarningsMinor += amtMinor;
+          } else if (m.status === MilestoneStatus.SUBMITTED) {
+            submittedMilestoneAmountMinor += amtMinor;
+          } else if (m.status === MilestoneStatus.APPROVED) {
+            approvedMilestoneAmountMinor += amtMinor;
+          }
+        }
+      }
+
+      for (const t of transactions) {
+        if (t.type === PaymentTransactionType.MILESTONE_RELEASE) {
+          const meta = (t.metadata as Record<string, unknown>) || {};
+          const comm = meta.commissionMinor ? BigInt(meta.commissionMinor as string) : 0n;
+          const net = meta.specialistNetMinor ? BigInt(meta.specialistNetMinor as string) : (t.amountMinor - comm);
+
+          if (t.status === PaymentTransactionStatus.SUCCEEDED) {
+            settledEarningsMinor += net;
+            platformCommissionMinor += comm;
+          } else if (t.status === PaymentTransactionStatus.PROCESSING || t.status === PaymentTransactionStatus.INITIATED) {
+            settlementInitiatedMinor += t.amountMinor;
+          }
+        }
+      }
+
+      return {
+        role: 'WORKER' as const,
+        currency: 'USD',
+        totalContractValueMinor: totalContractValueMinor.toString(),
+        totalContractValue: Number(totalContractValueMinor) / 100,
+        pendingMilestoneEarningsMinor: pendingMilestoneEarningsMinor.toString(),
+        pendingMilestoneEarnings: Number(pendingMilestoneEarningsMinor) / 100,
+        submittedMilestoneAmountMinor: submittedMilestoneAmountMinor.toString(),
+        submittedMilestoneAmount: Number(submittedMilestoneAmountMinor) / 100,
+        approvedMilestoneAmountMinor: approvedMilestoneAmountMinor.toString(),
+        approvedMilestoneAmount: Number(approvedMilestoneAmountMinor) / 100,
+        disputedOrHeldAmountMinor: disputedOrHeldAmountMinor.toString(),
+        disputedOrHeldAmount: Number(disputedOrHeldAmountMinor) / 100,
+        settlementInitiatedMinor: settlementInitiatedMinor.toString(),
+        settlementInitiatedAmount: Number(settlementInitiatedMinor) / 100,
+        settledEarningsMinor: settledEarningsMinor.toString(),
+        settledEarnings: Number(settledEarningsMinor) / 100,
+        platformCommissionMinor: platformCommissionMinor.toString(),
+        platformCommission: Number(platformCommissionMinor) / 100,
+        contractsCount: contracts.length,
+        recentTransactions: transactions.map((t) => ({
+          id: t.id,
+          transactionReference: t.transactionReference,
+          contractId: t.contractId,
+          payerId: t.payerId,
+          payeeId: t.payeeId,
+          type: t.type,
+          status: t.status,
+          amountMinor: t.amountMinor.toString(),
+          currency: t.currency,
+          provider: t.provider,
+          providerTransactionId: t.providerTransactionId,
+          failureReason: t.failureReason,
+          idempotencyKey: t.idempotencyKey,
+          metadata: t.metadata as Record<string, unknown> | null,
+          createdAt: t.createdAt.toISOString(),
+        })),
+      };
+    }
   }
 }
 

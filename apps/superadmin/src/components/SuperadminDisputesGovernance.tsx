@@ -122,57 +122,57 @@ export const SuperadminDisputesGovernance: React.FC = () => {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 font-sans">
       {actionMessage && (
-        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs flex items-center justify-between">
+        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-xs flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <CheckCircle2 className="w-4 h-4 shrink-0" />
             <span>{actionMessage}</span>
           </div>
-          <button onClick={() => setActionMessage(null)} className="text-emerald-500 hover:text-emerald-300">
+          <button onClick={() => setActionMessage(null)} className="dark:text-[#777777] text-[#64748B] hover:dark:text-white hover:text-black">
             &times;
           </button>
         </div>
       )}
 
       {errorMessage && (
-        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs flex items-center justify-between">
+        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-xs flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <AlertTriangle className="w-4 h-4 shrink-0" />
             <span>{errorMessage}</span>
           </div>
-          <button onClick={() => setErrorMessage(null)} className="text-rose-500 hover:text-rose-300">
+          <button onClick={() => setErrorMessage(null)} className="dark:text-[#777777] text-[#64748B] hover:dark:text-white hover:text-black">
             &times;
           </button>
         </div>
       )}
 
-      {/* Global Governance Metrics */}
+      {/* Global Governance Metrics Bento */}
       {metrics && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
-          <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1">
-            <span className="text-[10px] text-slate-400 uppercase font-semibold">Total Platform Disputes</span>
-            <div className="text-2xl font-bold text-white">{metrics.totalDisputes}</div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3.5">
+          <div className="p-4 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm space-y-1">
+            <span className="text-[10px] dark:text-[#A5A5A5] text-[#64748B] uppercase font-semibold">Total Disputes</span>
+            <div className="text-2xl font-bold font-mono dark:text-[#CDCBCA] text-[#242424]">{metrics.totalDisputes}</div>
           </div>
-          <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 space-y-1">
-            <span className="text-[10px] text-rose-400 uppercase font-semibold">Escalated (Action Req)</span>
-            <div className="text-2xl font-bold text-rose-300">{metrics.escalatedDisputes}</div>
+          <div className="p-4 rounded-2xl bg-rose-500/5 border border-rose-500/20 shadow-sm space-y-1">
+            <span className="text-[10px] text-rose-500 uppercase font-semibold">Escalated</span>
+            <div className="text-2xl font-bold font-mono text-rose-500">{metrics.escalatedDisputes}</div>
           </div>
-          <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-1">
-            <span className="text-[10px] text-amber-400 uppercase font-semibold">Active Escrow Holds</span>
-            <div className="text-2xl font-bold text-amber-300">{metrics.activeDisputeHoldCount}</div>
+          <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/20 shadow-sm space-y-1">
+            <span className="text-[10px] text-amber-500 uppercase font-semibold">Active Holds</span>
+            <div className="text-2xl font-bold font-mono text-amber-500">{metrics.activeDisputeHoldCount}</div>
           </div>
-          <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/30 space-y-1">
-            <span className="text-[10px] text-blue-400 uppercase font-semibold">In Mediation / Review</span>
-            <div className="text-2xl font-bold text-blue-300">{metrics.underReviewDisputes}</div>
+          <div className="p-4 rounded-2xl bg-[#2563EB]/5 border border-[#2563EB]/20 shadow-sm space-y-1">
+            <span className="text-[10px] text-[#2563EB] uppercase font-semibold">Under Review</span>
+            <div className="text-2xl font-bold font-mono text-[#2563EB]">{metrics.underReviewDisputes}</div>
           </div>
-          <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 space-y-1">
-            <span className="text-[10px] text-emerald-400 uppercase font-semibold">Resolved</span>
-            <div className="text-2xl font-bold text-emerald-300">{metrics.resolvedDisputes}</div>
+          <div className="p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/20 shadow-sm space-y-1">
+            <span className="text-[10px] text-emerald-500 uppercase font-semibold">Resolved</span>
+            <div className="text-2xl font-bold font-mono text-emerald-500">{metrics.resolvedDisputes}</div>
           </div>
-          <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1">
-            <span className="text-[10px] text-slate-400 uppercase font-semibold">Total Claimed Value</span>
-            <div className="text-lg font-bold text-white truncate font-mono">
+          <div className="p-4 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm space-y-1">
+            <span className="text-[10px] dark:text-[#A5A5A5] text-[#64748B] uppercase font-semibold">Total Claimed</span>
+            <div className="text-lg font-bold dark:text-[#CDCBCA] text-[#242424] truncate font-mono">
               {formatCurrencyMinor(metrics.totalClaimedMinor)}
             </div>
           </div>
@@ -180,34 +180,34 @@ export const SuperadminDisputesGovernance: React.FC = () => {
       )}
 
       {/* View Switcher & Search */}
-      <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-xl bg-slate-900/50 border border-slate-800">
+      <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm">
         <div className="flex items-center space-x-2">
           <button
             onClick={() => setActiveSubTab('all')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition ${
               activeSubTab === 'all'
-                ? 'bg-purple-600 text-white'
-                : 'bg-slate-800 text-slate-400 hover:text-white'
+                ? 'bg-[#2563EB] text-white shadow-sm'
+                : 'dark:bg-[#202020] bg-[#F1F5F9] dark:text-[#A5A5A5] text-[#64748B] hover:dark:text-white hover:text-black border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]'
             }`}
           >
             All Disputes ({metrics?.totalDisputes || 0})
           </button>
           <button
             onClick={() => setActiveSubTab('escalated')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition ${
               activeSubTab === 'escalated'
-                ? 'bg-rose-600 text-white'
-                : 'bg-slate-800 text-slate-400 hover:text-white'
+                ? 'bg-rose-600 text-white shadow-sm'
+                : 'dark:bg-[#202020] bg-[#F1F5F9] dark:text-[#A5A5A5] text-[#64748B] hover:dark:text-white hover:text-black border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]'
             }`}
           >
             Escalated to Superadmin ({metrics?.escalatedDisputes || 0})
           </button>
           <button
             onClick={() => setActiveSubTab('active_holds')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition ${
               activeSubTab === 'active_holds'
-                ? 'bg-amber-600 text-white'
-                : 'bg-slate-800 text-slate-400 hover:text-white'
+                ? 'bg-amber-600 text-white shadow-sm'
+                : 'dark:bg-[#202020] bg-[#F1F5F9] dark:text-[#A5A5A5] text-[#64748B] hover:dark:text-white hover:text-black border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]'
             }`}
           >
             Active Protective Holds ({metrics?.activeDisputeHoldCount || 0})
@@ -215,29 +215,29 @@ export const SuperadminDisputesGovernance: React.FC = () => {
         </div>
 
         <div className="flex items-center space-x-2 flex-1 sm:max-w-xs">
-          <Search className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+          <Search className="w-3.5 h-3.5 dark:text-[#777777] text-[#94A3B8] shrink-0" />
           <input
             type="text"
             placeholder="Search dossier..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-slate-100 placeholder-slate-500"
+            className="w-full dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] rounded-xl px-2.5 py-1.5 text-xs dark:text-[#CDCBCA] text-[#242424] placeholder-slate-400 focus:outline-none focus:border-[#2563EB]"
           />
           <button
             onClick={loadData}
             disabled={isLoading}
-            className="p-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700"
+            className="p-2 rounded-xl dark:bg-[#202020] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] dark:text-[#CDCBCA] text-[#242424] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm transition"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-[#2563EB]' : ''}`} />
           </button>
         </div>
       </div>
 
       {/* Disputes Dossier Table */}
-      <div className="rounded-xl border border-slate-800 bg-slate-900/40 overflow-hidden">
+      <div className="rounded-2xl border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] dark:bg-[#171717] bg-white overflow-hidden shadow-sm">
         <table className="w-full text-left border-collapse text-xs">
           <thead>
-            <tr className="border-b border-slate-800 bg-slate-900/80 text-slate-400 uppercase font-semibold">
+            <tr className="border-b dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] dark:bg-[#202020] bg-[#F1F5F9] dark:text-[#A5A5A5] text-[#64748B] uppercase font-semibold">
               <th className="py-3 px-4">Dispute #</th>
               <th className="py-3 px-4">Contract</th>
               <th className="py-3 px-4">Parties Involved</th>
@@ -247,42 +247,42 @@ export const SuperadminDisputesGovernance: React.FC = () => {
               <th className="py-3 px-4 text-right">Arbitration</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800/60 text-slate-200">
+          <tbody className="divide-y dark:divide-[rgba(205,203,202,0.1)] divide-[#E2E8F0] dark:text-[#CDCBCA] text-[#242424]">
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={7} className="py-8 text-center text-slate-500">
+                <td colSpan={7} className="py-8 text-center dark:text-[#777777] text-[#64748B]">
                   No disputes in this governance category.
                 </td>
               </tr>
             ) : (
               filtered.map((d) => (
-                <tr key={d.id} className="hover:bg-slate-800/30 transition">
-                  <td className="py-3 px-4 font-mono font-semibold text-purple-400">{d.disputeNumber}</td>
+                <tr key={d.id} className="hover:dark:bg-[#202020]/40 hover:bg-[#F8FAFC] transition">
+                  <td className="py-3 px-4 font-mono font-semibold text-[#2563EB]">{d.disputeNumber}</td>
                   <td className="py-3 px-4">
-                    <div className="font-medium text-slate-100">{d.contractNumber}</div>
-                    <div className="text-[11px] text-slate-400 truncate max-w-[140px]">{d.contractTitle}</div>
+                    <div className="font-medium dark:text-[#CDCBCA] text-[#242424]">{d.contractNumber}</div>
+                    <div className="text-[11px] dark:text-[#777777] text-[#64748B] truncate max-w-[140px]">{d.contractTitle}</div>
                   </td>
                   <td className="py-3 px-4 text-[11px]">
                     <div>
-                      <span className="text-slate-400">Initiator:</span> {d.initiatorName}
+                      <span className="dark:text-[#777777] text-[#64748B]">Initiator:</span> {d.initiatorName}
                     </div>
                     <div>
-                      <span className="text-slate-400">Respondent:</span> {d.respondentName}
+                      <span className="dark:text-[#777777] text-[#64748B]">Respondent:</span> {d.respondentName}
                     </div>
                   </td>
                   <td className="py-3 px-4">
-                    <span className="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300">
+                    <span className="px-2 py-0.5 rounded text-[10px] dark:bg-[#202020] bg-slate-200 dark:text-[#CDCBCA] text-[#475569]">
                       {d.category.replace(/_/g, ' ')}
                     </span>
                   </td>
                   <td className="py-3 px-4">
                     <span
-                      className={`px-2 py-0.5 rounded text-[10px] font-semibold ${
+                      className={`px-2 py-0.5 rounded text-[10px] font-semibold border ${
                         d.status === DisputeStatus.ESCALATED
-                          ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30 animate-pulse'
+                          ? 'bg-rose-500/10 text-rose-500 border-rose-500/20 animate-pulse'
                           : d.status === DisputeStatus.RESOLVED
-                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                            : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                            ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
+                            : 'bg-[#2563EB]/10 text-[#2563EB] border border-[#2563EB]/20'
                       }`}
                     >
                       {d.status.replace(/_/g, ' ')}
@@ -290,18 +290,18 @@ export const SuperadminDisputesGovernance: React.FC = () => {
                   </td>
                   <td className="py-3 px-4">
                     {d.disputeHoldActive ? (
-                      <span className="inline-flex items-center space-x-1 text-rose-400 font-semibold text-[11px]">
+                      <span className="inline-flex items-center space-x-1 text-rose-500 font-semibold text-[11px]">
                         <Lock className="w-3 h-3" />
                         <span>LOCKED</span>
                       </span>
                     ) : (
-                      <span className="text-slate-500 text-[11px]">CLEARED</span>
+                      <span className="text-[11px] dark:text-[#777777] text-[#64748B]">CLEARED</span>
                     )}
                   </td>
                   <td className="py-3 px-4 text-right">
                     <button
                       onClick={() => openDispute(d.id)}
-                      className="px-2.5 py-1 rounded bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 text-xs font-medium inline-flex items-center space-x-1"
+                      className="px-3 py-1 rounded-lg bg-[#2563EB]/10 hover:bg-[#2563EB]/20 text-[#2563EB] border border-[#2563EB]/20 text-xs font-semibold inline-flex items-center space-x-1 transition shadow-sm"
                     >
                       <Gavel className="w-3.5 h-3.5" />
                       <span>Arbitrate</span>
@@ -316,46 +316,46 @@ export const SuperadminDisputesGovernance: React.FC = () => {
 
       {/* Superadmin Arbitration Modal */}
       {selectedDispute && (
-        <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm flex justify-end">
-          <div className="w-full max-w-2xl bg-slate-900 border-l border-slate-800 h-full overflow-y-auto p-6 space-y-6">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex justify-end">
+          <div className="w-full max-w-2xl dark:bg-[#171717] bg-white border-l dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] h-full overflow-y-auto p-6 space-y-6 shadow-2xl">
+            <div className="flex items-center justify-between pb-4 border-b dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]">
               <div className="flex items-center space-x-3">
-                <div className="w-9 h-9 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400">
+                <div className="w-9 h-9 rounded-xl bg-[#2563EB]/10 border border-[#2563EB]/20 flex items-center justify-center text-[#2563EB]">
                   <ShieldCheck className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-white">{selectedDispute.disputeNumber}</h3>
-                  <p className="text-xs text-slate-400">Superadmin Governance Dossier</p>
+                  <h3 className="text-base font-bold dark:text-[#CDCBCA] text-[#242424]">{selectedDispute.disputeNumber}</h3>
+                  <p className="text-xs dark:text-[#A5A5A5] text-[#64748B]">Superadmin Governance Dossier</p>
                 </div>
               </div>
-              <button onClick={() => setSelectedDispute(null)} className="p-1 text-slate-400 hover:text-white">
+              <button onClick={() => setSelectedDispute(null)} className="p-1 rounded-lg text-slate-400 hover:dark:text-white hover:text-black hover:dark:bg-[#202020] hover:bg-[#F1F5F9] transition">
                 &times;
               </button>
             </div>
 
-            <div className="p-4 rounded-xl bg-slate-800/40 border border-slate-700 space-y-2 text-xs">
-              <div className="font-bold text-slate-200">{selectedDispute.title}</div>
-              <p className="text-slate-300 leading-relaxed">{selectedDispute.description}</p>
+            <div className="p-4 rounded-xl dark:bg-[#080808] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] space-y-2 text-xs">
+              <div className="font-bold dark:text-[#CDCBCA] text-[#242424]">{selectedDispute.title}</div>
+              <p className="dark:text-[#A5A5A5] text-[#64748B] leading-relaxed">{selectedDispute.description}</p>
             </div>
 
             {/* Evidence Inspector */}
             <div className="space-y-2">
-              <div className="text-xs font-semibold text-slate-300 flex items-center space-x-1.5">
-                <FileText className="w-3.5 h-3.5 text-blue-400" />
+              <div className="text-xs font-semibold dark:text-[#CDCBCA] text-[#242424] flex items-center space-x-1.5">
+                <FileText className="w-3.5 h-3.5 text-[#2563EB]" />
                 <span>Evidence Records ({selectedDispute.evidence.length})</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                 {selectedDispute.evidence.map((ev) => (
-                  <div key={ev.id} className="p-3 rounded-lg bg-slate-800/60 border border-slate-700 flex justify-between items-center">
+                  <div key={ev.id} className="p-3 rounded-xl dark:bg-[#080808] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] flex justify-between items-center">
                     <div className="truncate pr-2">
-                      <div className="font-medium text-slate-200 truncate">{ev.fileName}</div>
-                      <div className="text-[10px] text-slate-400">{ev.uploaderName}</div>
+                      <div className="font-medium dark:text-[#CDCBCA] text-[#242424] truncate">{ev.fileName}</div>
+                      <div className="text-[10px] dark:text-[#777777] text-[#64748B]">{ev.uploaderName}</div>
                     </div>
                     <a
                       href={ev.downloadUrl || ev.fileUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="p-1.5 rounded bg-purple-600/20 text-purple-300 hover:bg-purple-600/30 shrink-0"
+                      className="p-1.5 rounded-lg bg-[#2563EB]/10 text-[#2563EB] hover:bg-[#2563EB]/20 shrink-0"
                     >
                       <Download className="w-3.5 h-3.5" />
                     </a>
@@ -366,19 +366,19 @@ export const SuperadminDisputesGovernance: React.FC = () => {
 
             {/* Arbitration Form */}
             {selectedDispute.status !== DisputeStatus.RESOLVED && selectedDispute.status !== DisputeStatus.CLOSED && (
-              <div className="p-5 rounded-xl bg-purple-950/20 border border-purple-500/30 space-y-4">
-                <div className="flex items-center space-x-2 text-xs font-bold text-purple-300">
-                  <Gavel className="w-4 h-4 text-purple-400" />
+              <div className="p-5 rounded-2xl dark:bg-[#202020]/60 bg-[#EFF6FF] border dark:border-[rgba(205,203,202,0.18)] border-[#DBEAFE] space-y-4">
+                <div className="flex items-center space-x-2 text-xs font-bold text-[#2563EB]">
+                  <Gavel className="w-4 h-4 text-[#2563EB]" />
                   <span>Binding Superadmin Arbitrated Ruling</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                   <div>
-                    <label className="block text-slate-400 mb-1">Ruling Action</label>
+                    <label className="block dark:text-[#A5A5A5] text-[#475569] mb-1">Ruling Action</label>
                     <select
                       value={resolutionType}
                       onChange={(e) => setResolutionType(e.target.value as DisputeResolutionType)}
-                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200"
+                      className="w-full dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] rounded-xl px-2.5 py-1.5 dark:text-[#CDCBCA] text-[#242424] focus:outline-none"
                     >
                       <option value={DisputeResolutionType.SPLIT_SETTLEMENT}>Split Settlement</option>
                       <option value={DisputeResolutionType.FULL_REFUND_TO_CLIENT}>Full Refund to Client</option>
@@ -388,36 +388,36 @@ export const SuperadminDisputesGovernance: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-slate-400 mb-1">Client Amount ($)</label>
+                    <label className="block dark:text-[#A5A5A5] text-[#475569] mb-1">Client Amount ($)</label>
                     <input
                       type="number"
                       step="0.01"
                       value={clientAmount}
                       onChange={(e) => setClientAmount(e.target.value)}
-                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200"
+                      className="w-full dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] rounded-xl px-2.5 py-1.5 dark:text-[#CDCBCA] text-[#242424] font-mono focus:outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-slate-400 mb-1">Worker Amount ($)</label>
+                    <label className="block dark:text-[#A5A5A5] text-[#475569] mb-1">Worker Amount ($)</label>
                     <input
                       type="number"
                       step="0.01"
                       value={workerAmount}
                       onChange={(e) => setWorkerAmount(e.target.value)}
-                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200"
+                      className="w-full dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] rounded-xl px-2.5 py-1.5 dark:text-[#CDCBCA] text-[#242424] font-mono focus:outline-none"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-slate-400 text-xs mb-1">Superadmin Decision Rationale</label>
+                  <label className="block dark:text-[#A5A5A5] text-[#475569] text-xs mb-1">Superadmin Decision Rationale</label>
                   <textarea
                     rows={2}
                     placeholder="Enter authoritative administrative rationale for platform dispute resolution..."
                     value={rationale}
                     onChange={(e) => setRationale(e.target.value)}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100"
+                    className="w-full dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] rounded-xl p-2.5 text-xs dark:text-[#CDCBCA] text-[#242424] placeholder-slate-400 focus:outline-none"
                   />
                 </div>
 
@@ -425,7 +425,7 @@ export const SuperadminDisputesGovernance: React.FC = () => {
                   <button
                     onClick={handleArbitrate}
                     disabled={isSubmitting || !rationale.trim()}
-                    className="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-xs font-semibold text-white transition disabled:opacity-50 flex items-center space-x-1.5"
+                    className="px-5 py-2 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-xs font-semibold text-white transition disabled:opacity-50 flex items-center space-x-1.5 shadow-sm"
                   >
                     <Gavel className="w-3.5 h-3.5" />
                     <span>{isSubmitting ? 'Enforcing...' : 'Enforce Administrative Decision'}</span>

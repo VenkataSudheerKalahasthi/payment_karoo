@@ -143,65 +143,65 @@ export const DisputesWorkspace: React.FC = () => {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 font-sans">
       {actionMessage && (
-        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs flex items-center justify-between">
+        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-xs flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <CheckCircle2 className="w-4 h-4 shrink-0" />
             <span>{actionMessage}</span>
           </div>
-          <button onClick={() => setActionMessage(null)} className="text-emerald-500 hover:text-emerald-300">
+          <button onClick={() => setActionMessage(null)} className="dark:text-[#777777] text-[#64748B] hover:dark:text-white hover:text-black">
             &times;
           </button>
         </div>
       )}
 
       {errorMessage && (
-        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs flex items-center justify-between">
+        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-xs flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <AlertTriangle className="w-4 h-4 shrink-0" />
             <span>{errorMessage}</span>
           </div>
-          <button onClick={() => setErrorMessage(null)} className="text-rose-500 hover:text-rose-300">
+          <button onClick={() => setErrorMessage(null)} className="dark:text-[#777777] text-[#64748B] hover:dark:text-white hover:text-black">
             &times;
           </button>
         </div>
       )}
 
-      {/* Metrics Row */}
+      {/* Metrics Bento Row */}
       {metrics && (
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
-          <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1">
-            <span className="text-[10px] text-slate-400 uppercase font-semibold">Total Disputes</span>
-            <div className="text-xl font-bold text-white">{metrics.totalDisputes}</div>
+          <div className="p-4 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm space-y-1">
+            <span className="text-[10px] dark:text-[#A5A5A5] text-[#64748B] uppercase font-semibold">Total</span>
+            <div className="text-xl font-bold font-mono dark:text-[#CDCBCA] text-[#242424]">{metrics.totalDisputes}</div>
           </div>
-          <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/20 space-y-1">
-            <span className="text-[10px] text-amber-400 uppercase font-semibold">Open</span>
-            <div className="text-xl font-bold text-amber-300">{metrics.openDisputes}</div>
+          <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/20 shadow-sm space-y-1">
+            <span className="text-[10px] text-amber-500 uppercase font-semibold">Open</span>
+            <div className="text-xl font-bold font-mono text-amber-500">{metrics.openDisputes}</div>
           </div>
-          <div className="p-4 rounded-xl bg-blue-500/5 border border-blue-500/20 space-y-1">
-            <span className="text-[10px] text-blue-400 uppercase font-semibold">Under Review</span>
-            <div className="text-xl font-bold text-blue-300">{metrics.underReviewDisputes}</div>
+          <div className="p-4 rounded-2xl bg-[#2563EB]/5 border border-[#2563EB]/20 shadow-sm space-y-1">
+            <span className="text-[10px] text-[#2563EB] uppercase font-semibold">Under Review</span>
+            <div className="text-xl font-bold font-mono text-[#2563EB]">{metrics.underReviewDisputes}</div>
           </div>
-          <div className="p-4 rounded-xl bg-rose-500/5 border border-rose-500/20 space-y-1">
-            <span className="text-[10px] text-rose-400 uppercase font-semibold">Escalated</span>
-            <div className="text-xl font-bold text-rose-300">{metrics.escalatedDisputes}</div>
+          <div className="p-4 rounded-2xl bg-rose-500/5 border border-rose-500/20 shadow-sm space-y-1">
+            <span className="text-[10px] text-rose-500 uppercase font-semibold">Escalated</span>
+            <div className="text-xl font-bold font-mono text-rose-500">{metrics.escalatedDisputes}</div>
           </div>
-          <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20 space-y-1">
-            <span className="text-[10px] text-emerald-400 uppercase font-semibold">Resolved</span>
-            <div className="text-xl font-bold text-emerald-300">{metrics.resolvedDisputes}</div>
+          <div className="p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/20 shadow-sm space-y-1">
+            <span className="text-[10px] text-emerald-500 uppercase font-semibold">Resolved</span>
+            <div className="text-xl font-bold font-mono text-emerald-500">{metrics.resolvedDisputes}</div>
           </div>
-          <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1">
-            <span className="text-[10px] text-slate-400 uppercase font-semibold">Resolution Rate</span>
-            <div className="text-xl font-bold text-slate-200">{metrics.resolutionRatePercentage}%</div>
+          <div className="p-4 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm space-y-1">
+            <span className="text-[10px] dark:text-[#A5A5A5] text-[#64748B] uppercase font-semibold">Res. Rate</span>
+            <div className="text-xl font-bold font-mono dark:text-[#CDCBCA] text-[#242424]">{metrics.resolutionRatePercentage}%</div>
           </div>
-          <div className="p-4 rounded-xl bg-purple-500/5 border border-purple-500/20 space-y-1">
-            <span className="text-[10px] text-purple-400 uppercase font-semibold">Active Holds</span>
-            <div className="text-xl font-bold text-purple-300">{metrics.activeDisputeHoldCount}</div>
+          <div className="p-4 rounded-2xl bg-rose-500/5 border border-rose-500/20 shadow-sm space-y-1">
+            <span className="text-[10px] text-rose-500 uppercase font-semibold">Active Holds</span>
+            <div className="text-xl font-bold font-mono text-rose-500">{metrics.activeDisputeHoldCount}</div>
           </div>
-          <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1">
-            <span className="text-[10px] text-slate-400 uppercase font-semibold">Total Claimed</span>
-            <div className="text-sm font-bold text-white truncate">
+          <div className="p-4 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm space-y-1">
+            <span className="text-[10px] dark:text-[#A5A5A5] text-[#64748B] uppercase font-semibold">Claimed</span>
+            <div className="text-sm font-bold font-mono dark:text-[#CDCBCA] text-[#242424] truncate">
               {formatCurrencyMinor(metrics.totalClaimedMinor)}
             </div>
           </div>
@@ -209,20 +209,20 @@ export const DisputesWorkspace: React.FC = () => {
       )}
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-xl bg-slate-900/50 border border-slate-800">
+      <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm">
         <div className="flex items-center space-x-2 flex-1 min-w-[240px]">
-          <Search className="w-4 h-4 text-slate-400 shrink-0" />
+          <Search className="w-4 h-4 dark:text-[#777777] text-[#94A3B8] shrink-0" />
           <input
             type="text"
             placeholder="Search by dispute #, contract #, or participant..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-slate-800/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder-slate-400 focus:outline-none focus:border-blue-500"
+            className="w-full dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] rounded-xl px-3 py-1.5 text-xs dark:text-[#CDCBCA] text-[#242424] placeholder-slate-400 focus:outline-none focus:border-[#2563EB]"
           />
         </div>
 
         <div className="flex items-center space-x-2">
-          <div className="flex items-center space-x-1.5 text-xs text-slate-400">
+          <div className="flex items-center space-x-1.5 text-xs dark:text-[#A5A5A5] text-[#64748B]">
             <Filter className="w-3.5 h-3.5" />
             <span>Filter:</span>
           </div>
@@ -230,7 +230,7 @@ export const DisputesWorkspace: React.FC = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none"
+            className="dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] rounded-xl px-2.5 py-1.5 text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#2563EB]"
           >
             <option value="">All Statuses</option>
             {Object.values(DisputeStatus).map((st) => (
@@ -243,7 +243,7 @@ export const DisputesWorkspace: React.FC = () => {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none"
+            className="dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] rounded-xl px-2.5 py-1.5 text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#2563EB]"
           >
             <option value="">All Categories</option>
             {Object.values(DisputeCategory).map((cat) => (
@@ -256,20 +256,20 @@ export const DisputesWorkspace: React.FC = () => {
           <button
             onClick={loadData}
             disabled={isLoading}
-            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700"
+            className="p-2 rounded-xl dark:bg-[#202020] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] dark:text-[#CDCBCA] text-[#242424] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] transition shadow-sm"
             title="Refresh"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-[#2563EB]' : ''}`} />
           </button>
         </div>
       </div>
 
       {/* Disputes Table */}
-      <div className="rounded-xl border border-slate-800 bg-slate-900/40 overflow-hidden">
+      <div className="rounded-2xl border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] dark:bg-[#171717] bg-white overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-slate-800 bg-slate-900/80 text-slate-400 uppercase font-semibold">
+              <tr className="border-b dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] dark:bg-[#202020] bg-[#F1F5F9] dark:text-[#A5A5A5] text-[#64748B] uppercase font-semibold">
                 <th className="py-3 px-4">Dispute #</th>
                 <th className="py-3 px-4">Contract</th>
                 <th className="py-3 px-4">Initiator / Respondent</th>
@@ -280,31 +280,31 @@ export const DisputesWorkspace: React.FC = () => {
                 <th className="py-3 px-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 text-slate-200">
+            <tbody className="divide-y dark:divide-[rgba(205,203,202,0.1)] divide-[#E2E8F0] dark:text-[#CDCBCA] text-[#242424]">
               {filteredDisputes.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-8 text-center text-slate-500">
+                  <td colSpan={8} className="py-8 text-center dark:text-[#777777] text-[#64748B]">
                     No disputes match the current criteria.
                   </td>
                 </tr>
               ) : (
                 filteredDisputes.map((d) => (
-                  <tr key={d.id} className="hover:bg-slate-800/30 transition">
-                    <td className="py-3 px-4 font-mono font-semibold text-blue-400">{d.disputeNumber}</td>
+                  <tr key={d.id} className="hover:dark:bg-[#202020]/40 hover:bg-[#F8FAFC] transition">
+                    <td className="py-3 px-4 font-mono font-semibold text-[#2563EB]">{d.disputeNumber}</td>
                     <td className="py-3 px-4">
-                      <div className="font-medium text-slate-100">{d.contractNumber}</div>
-                      <div className="text-[11px] text-slate-400 truncate max-w-[160px]">{d.contractTitle}</div>
+                      <div className="font-medium dark:text-[#CDCBCA] text-[#242424]">{d.contractNumber}</div>
+                      <div className="text-[11px] dark:text-[#777777] text-[#64748B] truncate max-w-[160px]">{d.contractTitle}</div>
                     </td>
                     <td className="py-3 px-4">
                       <div className="text-[11px]">
-                        <span className="text-slate-400">By:</span> {d.initiatorName}
+                        <span className="dark:text-[#777777] text-[#64748B]">By:</span> {d.initiatorName}
                       </div>
                       <div className="text-[11px]">
-                        <span className="text-slate-400">Vs:</span> {d.respondentName}
+                        <span className="dark:text-[#777777] text-[#64748B]">Vs:</span> {d.respondentName}
                       </div>
                     </td>
                     <td className="py-3 px-4">
-                      <span className="px-2 py-0.5 rounded-full text-[10px] bg-slate-800 text-slate-300 border border-slate-700">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] dark:bg-[#202020] bg-slate-200 dark:text-[#CDCBCA] text-[#475569] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]">
                         {d.category.replace(/_/g, ' ')}
                       </span>
                     </td>
@@ -315,12 +315,12 @@ export const DisputesWorkspace: React.FC = () => {
                       <span
                         className={`px-2 py-0.5 rounded-full text-[10px] font-medium border ${
                           d.status === DisputeStatus.OPEN
-                            ? 'bg-amber-500/10 text-amber-300 border-amber-500/30'
+                            ? 'bg-amber-500/10 text-amber-500 border-amber-500/20'
                             : d.status === DisputeStatus.ESCALATED
-                              ? 'bg-rose-500/10 text-rose-300 border-rose-500/30'
+                              ? 'bg-rose-500/10 text-rose-500 border-rose-500/20'
                               : d.status === DisputeStatus.RESOLVED
-                                ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
-                                : 'bg-blue-500/10 text-blue-300 border-blue-500/30'
+                                ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+                                : 'bg-[#2563EB]/10 text-[#2563EB] border-[#2563EB]/20'
                         }`}
                       >
                         {d.status.replace(/_/g, ' ')}
@@ -328,20 +328,20 @@ export const DisputesWorkspace: React.FC = () => {
                     </td>
                     <td className="py-3 px-4">
                       {d.disputeHoldActive ? (
-                        <span className="inline-flex items-center space-x-1 text-[10px] text-rose-400">
+                        <span className="inline-flex items-center space-x-1 text-[10px] text-rose-500 font-semibold">
                           <Lock className="w-3 h-3" />
                           <span>Active</span>
                         </span>
                       ) : (
-                        <span className="text-[10px] text-slate-500">None</span>
+                        <span className="text-[10px] dark:text-[#777777] text-[#64748B]">None</span>
                       )}
                     </td>
                     <td className="py-3 px-4 text-right">
                       <button
                         onClick={() => openDisputeDetail(d.id)}
-                        className="inline-flex items-center space-x-1 px-2.5 py-1 rounded bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-xs font-medium transition"
+                        className="inline-flex items-center space-x-1 px-3 py-1 rounded-lg dark:bg-[#202020] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] dark:text-[#CDCBCA] text-[#242424] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] text-xs font-semibold transition shadow-sm"
                       >
-                        <Eye className="w-3.5 h-3.5" />
+                        <Eye className="w-3.5 h-3.5 text-[#2563EB]" />
                         <span>Inspect</span>
                       </button>
                     </td>
@@ -355,34 +355,34 @@ export const DisputesWorkspace: React.FC = () => {
 
       {/* Dispute Inspector Drawer / Modal */}
       {selectedDispute && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex justify-end">
-          <div className="w-full max-w-2xl bg-slate-900 border-l border-slate-800 h-full overflow-y-auto p-6 space-y-6">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex justify-end">
+          <div className="w-full max-w-2xl dark:bg-[#171717] bg-white border-l dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] h-full overflow-y-auto p-6 space-y-6 shadow-2xl">
+            <div className="flex items-center justify-between pb-4 border-b dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]">
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400">
+                <div className="w-8 h-8 rounded-xl bg-[#2563EB]/10 border border-[#2563EB]/20 flex items-center justify-center text-[#2563EB]">
                   <Scale className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-white">{selectedDispute.disputeNumber}</h3>
-                  <p className="text-xs text-slate-400">Contract #{selectedDispute.contractNumber}</p>
+                  <h3 className="text-base font-bold dark:text-[#CDCBCA] text-[#242424]">{selectedDispute.disputeNumber}</h3>
+                  <p className="text-xs dark:text-[#A5A5A5] text-[#64748B]">Contract #{selectedDispute.contractNumber}</p>
                 </div>
               </div>
               <button
                 onClick={() => setSelectedDispute(null)}
-                className="p-1 rounded text-slate-400 hover:text-white"
+                className="p-1 rounded-lg text-slate-400 hover:dark:text-white hover:text-black hover:dark:bg-[#202020] hover:bg-[#F1F5F9] transition"
               >
                 &times;
               </button>
             </div>
 
             {/* Hold Status Badge */}
-            <div className="p-3 rounded-lg bg-slate-800/70 border border-slate-700 flex items-center justify-between text-xs">
-              <span className="text-slate-300">Protective Escrow Hold:</span>
+            <div className="p-3.5 rounded-xl dark:bg-[#202020] bg-[#F1F5F9] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] flex items-center justify-between text-xs">
+              <span className="dark:text-[#A5A5A5] text-[#475569]">Protective Escrow Hold:</span>
               <span
-                className={`font-semibold px-2 py-0.5 rounded text-[11px] ${
+                className={`font-semibold px-2.5 py-0.5 rounded text-[11px] ${
                   selectedDispute.disputeHoldActive
-                    ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                    : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                    ? 'bg-rose-500/10 text-rose-500 border border-rose-500/20'
+                    : 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
                 }`}
               >
                 {selectedDispute.disputeHoldActive ? 'ACTIVE (Disbursements Locked)' : 'CLEARED'}
@@ -390,40 +390,40 @@ export const DisputesWorkspace: React.FC = () => {
             </div>
 
             {/* Dispute Summary */}
-            <div className="p-4 rounded-xl bg-slate-800/40 border border-slate-700/60 space-y-2">
+            <div className="p-4 rounded-xl dark:bg-[#080808] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] space-y-2">
               <div className="flex items-center justify-between text-xs">
-                <span className="font-semibold text-slate-200">{selectedDispute.title}</span>
-                <span className="text-slate-400">{new Date(selectedDispute.createdAt).toLocaleString()}</span>
+                <span className="font-semibold dark:text-[#CDCBCA] text-[#242424]">{selectedDispute.title}</span>
+                <span className="dark:text-[#777777] text-[#64748B] font-mono text-[11px]">{new Date(selectedDispute.createdAt).toLocaleString()}</span>
               </div>
-              <p className="text-xs text-slate-300 leading-relaxed">{selectedDispute.description}</p>
+              <p className="text-xs dark:text-[#A5A5A5] text-[#64748B] leading-relaxed">{selectedDispute.description}</p>
             </div>
 
             {/* Evidence Viewer */}
             <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs font-semibold text-slate-300">
+              <div className="flex items-center justify-between text-xs font-semibold dark:text-[#CDCBCA] text-[#242424]">
                 <span className="flex items-center space-x-1.5">
-                  <FileText className="w-3.5 h-3.5 text-blue-400" />
+                  <FileText className="w-3.5 h-3.5 text-[#2563EB]" />
                   <span>Submitted Evidence ({selectedDispute.evidence.length})</span>
                 </span>
               </div>
               {selectedDispute.evidence.length === 0 ? (
-                <p className="text-xs text-slate-500 italic">No evidence documents uploaded yet.</p>
+                <p className="text-xs dark:text-[#777777] text-[#64748B] italic">No evidence documents uploaded yet.</p>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {selectedDispute.evidence.map((ev) => (
                     <div
                       key={ev.id}
-                      className="p-3 rounded-lg bg-slate-800/60 border border-slate-700 flex items-center justify-between text-xs"
+                      className="p-3 rounded-xl dark:bg-[#080808] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] flex items-center justify-between text-xs"
                     >
                       <div className="truncate pr-2">
-                        <div className="font-medium text-slate-200 truncate">{ev.fileName}</div>
-                        <div className="text-[10px] text-slate-400">By {ev.uploaderName}</div>
+                        <div className="font-medium dark:text-[#CDCBCA] text-[#242424] truncate">{ev.fileName}</div>
+                        <div className="text-[10px] dark:text-[#777777] text-[#64748B]">By {ev.uploaderName}</div>
                       </div>
                       <a
                         href={ev.downloadUrl || ev.fileUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="p-1.5 rounded bg-blue-600/20 text-blue-300 hover:bg-blue-600/30 shrink-0"
+                        className="p-2 rounded-lg bg-[#2563EB]/10 text-[#2563EB] hover:bg-[#2563EB]/20 shrink-0"
                         title="Download Document"
                       >
                         <Download className="w-3.5 h-3.5" />
@@ -436,25 +436,25 @@ export const DisputesWorkspace: React.FC = () => {
 
             {/* Statements & Responses Thread */}
             <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs font-semibold text-slate-300">
+              <div className="flex items-center justify-between text-xs font-semibold dark:text-[#CDCBCA] text-[#242424]">
                 <span className="flex items-center space-x-1.5">
-                  <MessageSquare className="w-3.5 h-3.5 text-purple-400" />
+                  <MessageSquare className="w-3.5 h-3.5 text-[#2563EB]" />
                   <span>Participant Statements ({selectedDispute.responses.length})</span>
                 </span>
               </div>
               <div className="space-y-2 max-h-48 overflow-y-auto">
                 {selectedDispute.responses.length === 0 ? (
-                  <p className="text-xs text-slate-500 italic">No statements submitted yet.</p>
+                  <p className="text-xs dark:text-[#777777] text-[#64748B] italic">No statements submitted yet.</p>
                 ) : (
                   selectedDispute.responses.map((r) => (
-                    <div key={r.id} className="p-3 rounded-lg bg-slate-800/50 border border-slate-700/60 text-xs space-y-1">
-                      <div className="flex items-center justify-between text-[11px] text-slate-400">
-                        <span className="font-semibold text-slate-200">
+                    <div key={r.id} className="p-3.5 rounded-xl dark:bg-[#080808] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] text-xs space-y-1">
+                      <div className="flex items-center justify-between text-[11px] dark:text-[#777777] text-[#64748B]">
+                        <span className="font-semibold dark:text-[#CDCBCA] text-[#242424]">
                           {r.authorName} ({r.authorRole})
                         </span>
-                        <span>{new Date(r.createdAt).toLocaleTimeString()}</span>
+                        <span className="font-mono">{new Date(r.createdAt).toLocaleTimeString()}</span>
                       </div>
-                      <p className="text-slate-300">{r.content}</p>
+                      <p className="dark:text-[#A5A5A5] text-[#64748B]">{r.content}</p>
                     </div>
                   ))
                 )}
@@ -462,19 +462,19 @@ export const DisputesWorkspace: React.FC = () => {
             </div>
 
             {/* Administrative Internal Notes */}
-            <div className="space-y-2 p-4 rounded-xl bg-slate-800/30 border border-slate-700/70">
-              <div className="text-xs font-semibold text-slate-300 flex items-center space-x-1.5">
-                <ShieldAlert className="w-3.5 h-3.5 text-amber-400" />
+            <div className="space-y-2 p-4 rounded-xl dark:bg-[#202020]/40 bg-[#F1F5F9] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]">
+              <div className="text-xs font-semibold dark:text-[#CDCBCA] text-[#242424] flex items-center space-x-1.5">
+                <ShieldAlert className="w-3.5 h-3.5 text-amber-500" />
                 <span>Internal Staff Notes (Admin Confidential)</span>
               </div>
               <div className="space-y-2 max-h-36 overflow-y-auto">
                 {selectedDispute.internalNotes?.map((n) => (
-                  <div key={n.id} className="text-[11px] p-2 rounded bg-slate-800/60 border border-slate-700 space-y-0.5">
-                    <div className="text-slate-400 flex justify-between">
-                      <span className="font-medium text-slate-300">{n.authorName}</span>
-                      <span>{new Date(n.createdAt).toLocaleDateString()}</span>
+                  <div key={n.id} className="text-[11px] p-2.5 rounded-lg dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] space-y-0.5">
+                    <div className="dark:text-[#777777] text-[#64748B] flex justify-between">
+                      <span className="font-medium dark:text-[#CDCBCA] text-[#242424]">{n.authorName}</span>
+                      <span className="font-mono">{new Date(n.createdAt).toLocaleDateString()}</span>
                     </div>
-                    <p className="text-slate-200">{n.note}</p>
+                    <p className="dark:text-[#A5A5A5] text-[#64748B]">{n.note}</p>
                   </div>
                 ))}
               </div>
@@ -484,12 +484,12 @@ export const DisputesWorkspace: React.FC = () => {
                   placeholder="Add internal investigation note..."
                   value={internalNote}
                   onChange={(e) => setInternalNote(e.target.value)}
-                  className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder-slate-500"
+                  className="flex-1 dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] rounded-xl px-3 py-1.5 text-xs dark:text-[#CDCBCA] text-[#242424] placeholder-slate-400 focus:outline-none focus:border-[#2563EB]"
                 />
                 <button
                   onClick={handleAddNote}
                   disabled={isAddingNote || !internalNote.trim()}
-                  className="px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-xs font-medium text-white transition disabled:opacity-50"
+                  className="px-4 py-1.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-xs font-semibold text-white transition disabled:opacity-50 shadow-sm"
                 >
                   Save
                 </button>
@@ -498,19 +498,19 @@ export const DisputesWorkspace: React.FC = () => {
 
             {/* Binding Arbitration & Resolution Enforcement */}
             {selectedDispute.status !== DisputeStatus.RESOLVED && selectedDispute.status !== DisputeStatus.CLOSED && (
-              <div className="p-4 rounded-xl bg-blue-950/20 border border-blue-500/30 space-y-4">
-                <div className="flex items-center space-x-2 text-xs font-bold text-blue-300">
-                  <Gavel className="w-4 h-4 text-blue-400" />
+              <div className="p-4 rounded-xl dark:bg-[#202020]/60 bg-[#EFF6FF] border dark:border-[rgba(205,203,202,0.18)] border-[#DBEAFE] space-y-4">
+                <div className="flex items-center space-x-2 text-xs font-bold text-[#2563EB]">
+                  <Gavel className="w-4 h-4 text-[#2563EB]" />
                   <span>Administrative Arbitration &amp; Enforcement</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                   <div>
-                    <label className="block text-slate-400 mb-1">Resolution Decision</label>
+                    <label className="block dark:text-[#A5A5A5] text-[#475569] mb-1">Resolution Decision</label>
                     <select
                       value={resolutionType}
                       onChange={(e) => setResolutionType(e.target.value as DisputeResolutionType)}
-                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 focus:outline-none"
+                      className="w-full dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] rounded-xl px-2.5 py-1.5 dark:text-[#CDCBCA] text-[#242424] focus:outline-none"
                     >
                       <option value={DisputeResolutionType.SPLIT_SETTLEMENT}>Split Settlement</option>
                       <option value={DisputeResolutionType.FULL_REFUND_TO_CLIENT}>Full Refund to Client</option>
@@ -521,36 +521,36 @@ export const DisputesWorkspace: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-slate-400 mb-1">Client Share ($)</label>
+                    <label className="block dark:text-[#A5A5A5] text-[#475569] mb-1">Client Share ($)</label>
                     <input
                       type="number"
                       step="0.01"
                       value={clientAmount}
                       onChange={(e) => setClientAmount(e.target.value)}
-                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 focus:outline-none"
+                      className="w-full dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] rounded-xl px-2.5 py-1.5 dark:text-[#CDCBCA] text-[#242424] font-mono focus:outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-slate-400 mb-1">Worker Share ($)</label>
+                    <label className="block dark:text-[#A5A5A5] text-[#475569] mb-1">Worker Share ($)</label>
                     <input
                       type="number"
                       step="0.01"
                       value={workerAmount}
                       onChange={(e) => setWorkerAmount(e.target.value)}
-                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 focus:outline-none"
+                      className="w-full dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] rounded-xl px-2.5 py-1.5 dark:text-[#CDCBCA] text-[#242424] font-mono focus:outline-none"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-slate-400 text-xs mb-1">Binding Arbitration Rationale</label>
+                  <label className="block dark:text-[#A5A5A5] text-[#475569] text-xs mb-1">Binding Arbitration Rationale</label>
                   <textarea
                     rows={2}
                     placeholder="State binding arbitration justification and contractual findings..."
                     value={rationale}
                     onChange={(e) => setRationale(e.target.value)}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none"
+                    className="w-full dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] rounded-xl p-2.5 text-xs dark:text-[#CDCBCA] text-[#242424] placeholder-slate-400 focus:outline-none"
                   />
                 </div>
 
@@ -558,7 +558,7 @@ export const DisputesWorkspace: React.FC = () => {
                   <button
                     onClick={handleEnforceResolution}
                     disabled={isSubmittingResolution || !rationale.trim()}
-                    className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white flex items-center space-x-1.5 transition disabled:opacity-50"
+                    className="px-4 py-2 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-xs font-semibold text-white flex items-center space-x-1.5 transition disabled:opacity-50 shadow-sm"
                   >
                     <Gavel className="w-3.5 h-3.5" />
                     <span>{isSubmittingResolution ? 'Enforcing...' : 'Enforce Binding Resolution'}</span>

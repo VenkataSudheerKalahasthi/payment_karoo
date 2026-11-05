@@ -69,6 +69,104 @@ export async function listMyConversations(req: Request, res: Response): Promise<
 }
 
 /**
+ * Get or create a conversation for a contract or with a participant.
+ */
+export async function getOrCreateConversation(req: Request, res: Response): Promise<void> {
+  const user = req.user!;
+  const { contractId, recipientId } = req.body as { contractId?: string; recipientId?: string };
+
+  try {
+    let targetRecipientId = recipientId;
+
+    if (contractId) {
+      const contract = await prisma.contract.findUnique({
+        where: { id: contractId },
+        select: { id: true, clientId: true, workerId: true },
+      });
+
+      if (!contract) {
+        sendError(res, 404, 'NOT_FOUND', 'Contract not found');
+        return;
+      }
+
+      // Check if conversation already exists for this contract
+      const existing = await prisma.conversation.findFirst({
+        where: { contractId },
+        include: {
+          participants: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  avatarUrl: true,
+                  role: { select: { name: true } },
+                },
+              },
+            },
+          },
+          contract: {
+            select: { id: true, contractNumber: true, title: true, status: true },
+          },
+        },
+      });
+
+      if (existing) {
+        sendSuccess(res, 200, existing);
+        return;
+      }
+
+      if (!targetRecipientId) {
+        targetRecipientId = user.id === contract.clientId ? contract.workerId : contract.clientId;
+      }
+    }
+
+    if (!targetRecipientId) {
+      sendError(res, 400, 'BAD_REQUEST', 'Recipient ID or Contract ID is required');
+      return;
+    }
+
+    // Create new conversation with both participants
+    const newConversation = await prisma.conversation.create({
+      data: {
+        contractId: contractId || null,
+        participants: {
+          create: [
+            { userId: user.id },
+            { userId: targetRecipientId },
+          ],
+        },
+      },
+      include: {
+        participants: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                avatarUrl: true,
+                role: { select: { name: true } },
+              },
+            },
+          },
+        },
+        contract: {
+          select: { id: true, contractNumber: true, title: true, status: true },
+        },
+      },
+    });
+
+    sendSuccess(res, 201, newConversation);
+  } catch (error) {
+    logger.error('Error creating/retrieving conversation:', error);
+    sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Failed to initialize conversation');
+  }
+}
+
+
+/**
  * Get conversation details by ID.
  * Enforces participant authorization: only participants (or SUPERADMIN) can access.
  */

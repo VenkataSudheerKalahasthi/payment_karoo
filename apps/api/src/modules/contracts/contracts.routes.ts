@@ -21,6 +21,12 @@ import {
   verifyContractIntegrityHandler,
   getContractActivityHistoryHandler,
 } from './contracts.controller.js';
+import {
+  listAllMyInvoices,
+  listContractInvoices,
+  downloadInvoicePdf,
+} from './invoice.controller.js';
+
 import { authenticateUser, requireRole } from '../../middleware/auth.js';
 import { validateRequest } from '../../middleware/validate.js';
 import {
@@ -47,8 +53,18 @@ contractsRoutes.post(
 // List contracts (Role-scoped: Client sees own, Worker sees assigned, Admin sees all)
 contractsRoutes.get('/', authenticateUser(), listContracts);
 
+// List all invoices across user contracts (Client or Worker)
+contractsRoutes.get('/invoices/all', authenticateUser(), listAllMyInvoices);
+
 // Download professional contract PDF (Client, Worker or Admin)
 contractsRoutes.get('/:id/pdf', authenticateUser(), downloadContractPdf);
+
+// List invoices for a specific contract
+contractsRoutes.get('/:id/invoices', authenticateUser(), listContractInvoices);
+
+// Download specific invoice PDF
+contractsRoutes.get('/:id/invoices/:invoiceId/pdf', authenticateUser(), downloadInvoicePdf);
+
 
 // Get immutable contract version snapshots (Client, Worker, Admin, Superadmin)
 contractsRoutes.get('/:id/versions', authenticateUser(), getContractVersions);

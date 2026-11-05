@@ -33,6 +33,11 @@ import {
   GenerateDownloadUrlResponse,
   DisputeDto,
   DisputeDetailDto,
+  ClientWalletDto,
+  SpecialistWalletDto,
+  SettleMilestoneResultDto,
+  ProcessRefundResultDto,
+  PaymentTransactionDto,
   CreateDisputeRequest,
   ProposeDisputeResolutionRequest,
   ContractAmendmentDto,
@@ -46,6 +51,7 @@ import {
   MilestoneActivityDto,
   ProjectProgressSummaryDto,
   CreateProjectRequest,
+  InvoiceDto,
 } from '@trustpay/shared';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
@@ -140,6 +146,10 @@ export const apiService = {
     }
   },
 
+  syncUserWithRole: async (role: 'CLIENT' | 'WORKER', token?: string): Promise<ApiResponse<UserDto>> => {
+    return apiService.syncUser({ role }, token);
+  },
+
   getCurrentUser: async (token?: string): Promise<ApiResponse<UserDto>> => {
     try {
       const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
@@ -199,6 +209,11 @@ export const apiService = {
   },
 
   updateWorkerProfile: async (data: UpdateWorkerProfileRequest): Promise<ApiResponse<WorkerProfileDto>> => {
+    const res = await apiClient.put<ApiResponse<WorkerProfileDto>>('/workers/me/profile', data);
+    return res.data;
+  },
+
+  updateWorkerProfileMe: async (data: UpdateWorkerProfileRequest): Promise<ApiResponse<WorkerProfileDto>> => {
     const res = await apiClient.put<ApiResponse<WorkerProfileDto>>('/workers/me/profile', data);
     return res.data;
   },
@@ -383,19 +398,42 @@ export const apiService = {
     return res.data;
   },
 
+  // Invoices (Phase 7 Client Portal)
+  listInvoices: async (): Promise<ApiResponse<{ items: InvoiceDto[]; total: number }>> => {
+    const res = await apiClient.get<ApiResponse<{ items: InvoiceDto[]; total: number }>>('/contracts/invoices/all');
+    return res.data;
+  },
+
+  listContractInvoices: async (contractId: string): Promise<ApiResponse<InvoiceDto[]>> => {
+    const res = await apiClient.get<ApiResponse<InvoiceDto[]>>(`/contracts/${contractId}/invoices`);
+    return res.data;
+  },
+
+  downloadInvoicePdf: async (contractId: string, invoiceId: string): Promise<Blob> => {
+    const res = await apiClient.get(`/contracts/${contractId}/invoices/${invoiceId}/pdf`, {
+      responseType: 'blob',
+    });
+    return res.data;
+  },
+
   // Conversations
-  listConversations: async (): Promise<ApiResponse<unknown[]>> => {
-    const res = await apiClient.get<ApiResponse<unknown[]>>('/conversations');
+  listConversations: async (): Promise<ApiResponse<any[]>> => {
+    const res = await apiClient.get<ApiResponse<any[]>>('/conversations');
     return res.data;
   },
 
-  getConversationMessages: async (conversationId: string): Promise<ApiResponse<{ items: unknown[]; total: number }>> => {
-    const res = await apiClient.get<ApiResponse<{ items: unknown[]; total: number }>>(`/conversations/${conversationId}/messages`);
+  getOrCreateConversation: async (data: { contractId?: string; recipientId?: string }): Promise<ApiResponse<any>> => {
+    const res = await apiClient.post<ApiResponse<any>>('/conversations', data);
     return res.data;
   },
 
-  sendMessage: async (conversationId: string, content: string): Promise<ApiResponse<unknown>> => {
-    const res = await apiClient.post<ApiResponse<unknown>>(`/conversations/${conversationId}/messages`, { content });
+  getConversationMessages: async (conversationId: string): Promise<ApiResponse<{ items: any[]; total: number }>> => {
+    const res = await apiClient.get<ApiResponse<{ items: any[]; total: number }>>(`/conversations/${conversationId}/messages`);
+    return res.data;
+  },
+
+  sendMessage: async (conversationId: string, content: string): Promise<ApiResponse<any>> => {
+    const res = await apiClient.post<ApiResponse<any>>(`/conversations/${conversationId}/messages`, { content });
     return res.data;
   },
 
@@ -482,8 +520,23 @@ export const apiService = {
     contractId?: string;
     page?: number;
     limit?: number;
-  }): Promise<ApiResponse<{ items: unknown[]; total: number }>> => {
-    const res = await apiClient.get('/payments/transactions', { params });
+  }): Promise<ApiResponse<{ items: PaymentTransactionDto[]; total: number }>> => {
+    const res = await apiClient.get<ApiResponse<{ items: PaymentTransactionDto[]; total: number }>>('/payments/transactions', { params });
+    return res.data;
+  },
+
+  getWalletOverview: async (): Promise<ApiResponse<ClientWalletDto | SpecialistWalletDto>> => {
+    const res = await apiClient.get<ApiResponse<ClientWalletDto | SpecialistWalletDto>>('/payments/wallet');
+    return res.data;
+  },
+
+  settleMilestone: async (milestoneId: string, reason?: string): Promise<ApiResponse<SettleMilestoneResultDto>> => {
+    const res = await apiClient.post<ApiResponse<SettleMilestoneResultDto>>(`/payments/settlements/${milestoneId}`, { reason });
+    return res.data;
+  },
+
+  processRefund: async (data: { contractId: string; reason: string; amountMinor?: string | number }): Promise<ApiResponse<ProcessRefundResultDto>> => {
+    const res = await apiClient.post<ApiResponse<ProcessRefundResultDto>>('/payments/refunds', data);
     return res.data;
   },
 

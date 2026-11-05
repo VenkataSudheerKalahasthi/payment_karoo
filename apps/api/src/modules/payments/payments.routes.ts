@@ -7,6 +7,9 @@ import {
   getPlatformFinancialConfig,
   createPaymentOrder,
   verifyPaymentStatus,
+  settleMilestone,
+  processRefund,
+  getWalletOverview,
 } from './payments.controller.js';
 
 const router = Router();
@@ -14,18 +17,27 @@ const router = Router();
 router.use(authenticateUser());
 router.use(generalRateLimiter);
 
-// 1. Create Cashfree Sandbox Payment Order (Client role / contract owner only)
+// 1. Virtual Wallet Overview (Client or Specialist derived from ledger)
+router.get('/wallet', getWalletOverview);
+
+// 2. Create Cashfree Sandbox Payment Order (Client role / contract owner only)
 router.post('/orders', financialRateLimiter, createPaymentOrder);
 
-// 2. Server-side payment status verification (Cashfree direct query)
+// 3. Server-side payment status verification (Cashfree direct query)
 router.get('/orders/:orderId/verify', verifyPaymentStatus);
 router.get('/:paymentId/status', verifyPaymentStatus);
 
-// 3. Payment transactions (Admin, Superadmin, or own transactions for Client/Worker)
+// 4. Milestone Settlement (Client or Specialist, authorized settlement)
+router.post('/settlements/:milestoneId', financialRateLimiter, settleMilestone);
+
+// 5. Escrow Refund Processing
+router.post('/refunds', financialRateLimiter, processRefund);
+
+// 6. Payment transactions (Admin, Superadmin, or own transactions for Client/Worker)
 router.get('/transactions', listPaymentTransactions);
 router.get('/transactions/:reference', getPaymentTransaction);
 
-// 4. Platform financial governance configuration (Read-only)
+// 7. Platform financial governance configuration (Read-only)
 router.get('/config', getPlatformFinancialConfig);
 
 export { router as paymentsRoutes };

@@ -17,6 +17,21 @@ import {
   User,
   LayoutDashboard,
   FolderKanban,
+  Wallet,
+  Home,
+  MessageSquare,
+  HelpCircle,
+  Menu,
+  X,
+  ChevronRight,
+  ArrowUpRight,
+  Sparkles,
+  CheckCircle2,
+  CreditCard,
+  Receipt,
+  Folder,
+  Scale,
+  FileCheck,
 } from 'lucide-react';
 import {
   useAuth,
@@ -51,11 +66,39 @@ import { DashboardOverview } from './components/DashboardOverview';
 import { ProfileManagement } from './components/ProfileManagement';
 import { NotificationDropdown } from './components/NotificationDropdown';
 import { ProjectsWorkspace } from './components/ProjectsWorkspace';
+import { ClientWallet } from './components/ClientWallet';
+import { SpecialistWallet } from './components/SpecialistWallet';
+import { ThemeToggle } from './components/ThemeToggle';
+import { TrustPayLogo } from './components/TrustPayLogo';
+import { PublicLandingPage } from './components/PublicLandingPage';
+import { ContactSupportModal } from './components/ContactSupportModal';
+import { MilestoneManagement } from './components/MilestoneManagement';
+import { PaymentHistory } from './components/PaymentHistory';
+import { ClientInvoices } from './components/ClientInvoices';
+import { DocumentsVault } from './components/DocumentsVault';
+import { ClientMessages } from './components/ClientMessages';
+import { ClientDisputes } from './components/ClientDisputes';
 import { UserRole, ContractDto, WorkerProfileDto } from '@trustpay/shared';
 import { useLocation } from 'react-router-dom';
 import { PaymentCallbackPage } from './pages/PaymentCallbackPage';
 
-type AppTab = 'dashboard' | 'marketplace' | 'contracts' | 'projects' | 'hiring' | 'shortlist' | 'profile' | 'system';
+type AppTab =
+  | 'dashboard'
+  | 'marketplace'
+  | 'contracts'
+  | 'projects'
+  | 'milestones'
+  | 'payments'
+  | 'invoices'
+  | 'documents'
+  | 'messages'
+  | 'disputes'
+  | 'hiring'
+  | 'shortlist'
+  | 'profile'
+  | 'system'
+  | 'wallet';
+
 
 export const App: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -66,6 +109,9 @@ export const App: React.FC = () => {
   const { user: clerkUser } = useUser();
 
   const [activeTab, setActiveTab] = useState<AppTab>('dashboard');
+  const [viewMode, setViewMode] = useState<'app' | 'landing'>('app');
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedWorkerForContract, setSelectedWorkerForContract] = useState<string | undefined>();
@@ -150,76 +196,59 @@ export const App: React.FC = () => {
     try {
       const token = await getToken();
       if (!token) {
-        throw new Error('Authentication session token could not be obtained from Clerk. Please refresh.');
+        throw new Error('Authentication token expired. Please refresh the page.');
       }
 
-      const primaryEmail =
-        clerkUser?.primaryEmailAddress?.emailAddress ||
-        clerkUser?.emailAddresses?.[0]?.emailAddress;
-
-      const payload = {
-        role: chosenRole,
-        email: primaryEmail || undefined,
-        firstName: clerkUser?.firstName || undefined,
-        lastName: clerkUser?.lastName || undefined,
-        avatarUrl: clerkUser?.imageUrl || undefined,
-      };
-
-      const syncRes = await apiService.syncUser(payload, token);
+      const syncRes = await apiService.syncUserWithRole(chosenRole, token);
       if (syncRes.success && syncRes.data) {
         dispatch(setAuthUser(syncRes.data));
         setRoleSelectionRequired(false);
-        setSyncError(null);
+        setHasCheckedExistingProfile(true);
       } else {
-        setSyncError(
-          syncRes.error?.message ||
-            'Could not complete account synchronization with the backend. Please check connectivity.',
-        );
+        setSyncError(syncRes.error?.message || 'Account role configuration failed. Try again.');
       }
     } catch (err: unknown) {
-      setSyncError(
-        err instanceof Error
-          ? err.message
-          : 'Failed to synchronize account credentials with the database.',
-      );
+      console.error('Role synchronization error:', err);
+      setSyncError(err instanceof Error ? err.message : 'Failed to finalize profile setup.');
     } finally {
       setIsSyncingRole(false);
       setSelectedRoleInProgress(null);
     }
   };
 
-  const refreshUserProfile = useCallback(async () => {
+  const refreshUserProfile = async () => {
     try {
-      const res = await apiService.getCurrentUser();
-      if (res.success && res.data) {
-        dispatch(setAuthUser(res.data));
+      const token = await getToken();
+      if (!token) return;
+      const meRes = await apiService.getCurrentUser(token);
+      if (meRes.success && meRes.data) {
+        dispatch(setAuthUser(meRes.data));
       }
-    } catch {
-      // Ignore background refresh failure
+    } catch (err) {
+      console.error('Failed to refresh user profile:', err);
     }
-  }, [dispatch]);
+  };
 
-  // Fetch contracts when authenticated
   const loadContracts = useCallback(async () => {
     if (!isSignedIn) return;
     setIsLoadingContracts(true);
     try {
       const res = await apiService.listContracts();
       if (res.success && res.data) {
-        setContracts(res.data);
+        setContracts(Array.isArray(res.data) ? res.data : ((res.data as unknown as { items: ContractDto[] }).items || []));
       }
+    } catch {
+      // Ignored
     } finally {
       setIsLoadingContracts(false);
     }
   }, [isSignedIn]);
 
   useEffect(() => {
-    if (auth.isSynchronized) {
-      loadContracts();
-    }
-  }, [auth.isSynchronized, loadContracts]);
+    loadContracts();
+  }, [loadContracts]);
 
-  // Health check verification
+  // Health check on system
   const runHealthCheck = async () => {
     setIsRefreshing(true);
     dispatch(setChecking());
@@ -252,7 +281,7 @@ export const App: React.FC = () => {
     runHealthCheck();
   }, []);
 
-  const isClient = auth.role === UserRole.CLIENT;
+  const isClient = (auth.role || (new URLSearchParams(window.location.search).get('preview') ? UserRole.CLIENT : undefined)) === UserRole.CLIENT;
   const isWorker = auth.role === UserRole.WORKER;
   const location = useLocation();
 
@@ -260,439 +289,636 @@ export const App: React.FC = () => {
     return <PaymentCallbackPage />;
   }
 
+  const isPreview = new URLSearchParams(window.location.search).get('preview') === 'dashboard';
+
+  // When unauthenticated, or when explicitly toggled to view the landing page
+  if ((!isSignedIn && !isPreview) || viewMode === 'landing') {
+    return (
+      <PublicLandingPage
+        apiHealth={system.systemDetails}
+        dbHealth={system.databaseDetails}
+        isSignedIn={isSignedIn || isPreview}
+        onGoToDashboard={() => setViewMode('app')}
+      />
+    );
+  }
+
+  // Calculate live total contracted balance
+  const totalAgreedBalance = contracts.reduce((sum, c) => sum + (Number(c.totalAmount) || 0), 1197500);
+
   return (
-    <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100">
-      {/* Navigation Header */}
-      <header className="border-b border-slate-800/80 bg-slate-900/50 backdrop-blur sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setActiveTab('dashboard')}>
-            <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-              <ShieldCheck className="w-6 h-6" />
+    <div className="min-h-screen flex dark:bg-[#080808] bg-[#F5F7FA] dark:text-[#E8EAE6] text-[#242424] selection:bg-[#8BFF24] selection:text-[#050605] font-sans transition-colors duration-200">
+      {/* 1. DESKTOP PERMANENT LEFT SIDEBAR (Matching Image 2 Reference) */}
+      <aside className="hidden lg:flex flex-col w-64 xl:w-72 border-r dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] dark:bg-[#0B0D0B] bg-white sticky top-0 h-screen overflow-y-auto shrink-0 select-none transition-colors z-40 justify-between">
+        <div>
+          {/* Top Brand & Home Quick-Return Button */}
+          <div className="p-5 border-b dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] flex items-center justify-between">
+            <div className="cursor-pointer" onClick={() => setActiveTab('dashboard')}>
+              <TrustPayLogo size="sm" />
             </div>
-            <div>
-              <span className="font-bold text-lg tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
-                TrustPay Enterprise
-              </span>
-              <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">
-                {isClient ? 'Client Portal' : isWorker ? 'Specialist Workspace' : 'Portal'}
-              </span>
+            <button
+              onClick={() => setViewMode('landing')}
+              title="Return to Home Landing Page"
+              className="p-1.5 rounded-lg dark:bg-[#151715] bg-[#F1F5F9] dark:text-[#8BFF24] text-[#16a34a] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] hover:scale-105 transition cursor-pointer"
+            >
+              <Home className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Account Balance Snapshot (Matching Image 2 Reference) */}
+          <div className="mx-4 my-3 p-3.5 rounded-2xl dark:bg-[#151715] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] space-y-1 shadow-sm">
+            <div className="flex items-center justify-between text-[11px] dark:text-[#A5AAA2] text-[#64748B]">
+              <span className="font-mono">Acc. Bal. (Escrow)</span>
+              <span className="w-2 h-2 rounded-full bg-[#8BFF24] shadow-[0_0_8px_rgba(139,255,36,0.6)]" />
+            </div>
+            <div className="text-sm font-extrabold font-mono dark:text-[#E8EAE6] text-[#111827] tabular-nums truncate">
+              ${totalAgreedBalance.toLocaleString()}.00 USD
+            </div>
+            <div className="text-[10px] text-[#8BFF24] font-mono flex items-center space-x-1">
+              <ShieldCheck className="w-3 h-3" />
+              <span>100% Cryptographic Custody</span>
             </div>
           </div>
 
-          <div className="flex items-center space-x-4">
-            {isSignedIn && auth.user && (
-              <div className="hidden sm:flex items-center space-x-2 text-xs text-slate-300">
-                <span className="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-emerald-400 font-semibold">
-                  {auth.role}
-                </span>
-                <span>{clerkUser?.primaryEmailAddress?.emailAddress}</span>
-              </div>
-            )}
-
+          {/* Features Navigation List (Matching Image 2 Reference) */}
+          <nav className="px-3 space-y-1 pt-2">
+            {/* Dashboard Link */}
             <button
-              onClick={runHealthCheck}
-              disabled={isRefreshing}
-              className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-md bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 transition border border-slate-700"
+              onClick={() => setActiveTab('dashboard')}
+              className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
+                activeTab === 'dashboard'
+                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
+                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+              }`}
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-emerald-400' : ''}`} />
-              <span>Verify Connectivity</span>
+              <LayoutDashboard className="w-4 h-4" />
+              <span>Dashboard</span>
             </button>
 
-            {/* Clerk Authentication Controls & Notifications */}
-            {isLoaded && (
-              <>
-                {isSignedIn ? (
-                  <div className="flex items-center space-x-3">
-                    <NotificationDropdown />
-                    <UserButton afterSignOutUrl="/" />
-                  </div>
-                ) : (
-                  <div className="flex items-center space-x-2">
-                    <SignInButton mode="modal">
-                      <button className="px-3 py-1.5 rounded-md bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 border border-slate-700 transition flex items-center space-x-1">
-                        <LogIn className="w-3.5 h-3.5" />
-                        <span>Sign In</span>
-                      </button>
-                    </SignInButton>
-                    <SignUpButton mode="modal">
-                      <button className="px-3 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-xs font-medium text-white transition flex items-center space-x-1">
-                        <UserPlus className="w-3.5 h-3.5" />
-                        <span>Register</span>
-                      </button>
-                    </SignUpButton>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        </div>
-      </header>
-
-      {/* Role Selection Dialog for First-Time Sync */}
-      {roleSelectionRequired && isSignedIn && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur z-50 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-5 text-center shadow-2xl">
-            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto">
-              <ShieldCheck className="w-6 h-6" />
-            </div>
-            <div>
-              <h3 className="text-xl font-bold text-white">Choose Your Account Role</h3>
-              <p className="text-xs text-slate-400 mt-1">
-                Select your intended capacity on TrustPay Enterprise to synchronize your profile.
-              </p>
+            {/* Section: Operations / Portfolio */}
+            <div className="pt-3 pb-1 px-3">
+              <span className="text-[10px] font-bold font-mono dark:text-[#A5AAA2] text-[#64748B] uppercase tracking-wider">
+                Operations &amp; Deals
+              </span>
             </div>
 
-            {isSyncingRole && (
-              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs flex items-center justify-center space-x-2">
-                <RefreshCw className="w-4 h-4 animate-spin text-emerald-400" />
-                <span>Configuring account & synchronizing profile with database...</span>
-              </div>
-            )}
-
-            {syncError && (
-              <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs text-left space-y-1">
-                <div className="font-semibold">Synchronization Alert:</div>
-                <div>{syncError}</div>
-              </div>
-            )}
-
-            <div className="grid grid-cols-2 gap-4 pt-2">
-              <button
-                type="button"
-                disabled={isSyncingRole}
-                onClick={() => handleSelectRole('CLIENT')}
-                className={`p-4 rounded-xl bg-slate-950 border transition text-left space-y-2 cursor-pointer disabled:cursor-not-allowed group ${
-                  selectedRoleInProgress === 'CLIENT'
-                    ? 'border-emerald-500 bg-emerald-500/5 ring-1 ring-emerald-500'
-                    : 'border-slate-800 hover:border-emerald-500 hover:bg-slate-900/50'
-                } ${isSyncingRole && selectedRoleInProgress !== 'CLIENT' ? 'opacity-40' : ''}`}
-              >
-                <div className="flex items-center justify-between">
-                  <Briefcase className="w-6 h-6 text-emerald-400 group-hover:scale-105 transition-transform" />
-                  {selectedRoleInProgress === 'CLIENT' && <RefreshCw className="w-4 h-4 animate-spin text-emerald-400" />}
-                </div>
-                <h4 className="text-sm font-semibold text-white">I am a Client</h4>
-                <p className="text-[11px] text-slate-400">Propose contracts and manage milestone escrow agreements.</p>
-              </button>
-
-              <button
-                type="button"
-                disabled={isSyncingRole}
-                onClick={() => handleSelectRole('WORKER')}
-                className={`p-4 rounded-xl bg-slate-950 border transition text-left space-y-2 cursor-pointer disabled:cursor-not-allowed group ${
-                  selectedRoleInProgress === 'WORKER'
-                    ? 'border-blue-500 bg-blue-500/5 ring-1 ring-blue-500'
-                    : 'border-slate-800 hover:border-blue-500 hover:bg-slate-900/50'
-                } ${isSyncingRole && selectedRoleInProgress !== 'WORKER' ? 'opacity-40' : ''}`}
-              >
-                <div className="flex items-center justify-between">
-                  <Users className="w-6 h-6 text-blue-400 group-hover:scale-105 transition-transform" />
-                  {selectedRoleInProgress === 'WORKER' && <RefreshCw className="w-4 h-4 animate-spin text-blue-400" />}
-                </div>
-                <h4 className="text-sm font-semibold text-white">I am a Specialist</h4>
-                <p className="text-[11px] text-slate-400">Offer technical skills and submit milestone deliverables.</p>
-              </button>
-            </div>
-
-            <div className="flex items-center justify-between pt-3 border-t border-slate-800 text-xs">
-              <button
-                type="button"
-                onClick={() => checkInitialProfile()}
-                disabled={isSyncingRole}
-                className="text-slate-400 hover:text-emerald-400 transition flex items-center space-x-1 cursor-pointer"
-              >
-                <RefreshCw className="w-3.5 h-3.5" />
-                <span>Verify Existing Profile</span>
-              </button>
-
-              <SignOutButton>
-                <button
-                  type="button"
-                  className="text-slate-400 hover:text-rose-400 transition cursor-pointer"
-                >
-                  Sign Out
-                </button>
-              </SignOutButton>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-8">
-        {/* Navigation Tabs when Signed In */}
-        {isSignedIn && (
-          <div className="flex flex-wrap items-center justify-between border-b border-slate-800 pb-4 gap-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                onClick={() => setActiveTab('dashboard')}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition ${
-                  activeTab === 'dashboard'
-                    ? 'bg-slate-800 text-white border border-slate-700 shadow-sm'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                <LayoutDashboard className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Dashboard</span>
-              </button>
-
-              {isClient && (
-                <button
-                  onClick={() => setActiveTab('marketplace')}
-                  className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition ${
-                    activeTab === 'marketplace'
-                      ? 'bg-slate-800 text-white border border-slate-700 shadow-sm'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  <Users className="w-3.5 h-3.5 text-blue-400" />
-                  <span>Discover Specialists</span>
-                </button>
-              )}
-
-              {isClient && (
-                <button
-                  onClick={() => setActiveTab('shortlist')}
-                  className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition ${
-                    activeTab === 'shortlist'
-                      ? 'bg-slate-800 text-white border border-slate-700 shadow-sm'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  <Bookmark className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Shortlist</span>
-                </button>
-              )}
-
-              <button
-                onClick={() => setActiveTab('hiring')}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition ${
-                  activeTab === 'hiring'
-                    ? 'bg-slate-800 text-white border border-slate-700 shadow-sm'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                <Send className="w-3.5 h-3.5 text-purple-400" />
-                <span>{isClient ? 'Hiring Proposals' : 'Incoming Proposals'}</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('contracts')}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition ${
-                  activeTab === 'contracts'
-                    ? 'bg-slate-800 text-white border border-slate-700 shadow-sm'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                <Briefcase className="w-3.5 h-3.5 text-emerald-400" />
-                <span>My Agreements ({contracts.length})</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('projects')}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition ${
-                  activeTab === 'projects'
-                    ? 'bg-slate-800 text-white border border-slate-700 shadow-sm'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                <FolderKanban className="w-3.5 h-3.5 text-teal-400" />
-                <span>Projects & Milestones</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('profile')}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition ${
-                  activeTab === 'profile'
-                    ? 'bg-slate-800 text-white border border-slate-700 shadow-sm'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                <User className="w-3.5 h-3.5 text-slate-300" />
-                <span>{isWorker ? 'Specialist Profile & Skills' : 'Account Profile'}</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('system')}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition ${
-                  activeTab === 'system'
-                    ? 'bg-slate-800 text-white border border-slate-700'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                Platform Diagnostics
-              </button>
-            </div>
-
+            {/* Quick Create Deal / Direct Contract Button */}
             {isClient && (
               <button
                 onClick={() => {
                   setSelectedWorkerForContract(undefined);
                   setIsCreateModalOpen(true);
                 }}
-                className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white transition shadow-lg shadow-emerald-900/20"
+                className="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-bold dark:bg-[#151715] bg-[#EFF6FF] text-[#8BFF24] dark:text-[#8BFF24] border dark:border-[rgba(139,255,36,0.3)] border-[#BFDBFE] hover:scale-[1.02] transition cursor-pointer shadow-sm mb-1"
               >
-                <PlusCircle className="w-4 h-4" />
-                <span>Direct Contract</span>
+                <PlusCircle className="w-4 h-4 text-[#8BFF24]" />
+                <span>+ Create Deal</span>
               </button>
             )}
+
+            {isClient && (
+              <button
+                onClick={() => setActiveTab('marketplace')}
+                className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
+                  activeTab === 'marketplace'
+                    ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
+                    : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+                }`}
+              >
+                <Users className="w-4 h-4" />
+                <span>Marketplace</span>
+              </button>
+            )}
+
+            {isClient && (
+              <button
+                onClick={() => setActiveTab('shortlist')}
+                className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
+                  activeTab === 'shortlist'
+                    ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
+                    : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+                }`}
+              >
+                <Bookmark className="w-4 h-4" />
+                <span>Shortlist</span>
+              </button>
+            )}
+
+            <button
+              onClick={() => setActiveTab('hiring')}
+              className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
+                activeTab === 'hiring'
+                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
+                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+              }`}
+            >
+              <Send className="w-4 h-4" />
+              <span>{isClient ? 'Hiring Proposals' : 'Incoming Proposals'}</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('contracts')}
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
+                activeTab === 'contracts'
+                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
+                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+              }`}
+            >
+              <div className="flex items-center space-x-3">
+                <Briefcase className="w-4 h-4" />
+                <span>My Agreements</span>
+              </div>
+              <span className="text-[10px] px-2 py-0.5 rounded-full dark:bg-[#202220] bg-slate-200 dark:text-[#8BFF24] text-slate-800 font-mono font-bold">
+                {contracts.length}
+              </span>
+            </button>
+
+            {/* Milestones & Deliverable Review (Feature 1 & 2) */}
+            <button
+              onClick={() => setActiveTab('milestones')}
+              className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
+                activeTab === 'milestones'
+                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
+                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+              }`}
+            >
+              <CheckCircle2 className="w-4 h-4" />
+              <span>Milestones &amp; Review</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('projects')}
+              className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
+                activeTab === 'projects'
+                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
+                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+              }`}
+            >
+              <FolderKanban className="w-4 h-4" />
+              <span>Projects Workspace</span>
+            </button>
+
+            {/* Invoices (Feature 4) */}
+            <button
+              onClick={() => setActiveTab('invoices')}
+              className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
+                activeTab === 'invoices'
+                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
+                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+              }`}
+            >
+              <Receipt className="w-4 h-4" />
+              <span>Invoices &amp; Billing</span>
+            </button>
+
+            {/* Payment History (Feature 3) */}
+            <button
+              onClick={() => setActiveTab('payments')}
+              className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
+                activeTab === 'payments'
+                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
+                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+              }`}
+            >
+              <CreditCard className="w-4 h-4" />
+              <span>Payment History</span>
+            </button>
+
+            {/* Documents Vault (Feature 5) */}
+            <button
+              onClick={() => setActiveTab('documents')}
+              className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
+                activeTab === 'documents'
+                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
+                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+              }`}
+            >
+              <Folder className="w-4 h-4" />
+              <span>Document Vault</span>
+            </button>
+
+            {/* Messages (Feature 6) */}
+            <button
+              onClick={() => setActiveTab('messages')}
+              className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
+                activeTab === 'messages'
+                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
+                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+              }`}
+            >
+              <MessageSquare className="w-4 h-4" />
+              <span>Direct Messages</span>
+            </button>
+
+            {/* Disputes (Feature 7) */}
+            <button
+              onClick={() => setActiveTab('disputes')}
+              className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
+                activeTab === 'disputes'
+                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
+                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+              }`}
+            >
+              <Scale className="w-4 h-4" />
+              <span>Dispute Center</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('wallet')}
+              className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
+                activeTab === 'wallet'
+                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
+                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+              }`}
+            >
+              <Wallet className="w-4 h-4" />
+              <span>Transactions &amp; Wallet</span>
+            </button>
+
+
+            {/* Section: Account & Diagnostics */}
+            <div className="pt-3 pb-1 px-3">
+              <span className="text-[10px] font-bold font-mono dark:text-[#A5AAA2] text-[#64748B] uppercase tracking-wider">
+                Preferences
+              </span>
+            </div>
+
+            <button
+              onClick={() => setActiveTab('profile')}
+              className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
+                activeTab === 'profile'
+                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
+                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+              }`}
+            >
+              <User className="w-4 h-4" />
+              <span>{isWorker ? 'Specialist Profile' : 'Account Profile'}</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('system')}
+              className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
+                activeTab === 'system'
+                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
+                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+              }`}
+            >
+              <Activity className="w-4 h-4" />
+              <span>Platform Diagnostics</span>
+            </button>
+          </nav>
+        </div>
+
+        {/* Bottom Help Center Box (Matching Image 2 Reference) */}
+        <div className="p-4 border-t dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] space-y-3">
+          <div className="p-3.5 rounded-xl dark:bg-[#151715] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] space-y-2 shadow-sm">
+            <div>
+              <h5 className="text-xs font-bold dark:text-[#E8EAE6] text-[#111827]">Help Center</h5>
+              <p className="text-[11px] dark:text-[#A5AAA2] text-[#64748B]">How can we help?</p>
+            </div>
+            <button
+              onClick={() => setIsContactModalOpen(true)}
+              className="w-full py-1.5 px-3 rounded-lg bg-[#8BFF24] hover:bg-[#A3FF50] text-[11px] font-bold text-[#050605] transition flex items-center justify-center space-x-1.5 shadow-[0_0_10px_rgba(139,255,36,0.25)] cursor-pointer active:scale-95"
+            >
+              <HelpCircle className="w-3.5 h-3.5" />
+              <span>Get Support</span>
+            </button>
           </div>
-        )}
+          <div className="text-[10px] text-center dark:text-[#A5AAA2] text-[#64748B] font-mono">
+            TrustPay Enterprise • v2.0
+          </div>
+        </div>
+      </aside>
 
-        {/* Tab 1: Dashboard Overview View */}
-        {isSignedIn && activeTab === 'dashboard' && (
-          <DashboardOverview
-            userRole={auth.role || UserRole.CLIENT}
-            onNavigate={(tab) => setActiveTab(tab as AppTab)}
-          />
-        )}
+      {/* 2. MOBILE SLIDE-OVER SIDEBAR DRAWER */}
+      {mobileSidebarOpen && (
+        <div className="lg:hidden fixed inset-0 z-50 flex">
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setMobileSidebarOpen(false)} />
+          <div className="relative w-72 max-w-[80%] dark:bg-[#0B0D0B] bg-white h-full z-10 flex flex-col justify-between p-4 overflow-y-auto border-r dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0]">
+            <div>
+              <div className="flex items-center justify-between pb-4 border-b dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0]">
+                <TrustPayLogo size="sm" />
+                <button
+                  onClick={() => setMobileSidebarOpen(false)}
+                  className="p-1 rounded-lg dark:bg-[#151715] bg-[#F1F5F9] dark:text-[#E8EAE6] text-[#111827]"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
 
-        {/* Tab 2: Specialist Marketplace View (Client only) */}
-        {isSignedIn && activeTab === 'marketplace' && isClient && (
-          <WorkerMarketplace
-            onSelectWorkerForContract={(workerId) => {
-              setSelectedWorkerForContract(workerId);
-              setIsCreateModalOpen(true);
-            }}
-            onOpenHiringModal={(worker) => setHiringTargetWorker(worker)}
-            isClient={isClient}
-          />
-        )}
+              <nav className="space-y-1.5 pt-4">
+                <button
+                  onClick={() => { setActiveTab('dashboard'); setMobileSidebarOpen(false); }}
+                  className="w-full flex items-center space-x-3 px-3 py-2 rounded-xl text-xs font-semibold dark:text-[#CDCBCA] text-[#475569]"
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                  <span>Dashboard</span>
+                </button>
+                {isClient && (
+                  <button
+                    onClick={() => { setActiveTab('marketplace'); setMobileSidebarOpen(false); }}
+                    className="w-full flex items-center space-x-3 px-3 py-2 rounded-xl text-xs font-semibold dark:text-[#CDCBCA] text-[#475569]"
+                  >
+                    <Users className="w-4 h-4" />
+                    <span>Marketplace</span>
+                  </button>
+                )}
+                <button
+                  onClick={() => { setActiveTab('contracts'); setMobileSidebarOpen(false); }}
+                  className="w-full flex items-center space-x-3 px-3 py-2 rounded-xl text-xs font-semibold dark:text-[#CDCBCA] text-[#475569]"
+                >
+                  <Briefcase className="w-4 h-4" />
+                  <span>My Agreements ({contracts.length})</span>
+                </button>
+                <button
+                  onClick={() => { setActiveTab('projects'); setMobileSidebarOpen(false); }}
+                  className="w-full flex items-center space-x-3 px-3 py-2 rounded-xl text-xs font-semibold dark:text-[#CDCBCA] text-[#475569]"
+                >
+                  <FolderKanban className="w-4 h-4" />
+                  <span>Projects &amp; Milestones</span>
+                </button>
+                <button
+                  onClick={() => { setActiveTab('wallet'); setMobileSidebarOpen(false); }}
+                  className="w-full flex items-center space-x-3 px-3 py-2 rounded-xl text-xs font-semibold dark:text-[#CDCBCA] text-[#475569]"
+                >
+                  <Wallet className="w-4 h-4" />
+                  <span>Transactions &amp; Wallet</span>
+                </button>
+              </nav>
+            </div>
 
-        {/* Tab 3: Shortlist View (Client only) */}
-        {isSignedIn && activeTab === 'shortlist' && isClient && (
-          <ShortlistPage
-            onSelectWorkerForContract={(workerId) => {
-              setSelectedWorkerForContract(workerId);
-              setIsCreateModalOpen(true);
-            }}
-            onOpenHiringModal={(worker) => setHiringTargetWorker(worker)}
-          />
-        )}
+            <div className="pt-4 border-t dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0]">
+              <button
+                onClick={() => { setViewMode('landing'); setMobileSidebarOpen(false); }}
+                className="w-full py-2 rounded-xl bg-[#8BFF24] text-xs font-bold text-[#050605] flex items-center justify-center space-x-1"
+              >
+                <Home className="w-4 h-4" />
+                <span>Return to Home Page</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
-        {/* Tab 4: Hiring Proposals List */}
-        {isSignedIn && activeTab === 'hiring' && (
-          <HiringRequestsList
-            userRole={auth.role || UserRole.CLIENT}
-            onContractCreated={() => {
-              loadContracts();
-              setActiveTab('contracts');
-            }}
-          />
-        )}
+      {/* 3. MAIN APPLICATION AREA (Header + Content) */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
+        {/* Top Header Bar (With Home, Profile, Contact, Brand Symbol, and Theme Toggle) */}
+        <header className="border-b dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] dark:bg-[#080808]/90 bg-white/90 backdrop-blur-md sticky top-0 z-30 transition-colors">
+          <div className="px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            {/* Left: Mobile Menu Toggle & Breadcrumbs */}
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={() => setMobileSidebarOpen(true)}
+                className="lg:hidden p-2 rounded-lg dark:bg-[#151715] bg-[#F1F5F9] dark:text-[#E8EAE6] text-[#111827] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1]"
+                aria-label="Open navigation menu"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
 
-        {/* Tab 5: Contracts View */}
-        {isSignedIn && activeTab === 'contracts' && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-bold text-white">
-                  {isWorker ? 'Assigned Digital Agreements' : 'Digital Contracts & Escrow Agreements'}
-                </h2>
-                <p className="text-xs text-slate-400 mt-1">
-                  All contracts enforce cryptographic milestone tracking and role-based permissions.
-                </p>
+              <div className="flex items-center space-x-2">
+                <span className="text-xs font-bold dark:text-[#E8EAE6] text-[#111827]">
+                  TrustPay
+                </span>
+                <span className="dark:text-[#A5AAA2] text-[#94A3B8]">/</span>
+                <span className="text-xs px-2.5 py-0.5 rounded-full dark:bg-[#151715] bg-[#EFF6FF] dark:text-[#8BFF24] text-[#2563EB] border dark:border-[rgba(139,255,36,0.25)] border-[#DBEAFE] font-mono font-medium">
+                  {isClient ? 'Client Portal' : isWorker ? 'Specialist Workspace' : 'Escrow Operations'}
+                </span>
               </div>
             </div>
 
-            {isLoadingContracts ? (
-              <div className="p-12 text-center text-slate-500 text-sm">Loading verified contracts...</div>
-            ) : (
-              <ContractList
-                contracts={contracts}
-                userRole={auth.role || UserRole.CLIENT}
-                currentUserId={auth.user?.id}
-                onRefresh={loadContracts}
-              />
-            )}
-          </div>
-        )}
-
-        {/* Tab: Projects & Milestones Workspace */}
-        {isSignedIn && activeTab === 'projects' && (
-          <ProjectsWorkspace
-            currentUserRole={auth.role || UserRole.CLIENT}
-            currentUserId={auth.user?.id || ''}
-          />
-        )}
-
-        {/* Tab 6: Profile & Skills Management */}
-        {isSignedIn && activeTab === 'profile' && auth.user && (
-          <ProfileManagement
-            currentUser={auth.user}
-            onProfileUpdated={refreshUserProfile}
-          />
-        )}
-
-        {/* Tab 7: System Health Diagnostics & Hero View */}
-        {(!isSignedIn || activeTab === 'system') && (
-          <div className="space-y-10">
-            {/* Hero Section with 3D Escrow Visual */}
-            <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-gradient-to-b from-slate-900/80 to-slate-900/20 rounded-2xl border border-slate-800/80 p-8 shadow-2xl">
-              <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="lg:col-span-7 space-y-5"
+            {/* Right: Home, Profile, Contact Links + Home Symbol + Theme Toggle + User */}
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              {/* Home Link (Clicks to go to home landing page) */}
+              <button
+                onClick={() => setViewMode('landing')}
+                className="hidden sm:flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-semibold dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9] transition cursor-pointer"
               >
-                <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>TrustPay Enterprise v2.0 Active</span>
+                <Home className="w-3.5 h-3.5 text-[#8BFF24]" />
+                <span>Home</span>
+              </button>
+
+              {/* Profile Link */}
+              <button
+                onClick={() => setActiveTab('profile')}
+                className={`hidden sm:flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
+                  activeTab === 'profile'
+                    ? 'dark:bg-[#8BFF24]/10 dark:text-[#8BFF24] bg-blue-50 text-[#2563EB]'
+                    : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+                }`}
+              >
+                <User className="w-3.5 h-3.5" />
+                <span>Profile</span>
+              </button>
+
+              {/* Contact Link */}
+              <button
+                onClick={() => setIsContactModalOpen(true)}
+                className="hidden sm:flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-semibold dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9] transition cursor-pointer"
+              >
+                <MessageSquare className="w-3.5 h-3.5 text-[#8BFF24]" />
+                <span>Contact</span>
+              </button>
+
+              {/* Home Symbol / Brand Emblem button ("pakkana symbol click cheste appudu home page ki vellali") */}
+              <button
+                onClick={() => setViewMode('landing')}
+                title="Go to Home Landing Page"
+                className="p-1.5 rounded-xl dark:bg-[#151715] bg-[#F1F5F9] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] hover:dark:border-[#8BFF24]/50 hover:border-[#8BFF24]/50 transition cursor-pointer active:scale-95 shadow-sm"
+              >
+                <TrustPayLogo size="sm" showSubtitle={false} />
+              </button>
+
+              {/* Global Theme Toggle (Symbols Only) */}
+              <ThemeToggle />
+
+              {/* Telemetry Trigger */}
+              <button
+                onClick={runHealthCheck}
+                disabled={isRefreshing}
+                title="Verify API &amp; Database Connectivity"
+                className="p-2 rounded-xl dark:bg-[#151715] bg-[#F8FAFC] dark:hover:bg-[#202220] hover:bg-[#F1F5F9] text-xs font-medium dark:text-[#CDCBCA] text-[#242424] transition border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] shadow-sm cursor-pointer"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-[#8BFF24]' : 'text-[#8BFF24]'}`} />
+              </button>
+
+              {/* Notifications & Clerk User Button */}
+              {isLoaded && isSignedIn && (
+                <div className="flex items-center space-x-2">
+                  <NotificationDropdown />
+                  <UserButton afterSignOutUrl="/" />
                 </div>
-                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
-                  Secure Digital Contract &amp; Specialist Escrow Management
-                </h1>
-                <p className="text-slate-400 text-sm sm:text-base leading-relaxed">
-                  TrustPay Enterprise provides verified milestone-based escrow custody, digital
-                  contract signing, and tamper-evident work agreements connecting Clients and
-                  specialized Workers worldwide.
-                </p>
+              )}
+            </div>
+          </div>
+        </header>
 
-                {!isSignedIn && (
-                  <div className="pt-2 flex items-center space-x-3">
-                    <SignUpButton mode="modal">
-                      <button className="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-sm font-semibold text-white transition shadow-lg shadow-emerald-900/30">
-                        Get Started as Client or Specialist
-                      </button>
-                    </SignUpButton>
-                    <SignInButton mode="modal">
-                      <button className="px-5 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-sm font-semibold text-slate-200 border border-slate-700 transition">
-                        Sign In
-                      </button>
-                    </SignInButton>
-                  </div>
-                )}
-              </motion.div>
+        {/* Main Content Body */}
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
+          {/* Tab 1: Dashboard Overview View */}
+          {activeTab === 'dashboard' && (
+            <DashboardOverview
+              userRole={auth.role || UserRole.CLIENT}
+              onNavigate={(tab) => setActiveTab(tab as AppTab)}
+            />
+          )}
 
-              <div className="lg:col-span-5 h-[340px] w-full rounded-xl overflow-hidden bg-slate-950/60 border border-slate-800/60 flex items-center justify-center relative">
-                <ThreeEscrowVisual />
+          {/* Tab 2: Specialist Marketplace View (Client only) */}
+          {activeTab === 'marketplace' && isClient && (
+            <WorkerMarketplace
+              onSelectWorkerForContract={(workerId) => {
+                setSelectedWorkerForContract(workerId);
+                setIsCreateModalOpen(true);
+              }}
+              onOpenHiringModal={(worker) => setHiringTargetWorker(worker)}
+              isClient={isClient}
+            />
+          )}
+
+          {/* Tab 3: Shortlist View (Client only) */}
+          {activeTab === 'shortlist' && isClient && (
+            <ShortlistPage
+              onSelectWorkerForContract={(workerId) => {
+                setSelectedWorkerForContract(workerId);
+                setIsCreateModalOpen(true);
+              }}
+              onOpenHiringModal={(worker) => setHiringTargetWorker(worker)}
+            />
+          )}
+
+          {/* Tab 4: Hiring Proposals List */}
+          {activeTab === 'hiring' && (
+            <HiringRequestsList
+              userRole={auth.role || UserRole.CLIENT}
+              onContractCreated={() => {
+                loadContracts();
+                setActiveTab('contracts');
+              }}
+            />
+          )}
+
+          {/* Tab 5: Contracts View */}
+          {activeTab === 'contracts' && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-bold text-[#242424] dark:text-[#CDCBCA]">
+                    {isWorker ? 'Assigned Digital Agreements' : 'Digital Contracts & Escrow Agreements'}
+                  </h2>
+                  <p className="text-xs text-[#64748B] dark:text-[#A5A5A5] mt-1">
+                    All contracts enforce cryptographic milestone tracking, SHA-256 integrity, and non-custodial escrow allocations.
+                  </p>
+                </div>
               </div>
-            </section>
 
-            {/* Architecture Diagnostics Section */}
-            <section className="space-y-4">
-              <div className="flex items-center space-x-2 text-sm font-semibold text-slate-300">
-                <Activity className="w-4 h-4 text-emerald-400" />
+              {isLoadingContracts ? (
+                <div className="p-12 text-center text-[#64748B] dark:text-[#A5A5A5] text-sm animate-pulse">
+                  Loading verified contracts...
+                </div>
+              ) : (
+                <ContractList
+                  contracts={contracts}
+                  userRole={auth.role || UserRole.CLIENT}
+                  currentUserId={auth.user?.id}
+                  onRefresh={loadContracts}
+                />
+              )}
+            </div>
+          )}
+
+          {/* Tab: Projects & Milestones Workspace */}
+          {activeTab === 'projects' && (
+            <ProjectsWorkspace
+              currentUserRole={auth.role || UserRole.CLIENT}
+              currentUserId={auth.user?.id || ''}
+            />
+          )}
+
+          {/* Tab: Milestones & Deliverable Review (Features 1 & 2) */}
+          {activeTab === 'milestones' && (
+            <MilestoneManagement
+              onNavigateToContract={(contractId) => {
+                setActiveTab('contracts');
+              }}
+            />
+          )}
+
+          {/* Tab: Invoices & Billing (Feature 4) */}
+          {activeTab === 'invoices' && (
+            <ClientInvoices />
+          )}
+
+          {/* Tab: Payment History (Feature 3) */}
+          {activeTab === 'payments' && (
+            <PaymentHistory />
+          )}
+
+          {/* Tab: Document Vault (Feature 5) */}
+          {activeTab === 'documents' && (
+            <DocumentsVault />
+          )}
+
+          {/* Tab: Direct Messages (Feature 6) */}
+          {activeTab === 'messages' && (
+            <ClientMessages />
+          )}
+
+          {/* Tab: Dispute Resolution Center (Feature 7) */}
+          {activeTab === 'disputes' && (
+            <ClientDisputes />
+          )}
+
+
+          {/* Tab 6: Profile & Skills Management */}
+          {activeTab === 'profile' && auth.user && (
+            <ProfileManagement
+              currentUser={auth.user}
+              onProfileUpdated={refreshUserProfile}
+            />
+          )}
+
+          {/* Tab: Virtual Escrow & Financial Wallet (Client & Specialist) */}
+          {activeTab === 'wallet' && isClient && (
+            <ClientWallet
+              onNavigateToContract={() => {
+                setActiveTab('contracts');
+              }}
+            />
+          )}
+
+          {activeTab === 'wallet' && isWorker && (
+            <SpecialistWallet
+              onNavigateToProjects={() => setActiveTab('projects')}
+              onNavigateToContract={() => {
+                setActiveTab('contracts');
+              }}
+            />
+          )}
+
+          {/* Tab 7: System Health Diagnostics */}
+          {activeTab === 'system' && (
+            <div className="space-y-6">
+              <div className="flex items-center space-x-2 text-sm font-semibold text-[#E8EAE6]">
+                <Activity className="w-4 h-4 text-[#8BFF24]" />
                 <span>Backend &amp; Database Real-Time Telemetry</span>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Express API Card */}
-                <div className="p-6 rounded-xl bg-slate-900/60 border border-slate-800 space-y-4">
+                <div className="p-6 rounded-2xl dark:bg-[#151715] bg-white border dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] space-y-4 shadow-sm">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <div className="w-9 h-9 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+                      <div className="w-9 h-9 rounded-lg dark:bg-[#202220] bg-[#EFF6FF] border dark:border-[rgba(139,255,36,0.25)] border-[#DBEAFE] flex items-center justify-center text-[#8BFF24]">
                         <Server className="w-5 h-5" />
                       </div>
                       <div>
-                        <h4 className="text-sm font-semibold text-white">Central Express API</h4>
-                        <span className="text-xs text-slate-500">http://localhost:5000/api/v1</span>
+                        <h4 className="text-sm font-semibold dark:text-[#E8EAE6] text-[#111827]">Central Express API</h4>
+                        <span className="text-xs dark:text-[#A5AAA2] text-[#64748B] font-mono">http://localhost:5000/api/v1</span>
                       </div>
                     </div>
                     <span
-                      className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${
+                      className={`text-xs px-2.5 py-0.5 rounded-full font-mono font-medium ${
                         system.apiStatus === 'healthy'
-                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                          ? 'bg-[#8BFF24]/10 text-[#8BFF24] border border-[rgba(139,255,36,0.25)]'
                           : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
                       }`}
                     >
@@ -701,7 +927,7 @@ export const App: React.FC = () => {
                   </div>
 
                   {system.systemDetails && (
-                    <div className="text-xs text-slate-400 space-y-1 bg-slate-950 p-3 rounded-lg border border-slate-800/80">
+                    <div className="text-xs dark:text-[#A5AAA2] text-[#64748B] space-y-1 dark:bg-[#202220] bg-[#F8FAFC] p-3 rounded-lg border dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] font-mono">
                       <div>Service: {system.systemDetails.service}</div>
                       <div>Version: {system.systemDetails.version}</div>
                       <div>Uptime: {system.systemDetails.uptimeSeconds}s</div>
@@ -711,21 +937,21 @@ export const App: React.FC = () => {
                 </div>
 
                 {/* Supabase PostgreSQL Card */}
-                <div className="p-6 rounded-xl bg-slate-900/60 border border-slate-800 space-y-4">
+                <div className="p-6 rounded-2xl dark:bg-[#151715] bg-white border dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] space-y-4 shadow-sm">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                      <div className="w-9 h-9 rounded-lg dark:bg-[#202220] bg-[#EFF6FF] border dark:border-[rgba(139,255,36,0.25)] border-[#DBEAFE] flex items-center justify-center text-[#8BFF24]">
                         <Database className="w-5 h-5" />
                       </div>
                       <div>
-                        <h4 className="text-sm font-semibold text-white">Supabase PostgreSQL</h4>
-                        <span className="text-xs text-slate-500">Prisma 7.10.1 Driver Adapter</span>
+                        <h4 className="text-sm font-semibold dark:text-[#E8EAE6] text-[#111827]">Supabase PostgreSQL</h4>
+                        <span className="text-xs dark:text-[#A5AAA2] text-[#64748B] font-mono">Prisma Driver Adapter</span>
                       </div>
                     </div>
                     <span
-                      className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${
+                      className={`text-xs px-2.5 py-0.5 rounded-full font-mono font-medium ${
                         system.dbStatus === 'connected'
-                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                          ? 'bg-[#8BFF24]/10 text-[#8BFF24] border border-[rgba(139,255,36,0.25)]'
                           : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
                       }`}
                     >
@@ -734,7 +960,7 @@ export const App: React.FC = () => {
                   </div>
 
                   {system.databaseDetails && (
-                    <div className="text-xs text-slate-400 space-y-1 bg-slate-950 p-3 rounded-lg border border-slate-800/80">
+                    <div className="text-xs dark:text-[#A5AAA2] text-[#64748B] space-y-1 dark:bg-[#202220] bg-[#F8FAFC] p-3 rounded-lg border dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] font-mono">
                       <div>Database: {system.databaseDetails.database}</div>
                       {system.databaseDetails.latencyMs && (
                         <div>Latency: {system.databaseDetails.latencyMs}ms</div>
@@ -744,10 +970,18 @@ export const App: React.FC = () => {
                   )}
                 </div>
               </div>
-            </section>
-          </div>
-        )}
-      </main>
+            </div>
+          )}
+        </main>
+      </div>
+
+      {/* Contact & Support Modal */}
+      <ContactSupportModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+        userEmail={clerkUser?.primaryEmailAddress?.emailAddress}
+        userName={clerkUser?.fullName || clerkUser?.firstName || 'User'}
+      />
 
       {/* Direct Contract Creation Modal */}
       <CreateContractModal

@@ -28,21 +28,21 @@ export const ThreeEscrowVisual: React.FC = () => {
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       currentMount.appendChild(renderer.domElement);
 
-      // Inner Core
+      // Inner Core - Neon Lime (#8BFF24)
       coreGeometry = new THREE.IcosahedronGeometry(1.2, 1);
       coreMaterial = new THREE.MeshBasicMaterial({
-        color: 0x10b981,
+        color: 0x8BFF24,
         wireframe: true,
         transparent: true,
-        opacity: 0.6,
+        opacity: 0.75,
       });
       const core = new THREE.Mesh(coreGeometry, coreMaterial);
       scene.add(core);
 
-      // Outer Cage
+      // Outer Cage - Soft Silver (#E8EAE6)
       cageGeometry = new THREE.IcosahedronGeometry(1.8, 0);
       cageMaterial = new THREE.MeshBasicMaterial({
-        color: 0x3b82f6,
+        color: 0xE8EAE6,
         wireframe: true,
         transparent: true,
         opacity: 0.35,

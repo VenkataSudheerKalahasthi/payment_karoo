@@ -66,6 +66,10 @@ export const apiService = {
     return res.data;
   },
 
+  getMe: async (token?: string): Promise<ApiResponse<unknown>> => {
+    return apiService.getCurrentUser(token);
+  },
+
   getUserById: async (id: string): Promise<ApiResponse<unknown>> => {
     const res = await apiClient.get<ApiResponse<unknown>>(`/users/${id}`);
     return res.data;
@@ -81,6 +85,10 @@ export const apiService = {
     return res.data;
   },
 
+  listAllUsers: async (params?: Record<string, unknown>): Promise<ApiResponse<unknown>> => {
+    return apiService.listUsers(params);
+  },
+
   updateUserStatus: async (id: string, status: string, reason: string): Promise<ApiResponse<unknown>> => {
     const res = await apiClient.patch<ApiResponse<unknown>>(`/users/${id}/status`, { status, reason });
     return res.data;
@@ -89,6 +97,10 @@ export const apiService = {
   listActivities: async (params?: Record<string, unknown>): Promise<ApiResponse<unknown>> => {
     const res = await apiClient.get<ApiResponse<unknown>>('/admin/activities', { params });
     return res.data;
+  },
+
+  listAdminActivities: async (params?: Record<string, unknown>): Promise<ApiResponse<unknown>> => {
+    return apiService.listActivities(params);
   },
 
   listAuditLogs: async (params?: Record<string, unknown>): Promise<ApiResponse<unknown>> => {
@@ -107,9 +119,19 @@ export const apiService = {
     return res.data;
   },
 
+  listEscrows: async (params?: Record<string, unknown>): Promise<ApiResponse<EscrowRecordDto[]>> => {
+    const res = await apiService.listEscrowRecords(params);
+    return { ...res, data: res.data?.items || [] };
+  },
+
   listPaymentTransactions: async (params?: Record<string, unknown>): Promise<ApiResponse<{ items: PaymentTransactionDto[]; total: number }>> => {
     const res = await apiClient.get<ApiResponse<{ items: PaymentTransactionDto[]; total: number }>>('/payments/transactions', { params });
     return res.data;
+  },
+
+  listPayments: async (params?: Record<string, unknown>): Promise<ApiResponse<PaymentTransactionDto[]>> => {
+    const res = await apiService.listPaymentTransactions(params);
+    return { ...res, data: res.data?.items || [] };
   },
 
   setDisputeHold: async (contractId: string, disputeHold: boolean, reason: string): Promise<ApiResponse<EscrowRecordDto>> => {
@@ -201,6 +223,11 @@ export const apiService = {
 
   markAllNotificationsRead: async (): Promise<ApiResponse<unknown>> => {
     const res = await apiClient.patch<ApiResponse<unknown>>('/notifications/mark-all-read');
+    return res.data;
+  },
+
+  processRefund: async (data: { contractId: string; reason: string; amountMinor?: string | number }): Promise<ApiResponse<unknown>> => {
+    const res = await apiClient.post<ApiResponse<unknown>>('/payments/refunds', data);
     return res.data;
   },
 };

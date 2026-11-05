@@ -97,6 +97,10 @@ export const apiService = {
     return res.data;
   },
 
+  provisionRole: async (userId: string, role: string, reason: string): Promise<ApiResponse<unknown>> => {
+    return apiService.provisionUserRole(userId, role, reason);
+  },
+
   listActivities: async (params?: Record<string, unknown>): Promise<ApiResponse<unknown>> => {
     const res = await apiClient.get<ApiResponse<unknown>>('/admin/activities', { params });
     return res.data;
@@ -110,6 +114,11 @@ export const apiService = {
   listEscrowRecords: async (params?: Record<string, unknown>): Promise<ApiResponse<{ items: EscrowRecordDto[]; total: number }>> => {
     const res = await apiClient.get<ApiResponse<{ items: EscrowRecordDto[]; total: number }>>('/escrow', { params });
     return res.data;
+  },
+
+  listEscrows: async (params?: Record<string, unknown>): Promise<ApiResponse<EscrowRecordDto[]>> => {
+    const res = await apiService.listEscrowRecords(params);
+    return { ...res, data: res.data?.items || [] };
   },
 
   setDisputeHold: async (contractId: string, disputeHold: boolean, reason: string): Promise<ApiResponse<EscrowRecordDto>> => {
@@ -143,9 +152,19 @@ export const apiService = {
     return res.data;
   },
 
+  listLedgerAccounts: async (params?: Record<string, unknown>): Promise<ApiResponse<LedgerAccountDto[]>> => {
+    const res = await apiService.listAccounts(params);
+    return { ...res, data: res.data?.items || [] };
+  },
+
   listTransactions: async (params?: Record<string, unknown>): Promise<ApiResponse<{ items: LedgerTransactionDto[]; total: number }>> => {
     const res = await apiClient.get<ApiResponse<{ items: LedgerTransactionDto[]; total: number }>>('/ledger/transactions', { params });
     return res.data;
+  },
+
+  listLedgerTransactions: async (params?: Record<string, unknown>): Promise<ApiResponse<LedgerTransactionDto[]>> => {
+    const res = await apiService.listTransactions(params);
+    return { ...res, data: res.data?.items || [] };
   },
 
   reverseTransaction: async (reference: string, reason: string): Promise<ApiResponse<unknown>> => {
@@ -229,6 +248,11 @@ export const apiService = {
 
   markAllNotificationsRead: async (): Promise<ApiResponse<unknown>> => {
     const res = await apiClient.patch<ApiResponse<unknown>>('/notifications/mark-all-read');
+    return res.data;
+  },
+
+  processRefund: async (data: { contractId: string; reason: string; amountMinor?: string | number }): Promise<ApiResponse<unknown>> => {
+    const res = await apiClient.post<ApiResponse<unknown>>('/payments/refunds', data);
     return res.data;
   },
 };

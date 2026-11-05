@@ -15,6 +15,7 @@ import {
   Clock,
   ChevronLeft,
   ChevronRight,
+  Sparkles,
 } from 'lucide-react';
 
 interface WorkerMarketplaceProps {
@@ -130,15 +131,23 @@ export const WorkerMarketplace: React.FC<WorkerMarketplaceProps> = ({
       {/* Top Header & Search Bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h3 className="text-xl font-bold text-white tracking-tight">Verified Specialist Marketplace</h3>
-          <p className="text-xs text-slate-400 mt-1">
-            Browse verified technical professionals, inspect portfolio deliverables, and initiate milestone contracts.
+          <div className="flex items-center space-x-2">
+            <h3 className="text-xl font-bold dark:text-[#E8EAE6] text-[#111827] tracking-tight">
+              Verified Specialist Marketplace
+            </h3>
+            <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold dark:bg-[#202220] bg-[#F1F5F9] dark:text-[#8BFF24] text-[#16a34a] border dark:border-[rgba(139,255,36,0.25)] border-[#E2E8F0] font-mono">
+              <Sparkles className="w-3 h-3 text-[#8BFF24]" />
+              <span className="font-mono tabular-nums">{totalWorkers}</span> Verified
+            </span>
+          </div>
+          <p className="text-xs dark:text-[#A5AAA2] text-[#64748B] mt-1">
+            Browse verified technical specialists, inspect real portfolio deliverables, and initiate escrow-backed agreements.
           </p>
         </div>
 
         <div className="flex items-center space-x-3">
-          <div className="relative w-full sm:w-72">
-            <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-500" />
+          <div className="relative w-full sm:w-80">
+            <Search className="w-4 h-4 absolute left-3 top-2.5 dark:text-[#A5AAA2] text-[#64748B]" />
             <input
               type="text"
               value={searchTerm}
@@ -146,17 +155,17 @@ export const WorkerMarketplace: React.FC<WorkerMarketplaceProps> = ({
                 setSearchTerm(e.target.value);
                 setPage(1);
               }}
-              placeholder="Search by name, headline or bio..."
-              className="w-full pl-9 pr-3 py-2 rounded-lg bg-slate-900 border border-slate-800 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+              placeholder="Search by name, expertise or keywords..."
+              className="w-full pl-9 pr-3 py-2 rounded-xl dark:bg-[#151715] bg-white border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] text-xs dark:text-[#E8EAE6] text-[#111827] placeholder:text-[#6A6F68] focus:outline-none focus-visible:ring-1 focus-visible:ring-[#8BFF24] focus:border-[#8BFF24] transition-all shadow-sm"
             />
           </div>
         </div>
       </div>
 
       {/* Filter & Sorting Controls */}
-      <div className="bg-slate-900/40 border border-slate-800/80 rounded-xl p-4 flex flex-wrap items-center gap-3 text-xs text-slate-300">
-        <div className="flex items-center space-x-1.5 text-slate-400 font-medium">
-          <Filter className="w-3.5 h-3.5" />
+      <div className="dark:bg-[#151715] bg-white border dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] rounded-xl p-4 flex flex-wrap items-center gap-3 text-xs dark:text-[#A5AAA2] text-[#64748B] shadow-sm">
+        <div className="flex items-center space-x-1.5 dark:text-[#E8EAE6] text-[#111827] font-medium">
+          <Filter className="w-3.5 h-3.5 text-[#8BFF24]" />
           <span>Filters:</span>
         </div>
 
@@ -167,9 +176,9 @@ export const WorkerMarketplace: React.FC<WorkerMarketplaceProps> = ({
             setSelectedSkill(e.target.value);
             setPage(1);
           }}
-          className="bg-slate-800 border border-slate-700 rounded-md px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+          className="dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] rounded-lg px-3 py-1.5 text-xs dark:text-[#E8EAE6] text-[#111827] focus:outline-none focus:border-[#8BFF24] transition"
         >
-          <option value="">All Skills</option>
+          <option value="">All Skills ({skills.length})</option>
           {skills.map((s) => (
             <option key={s.id} value={s.name}>
               {s.name}
@@ -184,11 +193,11 @@ export const WorkerMarketplace: React.FC<WorkerMarketplaceProps> = ({
             setAvailability(e.target.value);
             setPage(1);
           }}
-          className="bg-slate-800 border border-slate-700 rounded-md px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+          className="dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] rounded-lg px-3 py-1.5 text-xs dark:text-[#E8EAE6] text-[#111827] focus:outline-none focus:border-[#8BFF24] transition"
         >
           <option value="">All Availability</option>
           <option value="AVAILABLE">Available Now</option>
-          <option value="BUSY">In Engagement</option>
+          <option value="BUSY">In Active Contract</option>
         </select>
 
         {/* Rate Min / Max */}
@@ -201,9 +210,9 @@ export const WorkerMarketplace: React.FC<WorkerMarketplaceProps> = ({
               setMinRate(e.target.value);
               setPage(1);
             }}
-            className="w-20 bg-slate-800 border border-slate-700 rounded-md px-2 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+            className="w-24 dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] rounded-lg px-2.5 py-1.5 text-xs dark:text-[#E8EAE6] text-[#111827] focus:outline-none focus:border-[#8BFF24] font-mono tabular-nums transition"
           />
-          <span className="text-slate-500">-</span>
+          <span className="text-[#6A6F68]">-</span>
           <input
             type="number"
             placeholder="Max $/hr"
@@ -212,13 +221,13 @@ export const WorkerMarketplace: React.FC<WorkerMarketplaceProps> = ({
               setMaxRate(e.target.value);
               setPage(1);
             }}
-            className="w-20 bg-slate-800 border border-slate-700 rounded-md px-2 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+            className="w-24 dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] rounded-lg px-2.5 py-1.5 text-xs dark:text-[#E8EAE6] text-[#111827] focus:outline-none focus:border-[#8BFF24] font-mono tabular-nums transition"
           />
         </div>
 
         {/* Sorting */}
         <div className="ml-auto flex items-center space-x-2">
-          <span className="text-slate-500">Sort by:</span>
+          <span className="dark:text-[#A5AAA2] text-[#64748B]">Sort:</span>
           <select
             value={`${sortBy}-${sortOrder}`}
             onChange={(e) => {
@@ -227,25 +236,27 @@ export const WorkerMarketplace: React.FC<WorkerMarketplaceProps> = ({
               setSortOrder(so);
               setPage(1);
             }}
-            className="bg-slate-800 border border-slate-700 rounded-md px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+            className="dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] rounded-lg px-3 py-1.5 text-xs dark:text-[#E8EAE6] text-[#111827] focus:outline-none focus:border-[#8BFF24] transition font-medium"
           >
-            <option value="rating-desc">Highest Rating</option>
-            <option value="hourlyRate-asc">Lowest Rate</option>
-            <option value="hourlyRate-desc">Highest Rate</option>
-            <option value="totalCompletedContracts-desc">Most Contracts</option>
+            <option value="rating-desc">Highest Rated</option>
+            <option value="hourlyRate-asc">Lowest Hourly Rate</option>
+            <option value="hourlyRate-desc">Highest Hourly Rate</option>
+            <option value="totalCompletedContracts-desc">Most Contracts Completed</option>
           </select>
         </div>
       </div>
 
       {/* Specialist Cards Grid */}
       {isLoading ? (
-        <div className="p-16 text-center text-slate-500 text-sm">Querying verified database specialists...</div>
+        <div className="p-16 text-center dark:text-[#A5AAA2] text-[#64748B] text-sm dark:bg-[#151715] bg-white border dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] rounded-xl animate-pulse font-mono">
+          Querying verified database specialists...
+        </div>
       ) : workers.length === 0 ? (
-        <div className="bg-slate-900/30 border border-slate-800 rounded-xl p-16 text-center text-slate-400 text-sm">
+        <div className="dark:bg-[#151715] bg-white border dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] rounded-xl p-16 text-center dark:text-[#A5AAA2] text-[#64748B] text-sm shadow-sm">
           No specialized workers matched your filter criteria. Try resetting skill or budget filters.
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {workers.map((worker) => {
             const isShortlisted = shortlistedIds.has(worker.id);
             const workerName = worker.user?.firstName
@@ -255,28 +266,30 @@ export const WorkerMarketplace: React.FC<WorkerMarketplaceProps> = ({
             return (
               <div
                 key={worker.id}
-                className="bg-slate-900/60 border border-slate-800 rounded-xl p-5 hover:border-slate-700 transition flex flex-col justify-between space-y-4"
+                className="dark:bg-[#151715] bg-white border dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] rounded-xl p-5 hover:border-[rgba(139,255,36,0.4)] transition-all flex flex-col justify-between space-y-4 shadow-sm group"
               >
                 <div className="space-y-3">
                   {/* Top Bar with Avatar, Rating, and Shortlist Bookmark */}
                   <div className="flex items-start justify-between">
                     <div className="flex items-center space-x-3">
-                      <div className="w-11 h-11 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold text-base">
+                      <div className="w-11 h-11 rounded-full dark:bg-[#202220] bg-[#EFF6FF] border dark:border-[rgba(139,255,36,0.25)] border-[#DBEAFE] flex items-center justify-center dark:text-[#8BFF24] text-[#2563EB] font-bold text-base shadow-inner">
                         {worker.user?.firstName?.[0] || 'W'}
                       </div>
                       <div>
                         <h4
                           onClick={() => setSelectedWorkerDetail(worker)}
-                          className="text-sm font-semibold text-white hover:text-emerald-400 transition cursor-pointer"
+                          className="text-sm font-semibold dark:text-[#E8EAE6] text-[#111827] hover:text-[#8BFF24] dark:hover:text-[#8BFF24] transition cursor-pointer"
                         >
                           {workerName}
                         </h4>
-                        <p className="text-xs text-slate-400 line-clamp-1">{worker.headline || 'Technical Consultant'}</p>
+                        <p className="text-xs dark:text-[#A5AAA2] text-[#64748B] line-clamp-1">
+                          {worker.headline || 'Technical Consultant'}
+                        </p>
                       </div>
                     </div>
 
                     <div className="flex items-center space-x-2">
-                      <span className="inline-flex items-center space-x-1 text-xs text-amber-400 font-medium bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
+                      <span className="inline-flex items-center space-x-1 text-xs text-amber-500 font-medium bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20 font-mono tabular-nums">
                         <Star className="w-3 h-3 fill-amber-400" />
                         <span>{Number(worker.rating || 5.0).toFixed(1)}</span>
                       </span>
@@ -285,10 +298,10 @@ export const WorkerMarketplace: React.FC<WorkerMarketplaceProps> = ({
                         <button
                           onClick={() => handleToggleShortlist(worker)}
                           title={isShortlisted ? 'Remove from shortlist' : 'Save to shortlist'}
-                          className={`p-1.5 rounded-md border transition ${
+                          className={`p-1.5 rounded-lg border transition cursor-pointer ${
                             isShortlisted
-                              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
-                              : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-slate-200'
+                              ? 'bg-[#8BFF24]/15 border-[rgba(139,255,36,0.3)] text-[#8BFF24]'
+                              : 'dark:bg-[#202220] bg-[#F1F5F9] dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] dark:text-[#A5AAA2] text-[#64748B] hover:text-[#8BFF24]'
                           }`}
                         >
                           {isShortlisted ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
@@ -298,27 +311,28 @@ export const WorkerMarketplace: React.FC<WorkerMarketplaceProps> = ({
                   </div>
 
                   {/* Metrics Bar */}
-                  <div className="flex items-center justify-between text-xs text-slate-400 pt-1 border-t border-slate-800/60">
+                  <div className="flex items-center justify-between text-xs dark:text-[#A5AAA2] text-[#64748B] pt-2 border-t dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0]">
                     <span className="flex items-center space-x-1">
-                      <Briefcase className="w-3.5 h-3.5 text-slate-500" />
-                      <span>{worker.totalCompletedContracts} completed</span>
+                      <Briefcase className="w-3.5 h-3.5 text-[#6A6F68]" />
+                      <span className="font-mono tabular-nums dark:text-[#E8EAE6] text-[#111827] font-semibold">{worker.totalCompletedContracts}</span>
+                      <span>completed</span>
                     </span>
 
                     {worker.hourlyRate && (
-                      <span className="font-semibold text-slate-200 text-sm">
+                      <span className="font-semibold text-[#8BFF24] dark:text-[#8BFF24] text-xs font-mono tabular-nums">
                         ${Number(worker.hourlyRate).toFixed(0)}
-                        <span className="text-xs font-normal text-slate-400">/hr</span>
+                        <span className="text-[11px] font-normal dark:text-[#A5AAA2] text-[#64748B]">/hr</span>
                       </span>
                     )}
 
                     <span
-                      className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                      className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${
                         worker.availability === 'AVAILABLE'
-                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                          : 'bg-slate-800 text-slate-400 border border-slate-700'
+                          ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                          : 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
                       }`}
                     >
-                      {worker.availability === 'AVAILABLE' ? 'Available' : 'Engaged'}
+                      {worker.availability === 'AVAILABLE' ? 'Available' : 'Busy'}
                     </span>
                   </div>
 
@@ -328,13 +342,13 @@ export const WorkerMarketplace: React.FC<WorkerMarketplaceProps> = ({
                       {worker.skills.slice(0, 4).map((ws) => (
                         <span
                           key={ws.id}
-                          className="px-2 py-0.5 rounded bg-slate-800/80 border border-slate-700 text-xs text-slate-300"
+                          className="px-2 py-0.5 rounded-md dark:bg-[#202220] bg-[#F1F5F9] border dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] text-[11px] dark:text-[#E8EAE6] text-[#111827] font-medium"
                         >
                           {ws.skillName || (ws as unknown as { skill?: { name: string } }).skill?.name}
                         </span>
                       ))}
                       {worker.skills.length > 4 && (
-                        <span className="px-1.5 py-0.5 text-xs text-slate-500">
+                        <span className="px-1.5 py-0.5 text-[10px] dark:text-[#6A6F68] text-[#94A3B8] font-mono">
                           +{worker.skills.length - 4} more
                         </span>
                       )}
@@ -343,10 +357,10 @@ export const WorkerMarketplace: React.FC<WorkerMarketplaceProps> = ({
                 </div>
 
                 {/* Card Actions */}
-                <div className="pt-2 border-t border-slate-800/80 flex items-center space-x-2">
+                <div className="pt-3 border-t dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] flex items-center space-x-2">
                   <button
                     onClick={() => setSelectedWorkerDetail(worker)}
-                    className="flex-1 py-1.5 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 transition text-center border border-slate-700"
+                    className="flex-1 py-1.5 px-3 rounded-xl dark:bg-[#202220] bg-[#F1F5F9] hover:dark:bg-[#292C28] hover:bg-[#E2E8F0] text-xs font-semibold dark:text-[#E8EAE6] text-[#111827] transition text-center border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1]"
                   >
                     View Portfolio
                   </button>
@@ -354,7 +368,7 @@ export const WorkerMarketplace: React.FC<WorkerMarketplaceProps> = ({
                   {isClient && onOpenHiringModal && (
                     <button
                       onClick={() => onOpenHiringModal(worker)}
-                      className="py-1.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-medium text-white transition flex items-center justify-center space-x-1"
+                      className="py-1.5 px-3.5 rounded-xl bg-[#8BFF24] hover:bg-[#A3FF50] text-xs font-bold text-[#050605] transition flex items-center justify-center space-x-1 shadow-[0_0_15px_rgba(139,255,36,0.2)] active:scale-95"
                     >
                       <Send className="w-3.5 h-3.5" />
                       <span>Hire</span>
@@ -364,8 +378,8 @@ export const WorkerMarketplace: React.FC<WorkerMarketplaceProps> = ({
                   {isClient && onSelectWorkerForContract && (
                     <button
                       onClick={() => onSelectWorkerForContract(worker.userId)}
-                      className="py-1.5 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium text-emerald-400 transition"
-                      title="Draft Contract directly"
+                      className="py-1.5 px-3 rounded-xl dark:bg-[#202220] bg-[#F1F5F9] hover:dark:bg-[#292C28] hover:bg-[#E2E8F0] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] text-xs font-medium text-[#8BFF24] transition hover:border-[rgba(139,255,36,0.3)]"
+                      title="Draft Direct Contract"
                     >
                       <FileText className="w-3.5 h-3.5" />
                     </button>
@@ -379,24 +393,25 @@ export const WorkerMarketplace: React.FC<WorkerMarketplaceProps> = ({
 
       {/* Pagination Controls */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between pt-4 border-t border-slate-800 text-xs text-slate-400">
+        <div className="flex items-center justify-between pt-4 border-t dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] text-xs dark:text-[#A5AAA2] text-[#64748B]">
           <div>
-            Showing Page <span className="font-semibold text-slate-200">{page}</span> of{' '}
-            <span className="font-semibold text-slate-200">{totalPages}</span> ({totalWorkers} total specialists)
+            Showing Page <span className="font-semibold dark:text-[#E8EAE6] text-[#111827] font-mono tabular-nums">{page}</span> of{' '}
+            <span className="font-semibold dark:text-[#E8EAE6] text-[#111827] font-mono tabular-nums">{totalPages}</span> (
+            <span className="font-mono tabular-nums text-[#8BFF24]">{totalWorkers}</span> total specialists)
           </div>
 
           <div className="flex items-center space-x-2">
             <button
               onClick={() => setPage((p) => Math.max(p - 1, 1))}
               disabled={page === 1}
-              className="p-1.5 rounded-md bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed text-slate-300 border border-slate-700"
+              className="p-1.5 rounded-lg dark:bg-[#202220] bg-[#F1F5F9] hover:dark:bg-[#292C28] hover:bg-[#E2E8F0] disabled:opacity-40 disabled:cursor-not-allowed dark:text-[#E8EAE6] text-[#111827] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] transition"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
               disabled={page === totalPages}
-              className="p-1.5 rounded-md bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed text-slate-300 border border-slate-700"
+              className="p-1.5 rounded-lg dark:bg-[#202220] bg-[#F1F5F9] hover:dark:bg-[#292C28] hover:bg-[#E2E8F0] disabled:opacity-40 disabled:cursor-not-allowed dark:text-[#E8EAE6] text-[#111827] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] transition"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -406,35 +421,40 @@ export const WorkerMarketplace: React.FC<WorkerMarketplaceProps> = ({
 
       {/* Full Worker Profile & Portfolio Detail Modal */}
       {selectedWorkerDetail && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 space-y-6 max-h-[90vh] overflow-y-auto text-slate-100 shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+          <div className="dark:bg-[#151715] bg-white border dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] rounded-2xl max-w-2xl w-full p-6 space-y-6 max-h-[90vh] overflow-y-auto dark:text-[#E8EAE6] text-[#111827] shadow-2xl">
             <div className="flex items-start justify-between">
               <div className="flex items-center space-x-4">
-                <div className="w-14 h-14 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold text-xl">
+                <div className="w-14 h-14 rounded-full dark:bg-[#202220] bg-[#EFF6FF] border dark:border-[rgba(139,255,36,0.25)] border-[#DBEAFE] flex items-center justify-center text-[#8BFF24] font-bold text-xl shadow-[0_0_15px_rgba(139,255,36,0.15)]">
                   {selectedWorkerDetail.user?.firstName?.[0] || 'W'}
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-white">
+                  <h3 className="text-lg font-bold dark:text-[#E8EAE6] text-[#111827]">
                     {selectedWorkerDetail.user?.firstName
                       ? `${selectedWorkerDetail.user.firstName} ${selectedWorkerDetail.user.lastName || ''}`.trim()
                       : `Specialist ${selectedWorkerDetail.userId.slice(0, 8)}`}
                   </h3>
-                  <p className="text-xs text-emerald-400 font-medium">
-                    {selectedWorkerDetail.headline || 'Verified Independent Contractor'}
+                  <p className="text-xs text-[#8BFF24] font-medium font-mono">
+                    {selectedWorkerDetail.headline || 'Verified Independent Specialist'}
                   </p>
-                  <div className="flex items-center space-x-3 text-xs text-slate-400 mt-1">
+                  <div className="flex items-center space-x-3 text-xs dark:text-[#A5AAA2] text-[#64748B] mt-1">
                     <span className="flex items-center space-x-1">
                       <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                      <span className="font-semibold text-slate-200">
+                      <span className="font-semibold dark:text-[#E8EAE6] text-[#111827] font-mono tabular-nums">
                         {Number(selectedWorkerDetail.rating || 5.0).toFixed(1)}
                       </span>
                     </span>
                     <span>•</span>
-                    <span>{selectedWorkerDetail.totalCompletedContracts} completed agreements</span>
+                    <span>
+                      <strong className="text-[#8BFF24] font-mono tabular-nums">
+                        {selectedWorkerDetail.totalCompletedContracts}
+                      </strong>{' '}
+                      completed agreements
+                    </span>
                     {selectedWorkerDetail.hourlyRate && (
                       <>
                         <span>•</span>
-                        <span className="font-semibold text-slate-200">
+                        <span className="font-semibold text-[#8BFF24] font-mono tabular-nums">
                           ${Number(selectedWorkerDetail.hourlyRate).toFixed(0)}/hr
                         </span>
                       </>
@@ -445,7 +465,7 @@ export const WorkerMarketplace: React.FC<WorkerMarketplaceProps> = ({
 
               <button
                 onClick={() => setSelectedWorkerDetail(null)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg bg-slate-800 border border-slate-700"
+                className="dark:text-[#A5AAA2] text-[#64748B] hover:dark:text-[#E8EAE6] hover:text-[#111827] p-1.5 rounded-lg dark:bg-[#202220] bg-[#F1F5F9] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] transition"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -453,59 +473,65 @@ export const WorkerMarketplace: React.FC<WorkerMarketplaceProps> = ({
 
             {/* Skills & Experience */}
             <div className="space-y-2">
-              <h4 className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Technical Skills &amp; Experience</h4>
+              <h4 className="text-xs font-semibold dark:text-[#E8EAE6] text-[#111827] uppercase tracking-wider font-mono">
+                Technical Skills &amp; Experience
+              </h4>
               <div className="flex flex-wrap gap-2">
                 {selectedWorkerDetail.skills && selectedWorkerDetail.skills.length > 0 ? (
                   selectedWorkerDetail.skills.map((ws) => (
                     <div
                       key={ws.id}
-                      className="px-3 py-1.5 rounded-lg bg-slate-800/90 border border-slate-700 flex items-center space-x-2 text-xs"
+                      className="px-3 py-1.5 rounded-lg dark:bg-[#202220] bg-[#F1F5F9] border dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] flex items-center space-x-2 text-xs"
                     >
-                      <span className="text-white font-medium">
+                      <span className="dark:text-[#E8EAE6] text-[#111827] font-medium">
                         {ws.skillName || (ws as unknown as { skill?: { name: string } }).skill?.name}
                       </span>
                       {ws.yearsOfExperience > 0 && (
-                        <span className="text-emerald-400 text-[10px] bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                        <span className="text-[#8BFF24] text-[10px] bg-[#8BFF24]/10 px-1.5 py-0.5 rounded border border-[rgba(139,255,36,0.25)] font-mono tabular-nums">
                           {ws.yearsOfExperience}y exp
                         </span>
                       )}
                     </div>
                   ))
                 ) : (
-                  <p className="text-xs text-slate-500 italic">No skills listed yet.</p>
+                  <p className="text-xs dark:text-[#6A6F68] text-[#94A3B8] italic">No skills listed yet.</p>
                 )}
               </div>
             </div>
 
             {/* Verified Portfolio Gallery */}
             <div className="space-y-3">
-              <h4 className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Verified Portfolio Items</h4>
+              <h4 className="text-xs font-semibold dark:text-[#E8EAE6] text-[#111827] uppercase tracking-wider font-mono">
+                Verified Portfolio Items
+              </h4>
               {selectedWorkerDetail.portfolioItems && selectedWorkerDetail.portfolioItems.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {selectedWorkerDetail.portfolioItems.map((item) => (
                     <div
                       key={item.id}
-                      className="p-3.5 rounded-xl bg-slate-800/50 border border-slate-700/80 space-y-2 flex flex-col justify-between"
+                      className="p-3.5 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] space-y-2 flex flex-col justify-between shadow-sm"
                     >
                       <div>
                         <div className="flex items-center justify-between">
-                          <h5 className="text-xs font-semibold text-white">{item.title}</h5>
+                          <h5 className="text-xs font-semibold dark:text-[#E8EAE6] text-[#111827]">{item.title}</h5>
                           {item.projectUrl && (
                             <a
                               href={item.projectUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-emerald-400 hover:text-emerald-300 text-xs inline-flex items-center space-x-0.5"
+                              className="text-[#8BFF24] hover:underline text-xs inline-flex items-center space-x-0.5 font-medium"
                             >
                               <span>Demo</span>
                               <ExternalLink className="w-3 h-3" />
                             </a>
                           )}
                         </div>
-                        <p className="text-xs text-slate-400 mt-1 line-clamp-3">{item.description}</p>
+                        <p className="text-xs dark:text-[#A5AAA2] text-[#64748B] mt-1 line-clamp-3 leading-relaxed">
+                          {item.description}
+                        </p>
                       </div>
 
-                      <div className="text-[10px] text-slate-500 pt-1 flex items-center space-x-1">
+                      <div className="text-[10px] dark:text-[#6A6F68] text-[#94A3B8] pt-2 border-t dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] flex items-center space-x-1 font-mono">
                         <Clock className="w-3 h-3" />
                         <span>Added {new Date(item.createdAt).toLocaleDateString()}</span>
                       </div>
@@ -513,15 +539,15 @@ export const WorkerMarketplace: React.FC<WorkerMarketplaceProps> = ({
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-slate-500 italic">No portfolio items posted yet.</p>
+                <p className="text-xs dark:text-[#6A6F68] text-[#94A3B8] italic">No portfolio items posted yet.</p>
               )}
             </div>
 
             {/* Modal Actions */}
-            <div className="pt-4 border-t border-slate-800 flex items-center justify-end space-x-3">
+            <div className="pt-4 border-t dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] flex items-center justify-end space-x-3">
               <button
                 onClick={() => setSelectedWorkerDetail(null)}
-                className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 border border-slate-700"
+                className="px-4 py-2 rounded-xl dark:bg-[#202220] bg-[#F1F5F9] hover:dark:bg-[#292C28] hover:bg-[#E2E8F0] text-xs font-semibold dark:text-[#E8EAE6] text-[#111827] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] transition"
               >
                 Close
               </button>
@@ -533,7 +559,7 @@ export const WorkerMarketplace: React.FC<WorkerMarketplaceProps> = ({
                     setSelectedWorkerDetail(null);
                     onOpenHiringModal(worker);
                   }}
-                  className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-medium text-white flex items-center space-x-1.5 shadow-lg shadow-emerald-600/20"
+                  className="px-5 py-2 rounded-xl bg-[#8BFF24] hover:bg-[#A3FF50] text-xs font-bold text-[#050605] flex items-center space-x-1.5 shadow-[0_0_15px_rgba(139,255,36,0.2)] transition active:scale-95"
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span>Send Hiring Proposal</span>

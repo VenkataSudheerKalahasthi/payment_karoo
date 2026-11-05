@@ -920,6 +920,96 @@ export interface FinancialOverviewDto {
   systemTrialBalanceBalanced: boolean;
 }
 
+export interface ClientWalletContractItemDto {
+  contractId: string;
+  contractNumber: string;
+  title: string;
+  status: string;
+  currency: string;
+  totalAgreedAmount: number;
+  fundedAmount: number;
+  releasedAmount: number;
+  refundedAmount: number;
+  remainingInEscrow: number;
+  escrowStatus: string;
+}
+
+export interface ClientWalletDto {
+  role: 'CLIENT';
+  currency: string;
+  totalContractFundingMinor: string;
+  totalContractFunding: number;
+  activeContractFundingMinor: string;
+  activeContractFunding: number;
+  allocatedMilestoneMinor: string;
+  allocatedMilestoneAmount: number;
+  pendingContractFundingMinor: string;
+  pendingContractFunding: number;
+  completedMilestoneMinor: string;
+  completedMilestoneAmount: number;
+  totalRefundedMinor: string;
+  totalRefundedAmount: number;
+  contracts: ClientWalletContractItemDto[];
+  recentTransactions: PaymentTransactionDto[];
+}
+
+export interface SpecialistWalletDto {
+  role: 'WORKER';
+  currency: string;
+  totalContractValueMinor: string;
+  totalContractValue: number;
+  pendingMilestoneEarningsMinor: string;
+  pendingMilestoneEarnings: number;
+  submittedMilestoneAmountMinor: string;
+  submittedMilestoneAmount: number;
+  approvedMilestoneAmountMinor: string;
+  approvedMilestoneAmount: number;
+  disputedOrHeldAmountMinor: string;
+  disputedOrHeldAmount: number;
+  settlementInitiatedMinor: string;
+  settlementInitiatedAmount: number;
+  settledEarningsMinor: string;
+  settledEarnings: number;
+  platformCommissionMinor: string;
+  platformCommission: number;
+  contractsCount: number;
+  recentTransactions: PaymentTransactionDto[];
+}
+
+export interface SettleMilestoneResultDto {
+  milestoneId: string;
+  contractId: string;
+  grossAmountMinor: string;
+  grossAmount: number;
+  platformCommissionMinor: string;
+  platformCommission: number;
+  feePercentage: number;
+  specialistNetMinor: string;
+  specialistNet: number;
+  currency: string;
+  transactionReference: string;
+  status: string;
+  settledAt: string;
+}
+
+export interface ProcessRefundRequest {
+  contractId: string;
+  amountMinor?: string | number;
+  reason: string;
+}
+
+export interface ProcessRefundResultDto {
+  contractId: string;
+  refundAmountMinor: string;
+  refundAmount: number;
+  currency: string;
+  transactionReference: string;
+  escrowStatus: string;
+  remainingInEscrowMinor: string;
+  refundedAt: string;
+}
+
+
 // ==============================================================================
 // 6. STORAGE & DOCUMENT ACCESS DTOs
 // ==============================================================================
@@ -1330,3 +1420,40 @@ export interface MilestoneTransitionRequest {
   targetStatus: MilestoneStatus;
   reason?: string;
 }
+
+export interface InvoiceLineItemDto {
+  description: string;
+  milestoneOrder?: number;
+  amount: number;
+  currency: string;
+  status: string;
+}
+
+export interface InvoiceDto {
+  id: string;
+  invoiceNumber: string;
+  contractId: string;
+  contractNumber: string;
+  contractTitle: string;
+  milestoneId?: string;
+  milestoneOrder?: number;
+  issuedAt: string;
+  dueDate?: string;
+  status: 'PAID' | 'IN_ESCROW' | 'PENDING' | 'REFUNDED';
+  currency: string;
+  subtotal: number;
+  taxOrFee: number;
+  total: number;
+  client: {
+    id?: string;
+    name: string;
+    email: string;
+  };
+  specialist: {
+    id?: string;
+    name: string;
+    email: string;
+  };
+  lineItems: InvoiceLineItemDto[];
+}
+

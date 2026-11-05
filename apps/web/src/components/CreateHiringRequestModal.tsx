@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { apiService } from '../services/api';
 import { WorkerProfileDto } from '@trustpay/shared';
-import { X, Send, AlertCircle } from 'lucide-react';
+import { X, Send, AlertCircle, FileText } from 'lucide-react';
 
 interface CreateHiringRequestModalProps {
   worker: WorkerProfileDto;
@@ -85,25 +85,30 @@ export const CreateHiringRequestModal: React.FC<CreateHiringRequestModalProps> =
     : `Specialist ${worker.userId.slice(0, 8)}`;
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-6 space-y-5 text-slate-100 shadow-2xl">
-        <div className="flex items-start justify-between">
-          <div>
-            <h3 className="text-lg font-bold text-white">Send Hiring Proposal</h3>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Target Specialist: <span className="text-emerald-400 font-semibold">{workerName}</span> ({worker.headline || 'Contractor'})
-            </p>
+    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+      <div className="dark:bg-[#151715] bg-white border dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] rounded-2xl max-w-xl w-full p-6 space-y-5 dark:text-[#E8EAE6] text-[#111827] shadow-2xl">
+        <div className="flex items-start justify-between border-b dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] pb-4">
+          <div className="flex items-center space-x-2.5">
+            <div className="w-9 h-9 rounded-xl dark:bg-[#202220] bg-[#EFF6FF] border dark:border-[rgba(139,255,36,0.25)] border-[#DBEAFE] flex items-center justify-center dark:text-[#8BFF24] text-[#2563EB]">
+              <FileText className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-base font-bold dark:text-[#E8EAE6] text-[#111827]">Send Hiring Proposal</h3>
+              <p className="text-xs dark:text-[#A5AAA2] text-[#64748B] mt-0.5">
+                Target Specialist: <span className="text-[#8BFF24] font-semibold">{workerName}</span> ({worker.headline || 'Specialist'})
+              </p>
+            </div>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white p-1 rounded-lg bg-slate-800 border border-slate-700"
+            className="dark:text-[#A5AAA2] text-[#64748B] hover:dark:text-[#E8EAE6] hover:text-[#111827] p-1.5 rounded-lg dark:bg-[#202220] bg-[#F1F5F9] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] transition"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {errorMessage && (
-          <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs flex items-center space-x-2">
+          <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 dark:text-rose-400 text-xs flex items-center space-x-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{errorMessage}</span>
           </div>
@@ -111,101 +116,107 @@ export const CreateHiringRequestModal: React.FC<CreateHiringRequestModalProps> =
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Project Title *</label>
+            <label className="block text-xs font-semibold dark:text-[#E8EAE6] text-[#111827] mb-1">Project Title *</label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. Fullstack React & Express Development"
-              className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+              placeholder="e.g. Enterprise Fullstack React & PostgreSQL Architecture"
+              className="w-full px-3 py-2 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] text-xs dark:text-[#E8EAE6] text-[#111827] placeholder:text-[#6A6F68] focus:outline-none focus:border-[#8BFF24] transition"
               required
             />
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Project Scope &amp; Deliverables *</label>
+            <label className="block text-xs font-semibold dark:text-[#E8EAE6] text-[#111827] mb-1">
+              Project Scope &amp; Deliverables *
+            </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={4}
               placeholder="Provide clear specifications, technical stack, deliverable requirements..."
-              className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+              className="w-full px-3 py-2 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] text-xs dark:text-[#E8EAE6] text-[#111827] placeholder:text-[#6A6F68] focus:outline-none focus:border-[#8BFF24] transition leading-relaxed"
               required
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Proposed Budget ($ USD) *</label>
+              <label className="block text-xs font-semibold dark:text-[#E8EAE6] text-[#111827] mb-1">
+                Proposed Budget ($ USD) *
+              </label>
               <input
                 type="number"
                 step="0.01"
                 value={proposedBudget}
                 onChange={(e) => setProposedBudget(e.target.value)}
-                placeholder="e.g. 1500"
-                className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+                placeholder="e.g. 2500"
+                className="w-full px-3 py-2 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] text-xs text-[#8BFF24] focus:outline-none focus:border-[#8BFF24] font-mono tabular-nums transition font-semibold"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Required Skills (comma-separated)</label>
+              <label className="block text-xs font-semibold dark:text-[#E8EAE6] text-[#111827] mb-1">
+                Required Skills (comma-separated)
+              </label>
               <input
                 type="text"
                 value={requiredSkills}
                 onChange={(e) => setRequiredSkills(e.target.value)}
                 placeholder="e.g. React, TypeScript, Node.js"
-                className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+                className="w-full px-3 py-2 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] text-xs dark:text-[#E8EAE6] text-[#111827] placeholder:text-[#6A6F68] focus:outline-none focus:border-[#8BFF24] transition"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Proposed Start Date</label>
+              <label className="block text-xs font-semibold dark:text-[#E8EAE6] text-[#111827] mb-1">Proposed Start Date</label>
               <input
                 type="date"
                 value={proposedStartDate}
                 onChange={(e) => setProposedStartDate(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+                className="w-full px-3 py-2 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] text-xs dark:text-[#E8EAE6] text-[#111827] focus:outline-none focus:border-[#8BFF24] font-mono transition"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Expected Completion Date</label>
+              <label className="block text-xs font-semibold dark:text-[#E8EAE6] text-[#111827] mb-1">Expected Completion Date</label>
               <input
                 type="date"
                 value={expectedCompletionDate}
                 onChange={(e) => setExpectedCompletionDate(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+                className="w-full px-3 py-2 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] text-xs dark:text-[#E8EAE6] text-[#111827] focus:outline-none focus:border-[#8BFF24] font-mono transition"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Message to Specialist</label>
+            <label className="block text-xs font-semibold dark:text-[#E8EAE6] text-[#111827] mb-1">Message to Specialist</label>
             <textarea
               value={clientMessage}
               onChange={(e) => setClientMessage(e.target.value)}
               rows={2}
-              placeholder="Introduce your project and any specific timeline expectations..."
-              className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+              placeholder="Introduce your project context and any specific timeline expectations..."
+              className="w-full px-3 py-2 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] text-xs dark:text-[#E8EAE6] text-[#111827] placeholder:text-[#6A6F68] focus:outline-none focus:border-[#8BFF24] transition leading-relaxed"
             />
           </div>
 
-          <div className="pt-3 border-t border-slate-800 flex items-center justify-end space-x-3">
+          <div className="pt-4 border-t dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] flex items-center justify-end space-x-3">
             <button
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 border border-slate-700"
+              className="px-4 py-2 rounded-xl dark:bg-[#202220] bg-[#F1F5F9] dark:hover:bg-[#292C28] hover:bg-[#E2E8F0] text-xs font-semibold dark:text-[#E8EAE6] text-[#111827] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] transition"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-xs font-semibold text-white flex items-center space-x-1.5 shadow-lg shadow-emerald-600/20"
+              className="px-5 py-2 rounded-xl bg-[#8BFF24] hover:bg-[#A3FF50] disabled:opacity-50 text-xs font-bold text-[#050605] flex items-center space-x-1.5 shadow-[0_0_15px_rgba(139,255,36,0.2)] transition active:scale-95 cursor-pointer"
             >
               <Send className="w-3.5 h-3.5" />
               <span>{isSubmitting ? 'Submitting...' : 'Send Proposal'}</span>
@@ -216,4 +227,3 @@ export const CreateHiringRequestModal: React.FC<CreateHiringRequestModalProps> =
     </div>
   );
 };
-

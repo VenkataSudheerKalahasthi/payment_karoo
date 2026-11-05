@@ -30,6 +30,62 @@ export interface PostTransactionInput {
 
 export class DoubleEntryLedgerService {
   /**
+   * Helper to derive currency-specific account codes.
+   */
+  getAccountCode(baseCode: string, currency = 'USD'): string {
+    const cur = currency.toUpperCase().trim();
+    if (cur === 'USD') return baseCode;
+    return `${baseCode}-${cur}`;
+  }
+
+  /**
+   * Ensures the system chart of accounts exists for the specified currency.
+   */
+  async ensureSystemAccounts(currency = 'USD') {
+    const cur = currency.toUpperCase().trim();
+    const systemAccounts = [
+      {
+        accountCode: this.getAccountCode('1000-CASH-ESCROW', cur),
+        accountName: `Custodial Escrow Holding Account (${cur})`,
+        accountType: LedgerAccountType.ASSET,
+        currency: cur,
+      },
+      {
+        accountCode: this.getAccountCode('2000-CLIENT-ESCROW-LIABILITY', cur),
+        accountName: `Client Escrow Balances Payable (${cur})`,
+        accountType: LedgerAccountType.LIABILITY,
+        currency: cur,
+      },
+      {
+        accountCode: this.getAccountCode('2100-WORKER-PAYABLE', cur),
+        accountName: `Worker Approved Milestones Payable (${cur})`,
+        accountType: LedgerAccountType.LIABILITY,
+        currency: cur,
+      },
+      {
+        accountCode: this.getAccountCode('4000-PLATFORM-FEE-REVENUE', cur),
+        accountName: `Platform Transaction Fee Revenue (${cur})`,
+        accountType: LedgerAccountType.REVENUE,
+        currency: cur,
+      },
+      {
+        accountCode: this.getAccountCode('5000-PAYMENT-PROCESSING-EXPENSE', cur),
+        accountName: `Payment Processor Fee Expense (${cur})`,
+        accountType: LedgerAccountType.EXPENSE,
+        currency: cur,
+      },
+    ];
+
+    for (const acc of systemAccounts) {
+      await prisma.ledgerAccount.upsert({
+        where: { accountCode: acc.accountCode },
+        update: { currency: cur, accountName: acc.accountName },
+        create: acc,
+      });
+    }
+  }
+
+  /**
    * Posts a balanced double-entry transaction atomically.
    * Total debits MUST strictly equal total credits.
    */

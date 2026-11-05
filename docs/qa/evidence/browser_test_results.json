@@ -1,0 +1,263 @@
+[
+  {
+    "name": "Client & Specialist Web Portal",
+    "url": "http://localhost:3000",
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_NAME_NOT_RESOLVED"
+    ],
+    "consoleWarnings": [
+      "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview",
+      "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview",
+      "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+    ],
+    "failedRequests": [
+      {
+        "url": "https://1-cqokzbsembecakqefrq52jixl4-j2h2kuiwcpnt2szx3am2t6y6uy-p.client.protect.clerk.com/ins_3LVh2RPVSrzgPBjPSBnwaaZqjmA/probe",
+        "error": "net::ERR_NAME_NOT_RESOLVED"
+      }
+    ],
+    "totalRequests": 187,
+    "successfulRequests": 187,
+    "testedControls": [
+      {
+        "text": "Verify Connectivity",
+        "action": "clicked",
+        "result": "success"
+      },
+      {
+        "text": "Sign In",
+        "action": "clicked",
+        "result": "success"
+      },
+      {
+        "text": "Register",
+        "action": "clicked",
+        "result": "success"
+      },
+      {
+        "text": "Get Started as Client or Specialist",
+        "action": "clicked",
+        "result": "success"
+      },
+      {
+        "text": "Sign In",
+        "action": "clicked",
+        "result": "success"
+      }
+    ],
+    "viewports": {
+      "desktop": {
+        "httpStatus": 200,
+        "pageTitle": "TrustPay Enterprise | Client & Worker Portal",
+        "bodySnippet": "TrustPay EnterprisePortal Verify Connectivity Sign In Register TrustPay Enterprise v2.0 Active Secure Digital Contract & Specialist Escrow Management TrustPay Enterprise provides verified milestone-based escrow custody, digital contract signing, and tamper-evident work agreements connecting Clients",
+        "screenshot": "web_portal_desktop.png"
+      },
+      "tablet": {
+        "httpStatus": 304,
+        "pageTitle": "TrustPay Enterprise | Client & Worker Portal",
+        "bodySnippet": "TrustPay EnterprisePortal Verify Connectivity Sign In Register TrustPay Enterprise v2.0 Active Secure Digital Contract & Specialist Escrow Management TrustPay Enterprise provides verified milestone-based escrow custody, digital contract signing, and tamper-evident work agreements connecting Clients",
+        "screenshot": "web_portal_tablet.png"
+      },
+      "mobile": {
+        "httpStatus": 304,
+        "pageTitle": "TrustPay Enterprise | Client & Worker Portal",
+        "bodySnippet": "TrustPay EnterprisePortal Verify Connectivity Sign In Register TrustPay Enterprise v2.0 Active Secure Digital Contract & Specialist Escrow Management TrustPay Enterprise provides verified milestone-based escrow custody, digital contract signing, and tamper-evident work agreements connecting Clients",
+        "screenshot": "web_portal_mobile.png"
+      }
+    },
+    "status": "PASS",
+    "controlsSummary": {
+      "buttons": [
+        {
+          "index": 0,
+          "text": "Verify Connectivity",
+          "disabled": false,
+          "type": "button"
+        },
+        {
+          "index": 1,
+          "text": "Sign In",
+          "disabled": false,
+          "type": "button"
+        },
+        {
+          "index": 2,
+          "text": "Register",
+          "disabled": false,
+          "type": "button"
+        },
+        {
+          "index": 3,
+          "text": "Get Started as Client or Specialist",
+          "disabled": false,
+          "type": "button"
+        },
+        {
+          "index": 4,
+          "text": "Sign In",
+          "disabled": false,
+          "type": "button"
+        }
+      ],
+      "inputs": [],
+      "links": []
+    }
+  },
+  {
+    "name": "Admin Portal",
+    "url": "http://localhost:3001",
+    "consoleErrors": [],
+    "consoleWarnings": [
+      "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview",
+      "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview",
+      "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+    ],
+    "failedRequests": [],
+    "totalRequests": 125,
+    "successfulRequests": 125,
+    "testedControls": [
+      {
+        "text": "Verify Cluster",
+        "action": "clicked",
+        "result": "success"
+      },
+      {
+        "text": "Admin Sign In",
+        "action": "clicked",
+        "result": "success"
+      },
+      {
+        "text": "Sign In with Administrative Credentials",
+        "action": "clicked",
+        "result": "success"
+      }
+    ],
+    "viewports": {
+      "desktop": {
+        "httpStatus": 200,
+        "pageTitle": "TrustPay Enterprise | Admin Portal",
+        "bodySnippet": "TrustPay Admin Enterprise Governance Administrative Oversight & Audit Console Verify Cluster Admin Sign In Administrative Authentication Required Only authorized administrators with verified Clerk identities and assigned ADMIN or SUPERADMIN roles may access this governance console. Sign In with Ad",
+        "screenshot": "admin_portal_desktop.png"
+      },
+      "tablet": {
+        "httpStatus": 304,
+        "pageTitle": "TrustPay Enterprise | Admin Portal",
+        "bodySnippet": "TrustPay Admin Enterprise Governance Administrative Oversight & Audit Console Verify Cluster Admin Sign In Administrative Authentication Required Only authorized administrators with verified Clerk identities and assigned ADMIN or SUPERADMIN roles may access this governance console. Sign In with Ad",
+        "screenshot": "admin_portal_tablet.png"
+      },
+      "mobile": {
+        "httpStatus": 304,
+        "pageTitle": "TrustPay Enterprise | Admin Portal",
+        "bodySnippet": "TrustPay Admin Enterprise Governance Administrative Oversight & Audit Console Verify Cluster Admin Sign In Administrative Authentication Required Only authorized administrators with verified Clerk identities and assigned ADMIN or SUPERADMIN roles may access this governance console. Sign In with Ad",
+        "screenshot": "admin_portal_mobile.png"
+      }
+    },
+    "status": "PASS",
+    "controlsSummary": {
+      "buttons": [
+        {
+          "index": 0,
+          "text": "Verify Cluster",
+          "disabled": false,
+          "type": "button"
+        },
+        {
+          "index": 1,
+          "text": "Admin Sign In",
+          "disabled": false,
+          "type": "button"
+        },
+        {
+          "index": 2,
+          "text": "Sign In with Administrative Credentials",
+          "disabled": false,
+          "type": "button"
+        }
+      ],
+      "inputs": [],
+      "links": []
+    }
+  },
+  {
+    "name": "Superadmin Portal",
+    "url": "http://localhost:3002",
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_NAME_NOT_RESOLVED"
+    ],
+    "consoleWarnings": [
+      "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview",
+      "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview",
+      "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+    ],
+    "failedRequests": [
+      {
+        "url": "https://1-arqa4ps3epmbouvn744zlgffom-aq6ccb4i3gea6iskdw4j5sx63y-p.client.protect.clerk.com/ins_3LVh2RPVSrzgPBjPSBnwaaZqjmA/probe",
+        "error": "net::ERR_NAME_NOT_RESOLVED"
+      }
+    ],
+    "totalRequests": 127,
+    "successfulRequests": 127,
+    "testedControls": [
+      {
+        "text": "Audit Cluster",
+        "action": "clicked",
+        "result": "success"
+      },
+      {
+        "text": "Governance Sign In",
+        "action": "clicked",
+        "result": "success"
+      },
+      {
+        "text": "Sign In with Superadmin Clearance",
+        "action": "clicked",
+        "result": "success"
+      }
+    ],
+    "viewports": {
+      "desktop": {
+        "httpStatus": 200,
+        "pageTitle": "TrustPay Enterprise | Superadmin Governance",
+        "bodySnippet": "TrustPay Superadmin Root Governance Enterprise Core System Console Audit Cluster Governance Sign In Superadmin Clearance Required This governance environment allows provisioning administrative roles and inspecting platform audit events. Access is restricted to designated SUPERADMIN accounts. Sign ",
+        "screenshot": "superadmin_portal_desktop.png"
+      },
+      "tablet": {
+        "httpStatus": 304,
+        "pageTitle": "TrustPay Enterprise | Superadmin Governance",
+        "bodySnippet": "TrustPay Superadmin Root Governance Enterprise Core System Console Audit Cluster Governance Sign In Superadmin Clearance Required This governance environment allows provisioning administrative roles and inspecting platform audit events. Access is restricted to designated SUPERADMIN accounts. Sign ",
+        "screenshot": "superadmin_portal_tablet.png"
+      },
+      "mobile": {
+        "httpStatus": 304,
+        "pageTitle": "TrustPay Enterprise | Superadmin Governance",
+        "bodySnippet": "TrustPay Superadmin Root Governance Enterprise Core System Console Audit Cluster Governance Sign In Superadmin Clearance Required This governance environment allows provisioning administrative roles and inspecting platform audit events. Access is restricted to designated SUPERADMIN accounts. Sign ",
+        "screenshot": "superadmin_portal_mobile.png"
+      }
+    },
+    "status": "PASS",
+    "controlsSummary": {
+      "buttons": [
+        {
+          "index": 0,
+          "text": "Audit Cluster",
+          "disabled": false,
+          "type": "button"
+        },
+        {
+          "index": 1,
+          "text": "Governance Sign In",
+          "disabled": false,
+          "type": "button"
+        },
+        {
+          "index": 2,
+          "text": "Sign In with Superadmin Clearance",
+          "disabled": false,
+          "type": "button"
+        }
+      ],
+      "inputs": [],
+      "links": []
+    }
+  }
+]

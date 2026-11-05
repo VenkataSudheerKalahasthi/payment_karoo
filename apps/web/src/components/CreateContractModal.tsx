@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { apiService } from '../services/api';
 import { WorkerProfileDto } from '@trustpay/shared';
-import { Plus, Trash2, ShieldCheck } from 'lucide-react';
+import { Plus, Trash2, ShieldCheck, X, FileText } from 'lucide-react';
 
 interface CreateContractModalProps {
   isOpen: boolean;
@@ -112,75 +112,87 @@ export const CreateContractModal: React.FC<CreateContractModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-6">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-          <div className="flex items-center space-x-2">
-            <ShieldCheck className="w-5 h-5 text-emerald-400" />
-            <h3 className="text-lg font-bold text-white">Create Digital Escrow Agreement</h3>
+    <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-6 shadow-2xl dark:text-[#CDCBCA] text-[#242424]">
+        <div className="flex items-center justify-between border-b dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] pb-4">
+          <div className="flex items-center space-x-2.5">
+            <div className="w-9 h-9 rounded-lg dark:bg-[#202020] bg-[#EFF6FF] border dark:border-[rgba(205,203,202,0.18)] border-[#DBEAFE] flex items-center justify-center text-[#2563EB]">
+              <ShieldCheck className="w-5 h-5 text-[#2563EB]" />
+            </div>
+            <div>
+              <h3 className="text-base font-bold dark:text-[#CDCBCA] text-[#242424]">Create Digital Escrow Agreement</h3>
+              <p className="text-xs dark:text-[#A5A5A5] text-[#64748B]">
+                Define terms, milestone deliverable phases, and escrow allocation values.
+              </p>
+            </div>
           </div>
-          <button onClick={onClose} className="p-1 rounded text-slate-400 hover:text-white">
-            ✕
+          <button
+            onClick={onClose}
+            className="dark:text-[#777777] text-[#64748B] hover:dark:text-[#CDCBCA] hover:text-[#242424] p-1.5 rounded-lg dark:bg-[#202020] bg-[#F1F5F9] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] transition"
+          >
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {error && (
-          <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs">
+          <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-500 dark:text-rose-400 text-xs">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-400 mb-1">Select Worker</label>
+            <label className="block text-xs font-semibold dark:text-[#CDCBCA] text-[#242424] mb-1">
+              Select Specialist Counterparty
+            </label>
             <select
               value={selectedWorkerId}
               onChange={(e) => setSelectedWorkerId(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-800 text-sm text-slate-200 focus:outline-none focus:border-emerald-500"
+              className="w-full px-3 py-2 rounded-lg dark:bg-[#202020] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#CBD5E1] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] transition"
               required
             >
-              {workers.length === 0 && <option value="">No registered workers found</option>}
+              {workers.length === 0 && <option value="">No registered specialists found</option>}
               {workers.map((w) => (
                 <option key={w.userId} value={w.userId}>
-                  Worker {w.user?.firstName || w.userId.slice(0, 8)} — {w.headline || 'Specialist'}
+                  Specialist {w.user?.firstName || w.userId.slice(0, 8)} — {w.headline || 'Technical Consultant'}
                 </option>
               ))}
             </select>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-400 mb-1">Contract Title</label>
+            <label className="block text-xs font-semibold dark:text-[#CDCBCA] text-[#242424] mb-1">Contract Title</label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g., Enterprise Web Application Security Hardening"
+              placeholder="e.g. Enterprise Security Hardening & Penetration Verification"
               required
-              className="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-800 text-sm text-slate-200 focus:outline-none focus:border-emerald-500"
+              className="w-full px-3 py-2 rounded-lg dark:bg-[#202020] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#CBD5E1] text-xs dark:text-[#CDCBCA] text-[#242424] placeholder:dark:text-[#777777] placeholder:text-[#94A3B8] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] transition"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-400 mb-1">Scope of Work</label>
+            <label className="block text-xs font-semibold dark:text-[#CDCBCA] text-[#242424] mb-1">Scope of Work</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Detailed description of objectives, deliverables, acceptance criteria..."
               required
               rows={3}
-              className="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-800 text-sm text-slate-200 focus:outline-none focus:border-emerald-500"
+              className="w-full px-3 py-2 rounded-lg dark:bg-[#202020] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#CBD5E1] text-xs dark:text-[#CDCBCA] text-[#242424] placeholder:dark:text-[#777777] placeholder:text-[#94A3B8] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] transition leading-relaxed"
             />
           </div>
 
           <div className="space-y-3 pt-2">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              <label className="text-xs font-semibold dark:text-[#CDCBCA] text-[#242424] uppercase tracking-wider">
                 Milestones &amp; Funding Allocation
               </label>
               <button
                 type="button"
                 onClick={handleAddMilestone}
-                className="inline-flex items-center space-x-1 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs font-medium text-emerald-400"
+                className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg dark:bg-[#202020] bg-[#EFF6FF] hover:dark:bg-[#303030] hover:bg-[#DBEAFE] text-xs font-medium text-[#2563EB] border dark:border-[rgba(205,203,202,0.18)] border-[#DBEAFE] transition"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Add Milestone</span>
@@ -189,33 +201,36 @@ export const CreateContractModal: React.FC<CreateContractModalProps> = ({
 
             <div className="space-y-3">
               {milestones.map((m, idx) => (
-                <div key={idx} className="p-3 rounded-lg bg-slate-950 border border-slate-800 space-y-2">
+                <div
+                  key={idx}
+                  className="p-3.5 rounded-xl dark:bg-[#202020] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] space-y-2.5"
+                >
                   <div className="flex items-center space-x-2">
-                    <span className="text-xs font-bold text-slate-500">#{idx + 1}</span>
+                    <span className="text-xs font-bold dark:text-[#777777] text-[#94A3B8] font-mono">#{idx + 1}</span>
                     <input
                       type="text"
                       value={m.title}
                       onChange={(e) => handleMilestoneChange(idx, 'title', e.target.value)}
                       placeholder="Milestone title"
                       required
-                      className="flex-1 px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-xs text-slate-200"
+                      className="flex-1 px-3 py-1.5 rounded-lg dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#CBD5E1] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] transition"
                     />
-                    <div className="relative w-28">
-                      <span className="absolute left-2 top-1.5 text-xs text-slate-500">$</span>
+                    <div className="relative w-32">
+                      <span className="absolute left-2.5 top-1.5 text-xs dark:text-[#777777] text-[#94A3B8]">$</span>
                       <input
                         type="number"
                         min="1"
                         value={m.amount}
                         onChange={(e) => handleMilestoneChange(idx, 'amount', Number(e.target.value))}
                         required
-                        className="w-full pl-6 pr-2 py-1 rounded bg-slate-900 border border-slate-800 text-xs text-slate-200 text-right"
+                        className="w-full pl-6 pr-2.5 py-1.5 rounded-lg dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#CBD5E1] text-xs dark:text-[#CDCBCA] text-[#242424] text-right font-mono tabular-nums focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] transition"
                       />
                     </div>
                     {milestones.length > 1 && (
                       <button
                         type="button"
                         onClick={() => handleRemoveMilestone(idx)}
-                        className="p-1 text-slate-500 hover:text-rose-400"
+                        className="p-1.5 dark:text-[#777777] text-[#94A3B8] hover:text-rose-500 transition"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -225,19 +240,19 @@ export const CreateContractModal: React.FC<CreateContractModalProps> = ({
                     type="text"
                     value={m.description}
                     onChange={(e) => handleMilestoneChange(idx, 'description', e.target.value)}
-                    placeholder="Deliverable specifications"
-                    className="w-full px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-xs text-slate-300"
+                    placeholder="Deliverable specifications and acceptance criteria"
+                    className="w-full px-3 py-1.5 rounded-lg dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#CBD5E1] text-xs dark:text-[#CDCBCA] text-[#334155] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] transition"
                   />
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="pt-3 border-t border-slate-800 flex items-center justify-between">
+          <div className="pt-4 border-t dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] flex items-center justify-between">
             <div>
-              <span className="text-xs text-slate-400">Calculated Escrow Total:</span>
-              <div className="text-lg font-bold text-emerald-400">
-                ${totalAmount.toLocaleString()} {currency}
+              <span className="text-xs dark:text-[#A5A5A5] text-[#64748B]">Calculated Escrow Total:</span>
+              <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400 font-mono tabular-nums">
+                ${totalAmount.toLocaleString()} <span className="text-xs font-normal dark:text-[#A5A5A5] text-[#64748B]">{currency}</span>
               </div>
             </div>
 
@@ -245,16 +260,17 @@ export const CreateContractModal: React.FC<CreateContractModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300"
+                className="px-4 py-2 rounded-lg dark:bg-[#202020] bg-[#F1F5F9] dark:hover:bg-[#303030] hover:bg-[#E2E8F0] text-xs font-medium dark:text-[#CDCBCA] text-[#242424] border dark:border-[rgba(205,203,202,0.18)] border-[#CBD5E1] transition"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-medium text-white transition disabled:opacity-50"
+                className="px-5 py-2 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] disabled:opacity-50 text-xs font-semibold text-white shadow-sm flex items-center space-x-1.5 transition"
               >
-                Propose Agreement
+                <FileText className="w-3.5 h-3.5" />
+                <span>{isSubmitting ? 'Proposing Agreement...' : 'Initialize Contract'}</span>
               </button>
             </div>
           </div>

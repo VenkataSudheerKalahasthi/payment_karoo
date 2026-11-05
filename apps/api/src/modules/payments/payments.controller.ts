@@ -161,3 +161,112 @@ export async function getPlatformFinancialConfig(req: Request, res: Response): P
   }
 }
 
+const settleMilestoneSchema = z.object({
+  reason: z.string().optional(),
+});
+
+export async function settleMilestone(req: Request, res: Response): Promise<void> {
+  const { milestoneId } = req.params;
+  const user = req.user!;
+  const parsed = settleMilestoneSchema.safeParse(req.body);
+
+  if (!milestoneId) {
+    sendError(res, 400, 'MISSING_MILESTONE_ID', 'Milestone ID is required');
+    return;
+  }
+
+  try {
+    const result = await paymentsService.settleMilestone({
+      milestoneId,
+      actor: user,
+      reason: parsed.success ? parsed.data.reason : undefined,
+    });
+
+    await recordAuditLog({
+      actorId: user.id,
+      action: 'MILESTONE_SETTLED',
+      resource: 'ContractMilestone',
+      resourceId: milestoneId,
+      details: {
+        contractId: result.contractId,
+        grossAmount: result.grossAmount,
+        platformCommission: result.platformCommission,
+        specialistNet: result.specialistNet,
+        transactionReference: result.transactionReference,
+      },
+      req,
+    });
+
+    sendSuccess(res, 200, result);
+  } catch (error: unknown) {
+    const err = error as { statusCode?: number; code?: string; message?: string };
+    if (err.statusCode) {
+      sendError(res, err.statusCode, err.code || 'BAD_REQUEST', err.message || 'Milestone settlement failed');
+      return;
+    }
+    logger.error(`Error settling milestone ${milestoneId}:`, error);
+    sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Failed to process milestone settlement');
+  }
+}
+
+const processRefundSchema = z.object({
+  contractId: z.string().uuid('Contract ID must be a valid UUID'),
+  amountMinor: z.union([z.string(), z.number()]).optional(),
+  reason: z.string().min(5, 'Reason must be at least 5 characters'),
+});
+
+export async function processRefund(req: Request, res: Response): Promise<void> {
+  const parsed = processRefundSchema.safeParse(req.body);
+  if (!parsed.success) {
+    sendError(res, 400, 'VALIDATION_ERROR', 'Invalid refund request', parsed.error.format());
+    return;
+  }
+
+  const user = req.user!;
+
+  try {
+    const result = await paymentsService.processRefund({
+      contractId: parsed.data.contractId,
+      actor: user,
+      amountMinor: parsed.data.amountMinor != null ? parsed.data.amountMinor.toString() : undefined,
+      reason: parsed.data.reason,
+    });
+
+    await recordAuditLog({
+      actorId: user.id,
+      action: 'ESCROW_REFUND_PROCESSED',
+      resource: 'EscrowRecord',
+      resourceId: parsed.data.contractId,
+      details: {
+        contractId: result.contractId,
+        refundAmount: result.refundAmount,
+        transactionReference: result.transactionReference,
+        reason: parsed.data.reason,
+      },
+      req,
+    });
+
+    sendSuccess(res, 200, result);
+  } catch (error: unknown) {
+    const err = error as { statusCode?: number; code?: string; message?: string };
+    if (err.statusCode) {
+      sendError(res, err.statusCode, err.code || 'BAD_REQUEST', err.message || 'Refund processing failed');
+      return;
+    }
+    logger.error('Error processing refund:', error);
+    sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Failed to process refund');
+  }
+}
+
+export async function getWalletOverview(req: Request, res: Response): Promise<void> {
+  const user = req.user!;
+
+  try {
+    const wallet = await paymentsService.getWalletOverview(user);
+    sendSuccess(res, 200, wallet);
+  } catch (error) {
+    logger.error('Error fetching wallet overview:', error);
+    sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Failed to retrieve wallet metrics');
+  }
+}
+

@@ -20,7 +20,7 @@ export const pool =
   globalThis.__trustpay_pg_pool__ ??
   new Pool({
     connectionString,
-    connectionTimeoutMillis: 10000,
+    connectionTimeoutMillis: 30000,
     idleTimeoutMillis: 30000,
     max: 10,
     ssl: isSupabaseOrRemote ? { rejectUnauthorized: false } : undefined,

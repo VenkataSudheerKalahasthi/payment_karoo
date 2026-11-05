@@ -1,0 +1,148 @@
+{
+  "timestamp": "2026-11-03T14:17:24.949Z",
+  "metrics": {
+    "totalEvaluated": 16,
+    "verifiedCount": 15,
+    "partialCount": 1,
+    "unverifiedCount": 0,
+    "failedCount": 0
+  },
+  "results": [
+    {
+      "id": "EVID-9.5-01",
+      "category": "Phase 9.5 Evidence",
+      "name": "Browser Screenshots Verification",
+      "status": "PARTIALLY_VERIFIED",
+      "details": "All 9 viewport screenshots exist on disk, but inspect unauthenticated landing/login states only due to Clerk authentication gate.",
+      "evidence": {
+        "screenshotsFound": 9,
+        "totalExpected": 9
+      }
+    },
+    {
+      "id": "EVID-9.5-02",
+      "category": "Phase 9.5 Evidence",
+      "name": "Contract PDF Artifact Verification",
+      "status": "VERIFIED",
+      "details": "Streaming PDFKit document exists (4868 bytes) with valid PDF-1.3 header",
+      "evidence": {
+        "sizeBytes": 4868,
+        "path": "contract_CTR-162778.pdf"
+      }
+    },
+    {
+      "id": "EVID-9.5-03",
+      "category": "Phase 9.5 Evidence",
+      "name": "Supabase Contract Record",
+      "status": "VERIFIED",
+      "details": "Contract CTR-162778 (50d8704d-ef67-44ff-92b5-4bbc9294e5a4) verified in Supabase (Status: COMPLETED, Milestones: 2)",
+      "evidence": {
+        "contractNumber": "CTR-162778",
+        "documentHash": "392547458ca6abe293940d596583c415478756b9f4ee274d46dea9f5854c49b5"
+      }
+    },
+    {
+      "id": "EVID-9.5-04",
+      "category": "Phase 9.5 Evidence",
+      "name": "Supabase Project Workspace Record",
+      "status": "VERIFIED",
+      "details": "Project workspace 1102779b-0118-4e96-90f4-df0e5a1cc9a7 verified in Supabase (Status: COMPLETED, Progress: 100%)",
+      "evidence": {
+        "projectId": "1102779b-0118-4e96-90f4-df0e5a1cc9a7",
+        "status": "COMPLETED"
+      }
+    },
+    {
+      "id": "EVID-9.5-05",
+      "category": "Phase 9.5 Evidence",
+      "name": "Supabase Dispute & Arbitration Record",
+      "status": "VERIFIED",
+      "details": "Dispute DSP-169483 verified (Status: RESOLVED, Evidence Count: 1, Resolutions: 1)",
+      "evidence": {
+        "disputeNumber": "DSP-169483",
+        "claimedAmount": "150000"
+      }
+    },
+    {
+      "id": "EVID-9.5-06",
+      "category": "Phase 9.5 Evidence",
+      "name": "Supabase Notification Record",
+      "status": "VERIFIED",
+      "details": "Notification 4a35f1bb-410a-4d14-bbbc-fa6eeaf9976a verified in Supabase (Type: MILESTONE_SUBMITTED, isRead: true)",
+      "evidence": {
+        "notifId": "4a35f1bb-410a-4d14-bbbc-fa6eeaf9976a",
+        "isRead": true
+      }
+    },
+    {
+      "id": "SEC-IDOR-01",
+      "category": "Security",
+      "name": "Contract Resource Ownership Isolation (IDOR)",
+      "status": "VERIFIED",
+      "details": "Owner Client and Worker permitted; Third-party Client B strictly blocked; Admin granted administrative oversight"
+    },
+    {
+      "id": "SEC-NOTE-01",
+      "category": "Security",
+      "name": "Dispute Internal Notes Confidentiality Isolation",
+      "status": "VERIFIED",
+      "details": "Internal notes strictly restricted to ADMIN/SUPERADMIN; Client and Worker access completely prevented"
+    },
+    {
+      "id": "SEC-RBAC-01",
+      "category": "Security",
+      "name": "Admin vs Superadmin Privilege Separation",
+      "status": "VERIFIED",
+      "details": "Superadmin-exclusive controls (role elevation, ledger reversal) cannot be executed by standard Admin"
+    },
+    {
+      "id": "SEC-STOR-01",
+      "category": "Security",
+      "name": "HMAC Signed Storage Token Integrity & Expiry",
+      "status": "VERIFIED",
+      "details": "Signed download tokens strictly validate timing-safe signature and expiration; tampered or expired tokens fail-closed"
+    },
+    {
+      "id": "SEC-WHK-01",
+      "category": "Security",
+      "name": "Timing-Safe Webhook HMAC & 300s Replay Guard",
+      "status": "VERIFIED",
+      "details": "Fresh webhook accepted; Expired (450s) rejected with REPLAY_DETECTED; Altered signature fails timing-safe check"
+    },
+    {
+      "id": "FIN-SETTLE-01",
+      "category": "Financial",
+      "name": "Duplicate Settlement Prevention & Status Gating",
+      "status": "VERIFIED",
+      "details": "Initial approved settlement succeeds; duplicate idempotency key rejected with HTTP 409; non-approved rejected with HTTP 400"
+    },
+    {
+      "id": "FIN-HOLD-01",
+      "category": "Financial",
+      "name": "Dispute Hold Freezing of Settlement Movement",
+      "status": "VERIFIED",
+      "details": "Dispute hold or disputed contract state strictly fail-closes escrow fund movements"
+    },
+    {
+      "id": "FIN-CALC-01",
+      "category": "Financial",
+      "name": "Integer Minor Unit Arithmetic & Commission Split",
+      "status": "VERIFIED",
+      "details": "Gross: $1499.95 (149995n) = Commission: $149.99 (14999n) + Net: $1349.96 (134996n). Zero round-off drift."
+    },
+    {
+      "id": "FIN-REV-01",
+      "category": "Financial",
+      "name": "Ledger Reversal Offsetting Journal Inversion",
+      "status": "VERIFIED",
+      "details": "Reversal completely neutralizes original transaction balances without modifying historical immutable entries"
+    },
+    {
+      "id": "FIN-SAFE-01",
+      "category": "Financial",
+      "name": "Payment Safety & Live Money Neutralization",
+      "status": "VERIFIED",
+      "details": "All 4 live financial flags strictly set to false; Cashfree configured for SANDBOX containment"
+    }
+  ]
+}

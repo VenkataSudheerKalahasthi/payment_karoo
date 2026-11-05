@@ -2,6 +2,7 @@ import { prisma } from '../../config/prisma.js';
 import { WebhookEventStatus, Prisma, PaymentTransactionStatus } from '@prisma/client';
 import { logger } from '../../utils/logger.js';
 import { cashfreeProvider } from '../payments/cashfree.provider.js';
+import { paymentsService } from '../payments/payments.service.js';
 
 export class WebhooksService {
   /**
@@ -127,6 +128,17 @@ export class WebhooksService {
           logger.info(
             `[CASHFREE WEBHOOK] Synchronized transaction ${tx.transactionReference} to status ${transactionStatus} (Sandbox Only - Zero Custody Movement).`,
           );
+
+          if (transactionStatus === PaymentTransactionStatus.SUCCEEDED) {
+            try {
+              await paymentsService.processConfirmedFunding({
+                orderId,
+                providerTransactionId: paymentId || tx.providerTransactionId || undefined,
+              });
+            } catch (fundingErr) {
+              logger.warn('[CASHFREE WEBHOOK] processConfirmedFunding note:', fundingErr);
+            }
+          }
         }
       }
     }

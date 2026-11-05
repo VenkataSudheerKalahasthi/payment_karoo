@@ -8,7 +8,7 @@ export function getAdminSocket(): Socket | null {
   return socket;
 }
 
-export function initAdminSocket(token: string): Socket {
+export function initAdminSocket(token?: string): Socket {
   if (socket && socket.connected) {
     return socket;
   }
@@ -18,7 +18,7 @@ export function initAdminSocket(token: string): Socket {
   }
 
   socket = io(SOCKET_URL, {
-    auth: { token },
+    auth: token ? { token } : undefined,
     transports: ['websocket', 'polling'],
     reconnection: true,
     reconnectionAttempts: 5,
