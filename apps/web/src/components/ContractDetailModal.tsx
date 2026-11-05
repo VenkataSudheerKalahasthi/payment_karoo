@@ -25,6 +25,7 @@ import {
   Clock,
   Layers,
   Scale,
+  Stamp,
 } from 'lucide-react';
 import { ContractLifecyclePanel } from './ContractLifecyclePanel';
 
@@ -229,6 +230,34 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
   const hasOtherAccepted = detailedContract.acceptances?.some(
     (a) => a.userId !== currentUserId && a.version === detailedContract.version,
   );
+
+  const hasClientStamp = (detailedContract.clientStamps && detailedContract.clientStamps.length > 0) || false;
+  const isApproved =
+    detailedContract.status === ContractStatus.ACTIVE ||
+    detailedContract.status === ContractStatus.COMPLETED ||
+    hasUserAccepted;
+
+  const [showStampModal, setShowStampModal] = useState(false);
+  const [isApplyingStamp, setIsApplyingStamp] = useState(false);
+  const [stampPosition, setStampPosition] = useState<'BOTTOM_RIGHT' | 'BOTTOM_LEFT' | 'BOTTOM_CENTER'>('BOTTOM_RIGHT');
+
+  const handleApplyStampFromModal = async () => {
+    try {
+      setIsApplyingStamp(true);
+      const res = await apiService.applyClientStamp(detailedContract.id, { stampPosition });
+      if (res.success) {
+        setShowStampModal(false);
+        await fetchContractDetails();
+        onRefresh();
+      } else {
+        alert(res.error?.message || 'Failed to apply office stamp');
+      }
+    } catch (err: any) {
+      alert(err?.response?.data?.error?.message || err?.message || 'Error applying office stamp');
+    } finally {
+      setIsApplyingStamp(false);
+    }
+  };
 
   const handleDownloadPdf = async () => {
     setIsDownloadingPdf(true);
@@ -446,6 +475,30 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
           </div>
 
           <div className="flex items-center space-x-2 shrink-0">
+            {isClient && isApproved && (
+              hasClientStamp ? (
+                <span className="px-3 py-1.5 rounded-lg bg-[#8BFF24]/10 text-[#8BFF24] border border-[#8BFF24]/30 text-xs font-bold flex items-center gap-1.5">
+                  <Stamp className="w-3.5 h-3.5" />
+                  <span>Stamp Applied</span>
+                </span>
+              ) : (
+                <button
+                  onClick={() => setShowStampModal(true)}
+                  className="px-3 py-1.5 rounded-lg bg-[#8BFF24] hover:bg-[#78e018] text-black text-xs font-bold flex items-center gap-1.5 transition shadow-[0_0_12px_rgba(139,255,36,0.25)] cursor-pointer"
+                >
+                  <Stamp className="w-3.5 h-3.5" />
+                  <span>Add Stamp</span>
+                </button>
+              )
+            )}
+
+            {isWorker && hasClientStamp && (
+              <span className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-xs font-semibold flex items-center gap-1.5">
+                <Stamp className="w-3.5 h-3.5" />
+                <span>Client Stamped</span>
+              </span>
+            )}
+
             <button
               onClick={handleDownloadPdf}
               disabled={isDownloadingPdf}
@@ -877,6 +930,48 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
                 )}
               </div>
             )}
+
+            {/* Client Office Stamp Status Banner */}
+            {isApproved && (
+              <div className="p-4 rounded-xl bg-[#141614] border border-[#262926] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-[#8BFF24]/10 border border-[#8BFF24]/30 flex items-center justify-center text-[#8BFF24]">
+                    <Stamp className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <span className="font-bold text-white flex items-center gap-1.5">
+                      Client Digital Office Stamp
+                      {hasClientStamp ? (
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#8BFF24]/10 text-[#8BFF24] border border-[#8BFF24]/30 font-semibold">
+                          Applied ✓
+                        </span>
+                      ) : (
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700 font-semibold">
+                          Ready to Apply
+                        </span>
+                      )}
+                    </span>
+                    <p className="text-zinc-400 mt-0.5">
+                      {hasClientStamp
+                        ? 'Official TrustPay office seal is embedded in the reserved space at the bottom of the shared PDF.'
+                        : isClient
+                        ? 'This contract is approved. You can now apply your official circular office stamp to the shared agreement.'
+                        : 'Awaiting Client office stamp application to the approved contract PDF.'}
+                    </p>
+                  </div>
+                </div>
+
+                {isClient && !hasClientStamp && (
+                  <button
+                    onClick={() => setShowStampModal(true)}
+                    className="px-4 py-2 rounded-xl bg-[#8BFF24] hover:bg-[#78e018] text-black text-xs font-bold transition shrink-0 flex items-center gap-1.5 shadow-[0_0_12px_rgba(139,255,36,0.2)]"
+                  >
+                    <Stamp className="w-4 h-4" />
+                    <span>Apply Office Stamp</span>
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         )}
 
@@ -1066,6 +1161,88 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
           </div>
         )}
       </div>
+
+      {/* CLIENT STAMP APPLICATION MODAL */}
+      {showStampModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="bg-[#121412] border border-[#262926] w-full max-w-lg rounded-2xl p-6 space-y-4 shadow-2xl relative">
+            <button
+              onClick={() => setShowStampModal(false)}
+              className="absolute top-4 right-4 text-zinc-400 hover:text-white p-1 rounded-lg hover:bg-zinc-800"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[#8BFF24]/10 border border-[#8BFF24]/30 flex items-center justify-center text-[#8BFF24]">
+                <Stamp className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-white">Apply Client Digital Office Stamp</h3>
+                <p className="text-xs text-zinc-400">Embed your official seal into Contract #{detailedContract.contractNumber}</p>
+              </div>
+            </div>
+
+            {/* Placement selection */}
+            <div className="space-y-2 text-xs">
+              <label className="text-zinc-300 font-semibold block">Placement in Reserved Empty Space</label>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { id: 'BOTTOM_RIGHT', label: 'Bottom Right' },
+                  { id: 'BOTTOM_CENTER', label: 'Bottom Center' },
+                  { id: 'BOTTOM_LEFT', label: 'Bottom Left' },
+                ].map((pos) => (
+                  <button
+                    key={pos.id}
+                    type="button"
+                    onClick={() => setStampPosition(pos.id as any)}
+                    className={`p-2.5 rounded-xl border text-center font-medium transition ${
+                      stampPosition === pos.id
+                        ? 'bg-[#8BFF24]/10 border-[#8BFF24] text-white shadow-sm'
+                        : 'bg-[#181a18] border-[#262926] text-zinc-400 hover:text-white'
+                    }`}
+                  >
+                    {pos.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="p-3.5 bg-[#181a18] rounded-xl border border-[#262926] text-xs text-zinc-400 space-y-1.5">
+              <div className="flex justify-between text-zinc-300">
+                <span>Signer:</span>
+                <span className="font-semibold text-white">Authenticated Client</span>
+              </div>
+              <div className="flex justify-between text-zinc-300">
+                <span>Timestamp:</span>
+                <span className="font-mono text-emerald-400">Server Live UTC</span>
+              </div>
+              <p className="text-[11px] text-zinc-500 pt-1 border-t border-[#262926]">
+                The stamp contains TRUSTPAY watermark, Client name, verified mobile, and server date. Embedded directly into the final PDF.
+              </p>
+            </div>
+
+            <div className="flex justify-end gap-2.5 pt-2 border-t border-[#262926]">
+              <button
+                type="button"
+                onClick={() => setShowStampModal(false)}
+                className="px-4 py-2 rounded-xl bg-zinc-800 text-zinc-300 hover:text-white text-xs font-semibold"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleApplyStampFromModal}
+                disabled={isApplyingStamp}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#8BFF24] hover:bg-[#78e018] text-black text-xs font-bold transition disabled:opacity-50"
+              >
+                <Stamp className="w-3.5 h-3.5" />
+                <span>{isApplyingStamp ? 'Applying Stamp...' : 'Confirm & Apply Stamp'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -314,6 +314,7 @@ model User {
   clientProjects           Project[]                    @relation("ClientProjects")
   workerProjects           Project[]                    @relation("WorkerProjects")
   milestoneActivities      MilestoneActivity[]
+  clientStamps             ClientStamp[]
 
   @@index([clerkId])
   @@index([email])
@@ -442,6 +443,7 @@ model Contract {
   versions           ContractVersion[]
   project            Project?
   milestoneActivities MilestoneActivity[]
+  clientStamps       ClientStamp[]
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
 
@@ -666,6 +668,30 @@ model ContractVersion {
   @@index([contractId])
   @@index([version])
   @@map("contract_versions")
+}
+
+model ClientStamp {
+  id                     String    @id @default(uuid())
+  contractId             String
+  clientId               String
+  profileNameSnapshot    String
+  verifiedMobileSnapshot String
+  appliedAt              DateTime  @default(now())
+  pdfVersion             Int       @default(1)
+  stampPosition          String    @default("BOTTOM_RIGHT")
+  stampAssetPath         String?
+  documentHash           String?
+  status                 String    @default("APPLIED")
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  contract               Contract  @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  client                 User      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@unique([contractId, pdfVersion])
+  @@index([contractId])
+  @@index([clientId])
+  @@map("client_stamps")
 }
 
 // ==============================================================================

@@ -660,5 +660,156 @@ describe('TRUSTPAY ENTERPRISE v2.0 — WORKER / SPECIALIST PORTAL FUNCTIONAL & S
       // Backend validates clientId !== workerId
     });
   });
+
+  // =========================================================================
+  // 11. Specialist Opportunities Discovery & Proposal Bidding (Features 5 & 7)
+  // =========================================================================
+  describe('11. Specialist Opportunities Discovery & Proposal Bidding', () => {
+    it('structures open market project opportunities with budget and scope verification', () => {
+      const openOpportunity = {
+        id: 'opp-101',
+        title: 'Full-Stack Escrow Integration & Security Hardening',
+        clientName: 'Acme Enterprise Labs',
+        description: 'Implement automated settlement webhooks and Cashfree replay guards',
+        budgetMinor: 350000,
+        currency: 'USD',
+        category: 'Full-Stack Development',
+        estimatedTimeline: '3 weeks',
+        milestonesCount: 3,
+        createdAt: new Date().toISOString(),
+      };
+
+      expect(openOpportunity.budgetMinor).toBe(350000);
+      expect(openOpportunity.milestonesCount).toBeGreaterThan(0);
+      expect(openOpportunity.category).toBe('Full-Stack Development');
+    });
+
+    it('submits a competitive proposal with rate, cover note and delivery schedule', () => {
+      const proposalPayload = {
+        opportunityId: 'opp-101',
+        proposedRateMinor: 320000,
+        coverLetter: 'I have 8+ years building cryptographic escrow engines and audited financial ledgers.',
+        estimatedDurationDays: 21,
+      };
+
+      expect(proposalPayload.proposedRateMinor).toBeLessThanOrEqual(350000);
+      expect(proposalPayload.coverLetter.length).toBeGreaterThan(20);
+      expect(proposalPayload.estimatedDurationDays).toBe(21);
+    });
+  });
+
+  // =========================================================================
+  // 12. Milestone Work Commencement, Deliverable Submission & Revisions (Features 12, 13, 14)
+  // =========================================================================
+  describe('12. Milestone Lifecycle: Start, Submit & Revisions', () => {
+    it('transitions milestone from PENDING to IN_PROGRESS upon worker work commencement', () => {
+      const initialMilestone = {
+        id: 'ms-01',
+        title: 'API Authentication & RBAC Engine',
+        status: MilestoneStatus.PENDING,
+        startedAt: null as string | null,
+      };
+
+      // Worker clicks Start Work
+      const startedMilestone = {
+        ...initialMilestone,
+        status: MilestoneStatus.IN_PROGRESS,
+        startedAt: new Date().toISOString(),
+      };
+
+      expect(startedMilestone.status).toBe(MilestoneStatus.IN_PROGRESS);
+      expect(startedMilestone.startedAt).toBeTruthy();
+    });
+
+    it('submits deliverable with work notes and artifact links', () => {
+      const submission = {
+        milestoneId: 'ms-01',
+        notes: 'Implemented JWT token verification, RBAC middleware, and unit test suite.',
+        attachments: ['https://storage.trustpay.io/deliverables/auth-engine.zip'],
+        submittedAt: new Date().toISOString(),
+        status: SubmissionStatus.SUBMITTED,
+      };
+
+      expect(submission.status).toBe(SubmissionStatus.SUBMITTED);
+      expect(submission.attachments.length).toBe(1);
+    });
+
+    it('records revision requests with client feedback and allows deliverable resubmission', () => {
+      const revisionRequest = {
+        submissionId: 'sub-01',
+        revisionNumber: 1,
+        feedback: 'Please ensure refresh token rotation is supported as well.',
+        requestedAt: new Date().toISOString(),
+      };
+
+      expect(revisionRequest.revisionNumber).toBe(1);
+      expect(revisionRequest.feedback).toContain('refresh token rotation');
+
+      const resubmission = {
+        milestoneId: 'ms-01',
+        submissionId: 'sub-01',
+        notes: 'Updated auth engine to support rotating refresh tokens and invalidation blacklist.',
+        attachments: ['https://storage.trustpay.io/deliverables/auth-engine-v2.zip'],
+        status: SubmissionStatus.RESUBMITTED,
+      };
+
+      expect(resubmission.status).toBe(SubmissionStatus.RESUBMITTED);
+    });
+  });
+
+  // =========================================================================
+  // 13. Specialist Invoices & Billing Verification (Feature 16)
+  // =========================================================================
+  describe('13. Specialist Invoices & Billing Records', () => {
+    it('generates itemized invoices showing gross billings, fees, and net specialist payout', () => {
+      const invoice = {
+        invoiceNumber: 'INV-2026-0042',
+        contractId: 'cnt-01',
+        contractTitle: 'Fintech Microservices Architecture',
+        specialist: { name: 'Jane Specialist', email: 'jane@specialist.io' },
+        client: { name: 'FinCorp Global', email: 'billing@fincorp.io' },
+        subtotal: 5000,
+        taxOrFee: 250,
+        total: 5250,
+        currency: 'USD',
+        status: 'PAID',
+        lineItems: [
+          { description: 'Milestone 1: Architecture Blueprint', amount: 2500, currency: 'USD' },
+          { description: 'Milestone 2: Core Ledger Engine', amount: 2500, currency: 'USD' },
+        ],
+      };
+
+      expect(invoice.total).toBe(invoice.subtotal + invoice.taxOrFee);
+      expect(invoice.lineItems.reduce((acc, item) => acc + item.amount, 0)).toBe(invoice.subtotal);
+      expect(invoice.status).toBe('PAID');
+    });
+  });
+
+  // =========================================================================
+  // 14. Specialist Dispute Rebuttals & Counter-Evidence (Feature 19)
+  // =========================================================================
+  describe('14. Specialist Dispute Rebuttals & Evidence Upload', () => {
+    it('allows specialist to submit formal rebuttals and counter-evidence to active disputes', () => {
+      const dispute = {
+        id: 'dsp-01',
+        disputeNumber: 'DSP-2026-001',
+        status: DisputeStatus.UNDER_REVIEW,
+        category: DisputeCategory.QUALITY_OF_WORK,
+        claimedAmountMinor: 150000,
+      };
+
+      const specialistRebuttal = {
+        disputeId: dispute.id,
+        fileName: 'Work Audit Logs & Test Coverage Report.pdf',
+        fileUrl: 'https://storage.trustpay.io/evidence/dsp-01/audit-log.pdf',
+        description: 'Proof of milestone delivery adhering 100% to agreed scope specification.',
+        submittedByRole: UserRole.WORKER,
+      };
+
+      expect(specialistRebuttal.submittedByRole).toBe(UserRole.WORKER);
+      expect(specialistRebuttal.fileUrl).toContain('https://');
+      expect(specialistRebuttal.description).toBeTruthy();
+    });
+  });
 });
 

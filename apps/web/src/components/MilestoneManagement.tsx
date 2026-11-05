@@ -15,9 +15,11 @@ import {
   AlertTriangle,
   History,
   X,
+  Upload,
+  Play,
 } from 'lucide-react';
 import { apiService } from '../services/api';
-import { ContractDto, ContractMilestoneDto } from '@trustpay/shared';
+import { ContractDto, ContractMilestoneDto, UserRole } from '@trustpay/shared';
 
 interface MilestoneWithContract extends ContractMilestoneDto {
   contractId: string;
@@ -28,10 +30,15 @@ interface MilestoneWithContract extends ContractMilestoneDto {
 }
 
 interface MilestoneManagementProps {
+  userRole?: UserRole;
   onNavigateToContract?: (contractId: string) => void;
 }
 
-export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({ onNavigateToContract }) => {
+export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
+  userRole,
+  onNavigateToContract,
+}) => {
+  const isWorker = userRole === UserRole.WORKER;
   const [contracts, setContracts] = useState<ContractDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -46,6 +53,12 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({ onNavi
   const [selectedMilestone, setSelectedMilestone] = useState<MilestoneWithContract | null>(null);
   const [showRevisionModal, setShowRevisionModal] = useState(false);
   const [revisionFeedback, setRevisionFeedback] = useState('');
+
+  // Specialist Submission Modal State
+  const [showSubmissionModal, setShowSubmissionModal] = useState(false);
+  const [submissionNotes, setSubmissionNotes] = useState('');
+  const [submissionAttachmentUrl, setSubmissionAttachmentUrl] = useState('');
+
 
   const fetchContracts = async () => {
     try {
@@ -180,6 +193,55 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({ onNavi
     }
   };
 
+  // Specialist: Start Milestone Work
+  const handleStartMilestone = async (m: MilestoneWithContract) => {
+    try {
+      setActionLoading(m.id);
+      const res = await apiService.startMilestone(m.contractId, m.id);
+      if (res.success) {
+        await fetchContracts();
+      } else {
+        alert(res.error?.message || 'Failed to commence milestone work');
+      }
+    } catch (err: any) {
+      alert(err?.response?.data?.error?.message || err?.message || 'Error commencing milestone');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  // Specialist: Submit Milestone Deliverable
+  const handleSubmitDeliverable = async () => {
+    if (!selectedMilestone || !submissionNotes.trim()) {
+      alert('Please provide deliverable notes explaining your completed work.');
+      return;
+    }
+
+    try {
+      setActionLoading(selectedMilestone.id);
+      const attachments = submissionAttachmentUrl.trim() ? [submissionAttachmentUrl.trim()] : [];
+      const res = await apiService.submitMilestone(selectedMilestone.contractId, selectedMilestone.id, {
+        notes: submissionNotes.trim(),
+        attachmentUrls: attachments,
+      });
+
+      if (res.success) {
+        setShowSubmissionModal(false);
+        setSubmissionNotes('');
+        setSubmissionAttachmentUrl('');
+        setSelectedMilestone(null);
+        await fetchContracts();
+      } else {
+        alert(res.error?.message || 'Failed to submit milestone deliverable');
+      }
+    } catch (err: any) {
+      alert(err?.response?.data?.error?.message || err?.message || 'Error submitting deliverable');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'SUBMITTED':
@@ -237,9 +299,13 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({ onNavi
               <CheckCircle2 className="w-5 h-5 text-[#8BFF24]" />
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Milestone Management & Review</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                {isWorker ? 'Specialist Milestone Deliverables' : 'Milestone Management & Review'}
+              </h1>
               <p className="text-sm text-zinc-400">
-                Track deliverables, inspect submitted work, and authorize escrow release.
+                {isWorker
+                  ? 'Commence milestone work, upload deliverable evidence, address client feedback, and track escrow settlements.'
+                  : 'Track deliverables, inspect submitted work, and authorize escrow release.'}
               </p>
             </div>
           </div>
@@ -479,7 +545,41 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({ onNavi
                     </div>
 
                     <div className="flex items-center gap-2">
-                      {isReviewable ? (
+                      {isWorker ? (
+                        <>
+                          {m.status === 'PENDING' && (
+                            <button
+                              onClick={() => handleStartMilestone(m)}
+                              disabled={actionLoading === m.id}
+                              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#8BFF24] hover:bg-[#78e018] text-black text-xs font-bold transition shadow-[0_0_12px_rgba(139,255,36,0.25)]"
+                            >
+                              <Play className="w-3.5 h-3.5" />
+                              {actionLoading === m.id ? 'Starting...' : 'Commence Work'}
+                            </button>
+                          )}
+
+                          {(m.status === 'IN_PROGRESS' || m.status === 'IN_REVISION') && (
+                            <button
+                              onClick={() => {
+                                setSelectedMilestone(m);
+                                setShowSubmissionModal(true);
+                              }}
+                              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#8BFF24] hover:bg-[#78e018] text-black text-xs font-bold transition shadow-[0_0_12px_rgba(139,255,36,0.25)]"
+                            >
+                              <Upload className="w-3.5 h-3.5" />
+                              {m.status === 'IN_REVISION' ? 'Resubmit Work' : 'Submit Deliverable'}
+                            </button>
+                          )}
+
+                          <button
+                            onClick={() => setSelectedMilestone(m)}
+                            className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#181a18] hover:bg-[#202220] border border-[#2e322e] text-zinc-300 hover:text-white text-xs font-medium transition"
+                          >
+                            Details
+                            <ChevronRight className="w-3.5 h-3.5" />
+                          </button>
+                        </>
+                      ) : isReviewable ? (
                         <>
                           <button
                             onClick={() => {
@@ -693,6 +793,99 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({ onNavi
           </div>
         </div>
       )}
+
+      {/* Specialist Deliverable Submission Modal (Phase 14 & 15) */}
+      {showSubmissionModal && selectedMilestone && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="bg-[#121412] border border-[#262926] w-full max-w-lg rounded-2xl p-6 space-y-4 shadow-2xl relative">
+            <button
+              onClick={() => setShowSubmissionModal(false)}
+              className="absolute top-4 right-4 text-zinc-400 hover:text-white p-1 rounded-lg hover:bg-zinc-800"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[#8BFF24]/10 border border-[#8BFF24]/30 flex items-center justify-center text-[#8BFF24]">
+                <Upload className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white">
+                  {selectedMilestone.status === 'IN_REVISION' ? 'Resubmit Revised Deliverable' : 'Submit Milestone Deliverable'}
+                </h3>
+                <p className="text-xs text-zinc-400">
+                  Milestone #{selectedMilestone.order}: {selectedMilestone.title} (${Number(selectedMilestone.amount).toLocaleString()} {selectedMilestone.currency})
+                </p>
+              </div>
+            </div>
+
+            {selectedMilestone.status === 'IN_REVISION' && (
+              <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl space-y-1 text-xs text-amber-300">
+                <span className="font-bold flex items-center gap-1">
+                  <AlertTriangle className="w-3.5 h-3.5" />
+                  Client Requested Changes
+                </span>
+                <p className="text-zinc-300">
+                  Ensure all requested revisions and feedback from the client have been addressed before submitting.
+                </p>
+              </div>
+            )}
+
+            <div className="space-y-3 text-xs">
+              <div>
+                <label className="text-zinc-300 font-semibold block mb-1">
+                  Deliverable Notes & Summary of Work <span className="text-red-400">*</span>
+                </label>
+                <textarea
+                  rows={4}
+                  value={submissionNotes}
+                  onChange={(e) => setSubmissionNotes(e.target.value)}
+                  placeholder="Detail the work completed, feature implementations, and testing outcomes..."
+                  className="w-full bg-[#181a18] border border-[#2e322e] rounded-xl p-3 text-white placeholder-zinc-500 focus:outline-none focus:border-[#8BFF24]/60"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="text-zinc-300 font-semibold block mb-1">
+                  Deliverable File Attachment / URL (Supabase Storage / GitHub / Figma)
+                </label>
+                <input
+                  type="url"
+                  value={submissionAttachmentUrl}
+                  onChange={(e) => setSubmissionAttachmentUrl(e.target.value)}
+                  placeholder="https://..."
+                  className="w-full bg-[#181a18] border border-[#2e322e] rounded-xl p-2.5 text-white placeholder-zinc-500 focus:outline-none focus:border-[#8BFF24]/60"
+                />
+              </div>
+            </div>
+
+            <div className="p-3 bg-[#181a18] rounded-xl border border-[#262926] flex items-center gap-2 text-xs text-zinc-400">
+              <ShieldCheck className="w-4 h-4 text-[#8BFF24] flex-shrink-0" />
+              <span>Submission will transition the milestone to SUBMITTED and notify the client for escrow release.</span>
+            </div>
+
+            <div className="flex justify-end gap-2.5 pt-2 border-t border-[#262926]">
+              <button
+                type="button"
+                onClick={() => setShowSubmissionModal(false)}
+                className="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-semibold"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSubmitDeliverable}
+                disabled={actionLoading === selectedMilestone.id || !submissionNotes.trim()}
+                className="px-5 py-2 rounded-xl bg-[#8BFF24] hover:bg-[#78e018] text-black text-xs font-bold transition disabled:opacity-50"
+              >
+                {actionLoading === selectedMilestone.id ? 'Submitting...' : 'Transmit Deliverable'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+

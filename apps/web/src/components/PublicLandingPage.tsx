@@ -13,9 +13,10 @@ import {
   Send,
   Sparkles,
 } from 'lucide-react';
-import { SignInButton, SignUpButton } from '@clerk/clerk-react';
+import { useClerk } from '@clerk/clerk-react';
 import { ThemeToggle } from './ThemeToggle';
 import { TrustPayLogo } from './TrustPayLogo';
+import { RoleSelectionModal } from './RoleSelectionModal';
 import { SystemHealthStatus, DatabaseHealthStatus } from '@trustpay/shared';
 
 interface PublicLandingPageProps {
@@ -31,12 +32,38 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
   isSignedIn = false,
   onGoToDashboard,
 }) => {
+  const clerk = useClerk();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [contactName, setContactName] = useState('');
   const [contactEmail, setContactEmail] = useState('');
   const [contactMessage, setContactMessage] = useState('');
   const [contactSubmitted, setContactSubmitted] = useState(false);
+
+  // Role Selection Modal for Registration & Login
+  const [authRoleModalOpen, setAuthRoleModalOpen] = useState(false);
+  const [authActionType, setAuthActionType] = useState<'register' | 'login'>('register');
+
+  const openAuthWithRolePrompt = (action: 'register' | 'login') => {
+    setAuthActionType(action);
+    setAuthRoleModalOpen(true);
+    setMobileMenuOpen(false);
+  };
+
+  const handleRoleSelectedForAuth = (role: 'CLIENT' | 'WORKER') => {
+    try {
+      localStorage.setItem('trustpay_selected_role', role);
+    } catch (e) {
+      console.warn('Could not save role intent to localStorage', e);
+    }
+    setAuthRoleModalOpen(false);
+
+    if (authActionType === 'register') {
+      clerk.openSignUp();
+    } else {
+      clerk.openSignIn();
+    }
+  };
 
   const toggleFaq = (index: number) => {
     setActiveFaq(activeFaq === index ? null : index);
@@ -129,19 +156,21 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
             ) : (
               <>
                 {/* Sign in Pill Button */}
-                <SignInButton mode="modal">
-                  <button className="px-5 py-2 rounded-full text-xs font-semibold dark:text-[#E8EAE6] text-[#242424] dark:bg-white/5 bg-black/5 hover:dark:bg-white/10 hover:bg-black/10 border dark:border-white/10 border-black/10 transition-all cursor-pointer backdrop-blur-sm">
-                    Sign in
-                  </button>
-                </SignInButton>
+                <button
+                  onClick={() => openAuthWithRolePrompt('login')}
+                  className="px-5 py-2 rounded-full text-xs font-semibold dark:text-[#E8EAE6] text-[#242424] dark:bg-white/5 bg-black/5 hover:dark:bg-white/10 hover:bg-black/10 border dark:border-white/10 border-black/10 transition-all cursor-pointer backdrop-blur-sm"
+                >
+                  Sign in
+                </button>
 
                 {/* Get Started Pill Button */}
-                <SignUpButton mode="modal">
-                  <button className="px-5 py-2 rounded-full bg-[#8BFF24] hover:bg-[#A3FF50] text-xs font-bold text-[#050605] transition-all duration-300 shadow-[0_0_20px_rgba(139,255,36,0.25)] hover:shadow-[0_0_25px_rgba(139,255,36,0.4)] flex items-center space-x-1.5 active:scale-95 cursor-pointer">
-                    <span>Get Started</span>
-                    <span className="text-sm">↗</span>
-                  </button>
-                </SignUpButton>
+                <button
+                  onClick={() => openAuthWithRolePrompt('register')}
+                  className="px-5 py-2 rounded-full bg-[#8BFF24] hover:bg-[#A3FF50] text-xs font-bold text-[#050605] transition-all duration-300 shadow-[0_0_20px_rgba(139,255,36,0.25)] hover:shadow-[0_0_25px_rgba(139,255,36,0.4)] flex items-center space-x-1.5 active:scale-95 cursor-pointer"
+                >
+                  <span>Get Started</span>
+                  <span className="text-sm">↗</span>
+                </button>
               </>
             )}
           </div>
@@ -149,11 +178,12 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
           {/* Mobile Actions */}
           <div className="md:hidden flex items-center space-x-2">
             <ThemeToggle />
-            <SignUpButton mode="modal">
-              <button className="px-3.5 py-1.5 rounded-full bg-[#8BFF24] text-xs font-bold text-[#050605]">
-                Get Started
-              </button>
-            </SignUpButton>
+            <button
+              onClick={() => openAuthWithRolePrompt('register')}
+              className="px-3.5 py-1.5 rounded-full bg-[#8BFF24] text-xs font-bold text-[#050605]"
+            >
+              Get Started
+            </button>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="p-2 rounded-full dark:bg-white/5 bg-black/5 text-[#E8EAE6] border dark:border-white/10 border-black/10"
@@ -203,16 +233,18 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
               Security
             </a>
             <div className="pt-3 border-t dark:border-white/10 border-black/10 flex items-center space-x-3">
-              <SignInButton mode="modal">
-                <button className="flex-1 py-2.5 rounded-full dark:bg-white/5 bg-black/5 text-xs font-semibold dark:text-[#E8EAE6] text-[#242424] border dark:border-white/10 border-black/10">
-                  Sign in
-                </button>
-              </SignInButton>
-              <SignUpButton mode="modal">
-                <button className="flex-1 py-2.5 rounded-full bg-[#8BFF24] text-xs font-bold text-[#050605]">
-                  Get Started
-                </button>
-              </SignUpButton>
+              <button
+                onClick={() => openAuthWithRolePrompt('login')}
+                className="flex-1 py-2.5 rounded-full dark:bg-white/5 bg-black/5 text-xs font-semibold dark:text-[#E8EAE6] text-[#242424] border dark:border-white/10 border-black/10"
+              >
+                Sign in
+              </button>
+              <button
+                onClick={() => openAuthWithRolePrompt('register')}
+                className="flex-1 py-2.5 rounded-full bg-[#8BFF24] text-xs font-bold text-[#050605]"
+              >
+                Get Started
+              </button>
             </div>
           </div>
         )}
@@ -243,12 +275,13 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
 
           {/* Primary CTA Button */}
           <div className="pt-2">
-            <SignUpButton mode="modal">
-              <button className="px-8 py-3.5 rounded-full bg-[#8BFF24] hover:bg-[#A3FF50] text-sm font-bold text-[#050605] transition-all duration-300 shadow-[0_0_35px_rgba(139,255,36,0.4)] hover:shadow-[0_0_45px_rgba(139,255,36,0.6)] flex items-center justify-center space-x-2 mx-auto active:scale-95 cursor-pointer">
-                <span>Get Started for Free</span>
-                <span className="text-base">↗</span>
-              </button>
-            </SignUpButton>
+            <button
+              onClick={() => openAuthWithRolePrompt('register')}
+              className="px-8 py-3.5 rounded-full bg-[#8BFF24] hover:bg-[#A3FF50] text-sm font-bold text-[#050605] transition-all duration-300 shadow-[0_0_35px_rgba(139,255,36,0.4)] hover:shadow-[0_0_45px_rgba(139,255,36,0.6)] flex items-center justify-center space-x-2 mx-auto active:scale-95 cursor-pointer"
+            >
+              <span>Get Started for Free</span>
+              <span className="text-base">↗</span>
+            </button>
           </div>
 
           {/* Center Brand Showcase Emblem (Matching Reference Image) */}
@@ -626,6 +659,15 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
           </div>
         </div>
       </footer>
+
+      {/* Role Selection Modal for Sign Up & Sign In */}
+      <RoleSelectionModal
+        isOpen={authRoleModalOpen}
+        onSelectRole={handleRoleSelectedForAuth}
+        onCancel={() => setAuthRoleModalOpen(false)}
+        actionType={authActionType}
+        onToggleActionType={(type) => setAuthActionType(type)}
+      />
     </div>
   );
 };

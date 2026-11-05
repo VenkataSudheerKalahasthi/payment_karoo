@@ -52,6 +52,11 @@ import {
   ProjectProgressSummaryDto,
   CreateProjectRequest,
   InvoiceDto,
+  ProjectOpportunityDto,
+  SubmitOpportunityProposalRequest,
+  ClientStampDto,
+  ClientStampPreviewDto,
+  ApplyClientStampRequest,
 } from '@trustpay/shared';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
@@ -437,6 +442,24 @@ export const apiService = {
     return res.data;
   },
 
+  // Opportunities & Open Project Discovery (Phase 6 Specialist Portal)
+  listOpportunities: async (params?: {
+    search?: string;
+    category?: string;
+    minBudget?: number;
+    maxBudget?: number;
+  }): Promise<ApiResponse<{ items: ProjectOpportunityDto[]; total: number }>> => {
+    const res = await apiClient.get<ApiResponse<{ items: ProjectOpportunityDto[]; total: number }>>('/projects/opportunities', {
+      params,
+    });
+    return res.data;
+  },
+
+  submitOpportunityProposal: async (data: SubmitOpportunityProposalRequest): Promise<ApiResponse<unknown>> => {
+    const res = await apiClient.post<ApiResponse<unknown>>('/projects/opportunities/proposals', data);
+    return res.data;
+  },
+
   // Notifications
   listNotifications: async (): Promise<ApiResponse<{ items: NotificationDto[]; unreadCount: number }>> => {
     const res = await apiClient.get<ApiResponse<{ items: NotificationDto[]; unreadCount: number }>>('/notifications');
@@ -644,6 +667,27 @@ export const apiService = {
     const res = await apiClient.get<ApiResponse<MilestoneActivityDto[]>>(`/projects/${projectId}/activities`, {
       params: milestoneId ? { milestoneId } : undefined,
     });
+    return res.data;
+  },
+
+  // Client Digital Office Stamp (Client only)
+  getClientStampPreview: async (): Promise<ApiResponse<ClientStampPreviewDto>> => {
+    const res = await apiClient.get<ApiResponse<ClientStampPreviewDto>>('/contracts/stamp/preview');
+    return res.data;
+  },
+
+  applyClientStamp: async (contractId: string, data?: ApplyClientStampRequest): Promise<ApiResponse<ClientStampDto>> => {
+    const res = await apiClient.post<ApiResponse<ClientStampDto>>(`/contracts/${contractId}/stamp/apply`, data || {});
+    return res.data;
+  },
+
+  getContractStamp: async (contractId: string): Promise<ApiResponse<ClientStampDto | null>> => {
+    const res = await apiClient.get<ApiResponse<ClientStampDto | null>>(`/contracts/${contractId}/stamp`);
+    return res.data;
+  },
+
+  listClientStampHistory: async (): Promise<ApiResponse<{ items: ClientStampDto[]; total: number }>> => {
+    const res = await apiClient.get<ApiResponse<{ items: ClientStampDto[]; total: number }>>('/contracts/stamps/history');
     return res.data;
   },
 };

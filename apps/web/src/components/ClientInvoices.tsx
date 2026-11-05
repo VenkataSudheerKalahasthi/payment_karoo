@@ -15,9 +15,14 @@ import {
   Receipt,
 } from 'lucide-react';
 import { apiService } from '../services/api';
-import { InvoiceDto } from '@trustpay/shared';
+import { InvoiceDto, UserRole } from '@trustpay/shared';
 
-export const ClientInvoices: React.FC = () => {
+interface ClientInvoicesProps {
+  userRole?: UserRole;
+}
+
+export const ClientInvoices: React.FC<ClientInvoicesProps> = ({ userRole }) => {
+  const isWorker = userRole === UserRole.WORKER;
   const [invoices, setInvoices] = useState<InvoiceDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -145,9 +150,13 @@ export const ClientInvoices: React.FC = () => {
             <Receipt className="w-5 h-5 text-[#8BFF24]" />
           </div>
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Invoices & Billing</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+              {isWorker ? 'Specialist Invoices & Billing' : 'Invoices & Billing'}
+            </h1>
             <p className="text-sm text-zinc-400">
-              Tax-compliant milestone escrow invoices and professional PDF generation.
+              {isWorker
+                ? 'Tax-compliant milestone escrow invoices, earnings records, and professional PDF generation.'
+                : 'Tax-compliant milestone escrow invoices and professional PDF generation.'}
             </p>
           </div>
         </div>
@@ -183,9 +192,13 @@ export const ClientInvoices: React.FC = () => {
         </div>
 
         <div className="bg-[#121412] border border-[#262926] p-4 rounded-xl">
-          <p className="text-xs text-zinc-400 uppercase tracking-wider font-medium">Settled & Released</p>
+          <p className="text-xs text-zinc-400 uppercase tracking-wider font-medium">
+            {isWorker ? 'Earned & Disbursed' : 'Settled & Released'}
+          </p>
           <p className="text-2xl font-bold text-emerald-400 mt-1 font-mono">${metrics.totalPaid.toLocaleString()}</p>
-          <p className="text-xs text-zinc-500 mt-1">Disbursed to Specialists</p>
+          <p className="text-xs text-zinc-500 mt-1">
+            {isWorker ? 'Disbursed to your wallet' : 'Disbursed to Specialists'}
+          </p>
         </div>
       </div>
 
@@ -195,7 +208,7 @@ export const ClientInvoices: React.FC = () => {
           <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search invoice #, contract or specialist..."
+            placeholder={isWorker ? 'Search invoice #, contract or client...' : 'Search invoice #, contract or specialist...'}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-[#181a18] border border-[#2e322e] rounded-lg pl-9 pr-4 py-2 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#8BFF24]/60 transition"
@@ -249,7 +262,7 @@ export const ClientInvoices: React.FC = () => {
                   <th className="py-3.5 px-4 font-semibold">Invoice #</th>
                   <th className="py-3.5 px-4 font-semibold">Date Issued</th>
                   <th className="py-3.5 px-4 font-semibold">Contract / Scope</th>
-                  <th className="py-3.5 px-4 font-semibold">Issued By</th>
+                  <th className="py-3.5 px-4 font-semibold">{isWorker ? 'Client' : 'Issued By'}</th>
                   <th className="py-3.5 px-4 font-semibold">Amount</th>
                   <th className="py-3.5 px-4 font-semibold">Status</th>
                   <th className="py-3.5 px-4 font-semibold text-right">Actions</th>
@@ -269,7 +282,9 @@ export const ClientInvoices: React.FC = () => {
                       <span className="text-[11px] text-zinc-500 font-mono">{inv.contractNumber}</span>
                     </td>
                     <td className="py-3.5 px-4 text-xs">
-                      {inv.specialist?.name || 'Assigned Specialist'}
+                      {isWorker
+                        ? (inv.client?.name || 'Verified Client')
+                        : (inv.specialist?.name || 'Assigned Specialist')}
                     </td>
                     <td className="py-3.5 px-4 font-mono font-bold text-white text-xs">
                       ${inv.total.toLocaleString()} <span className="text-[10px] text-zinc-400 font-normal">{inv.currency}</span>

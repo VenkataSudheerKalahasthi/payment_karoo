@@ -34,6 +34,7 @@ import {
 import {
   streamContractPdf,
   computeCanonicalContractHash,
+  formatStampDate,
 } from './contract-pdf.service.js';
 import { executeMilestoneTransition } from './milestones.state-machine.js';
 import { projectsService } from '../projects/projects.service.js';
@@ -254,6 +255,10 @@ export async function listContracts(req: Request, res: Response): Promise<void> 
         versions: {
           orderBy: { version: 'asc' },
         },
+        clientStamps: {
+          where: { status: 'APPLIED' },
+          orderBy: { appliedAt: 'desc' },
+        },
         milestones: {
           orderBy: { order: 'asc' },
           include: {
@@ -304,6 +309,10 @@ export async function getContractById(req: Request, res: Response): Promise<void
         },
         versions: {
           orderBy: { version: 'asc' },
+        },
+        clientStamps: {
+          where: { status: 'APPLIED' },
+          orderBy: { appliedAt: 'desc' },
         },
         milestones: {
           orderBy: { order: 'asc' },
@@ -1303,6 +1312,11 @@ export async function downloadContractPdf(req: Request, res: Response): Promise<
             user: { select: { firstName: true, lastName: true, email: true } },
           },
         },
+        clientStamps: {
+          where: { status: 'APPLIED' },
+          orderBy: { appliedAt: 'desc' },
+          take: 1,
+        },
       },
     });
 
@@ -1445,6 +1459,15 @@ export async function downloadContractPdf(req: Request, res: Response): Promise<
         documentHash: a.documentHash,
         user: a.user,
       })),
+      clientStamp: contract.clientStamps?.[0]
+        ? {
+            profileName: contract.clientStamps[0].profileNameSnapshot,
+            verifiedMobile: contract.clientStamps[0].verifiedMobileSnapshot,
+            appliedAt: contract.clientStamps[0].appliedAt,
+            stampPosition: contract.clientStamps[0].stampPosition,
+            documentHash: contract.clientStamps[0].documentHash,
+          }
+        : null,
     });
 
     await recordAuditLog({
@@ -2267,6 +2290,293 @@ export async function getContractActivityHistoryHandler(req: Request, res: Respo
     sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Failed to fetch contract activity history');
   }
 }
+
+// ==============================================================================
+// CLIENT DIGITAL OFFICE STAMP CONTROLLER
+// ==============================================================================
+
+/**
+ * Returns a live preview of the official TrustPay Client Office Stamp.
+ * Derived from authenticated session profile and server timestamp.
+ * Accessible by Client only.
+ */
+export async function getClientStampPreview(req: Request, res: Response): Promise<void> {
+  const currentUser = req.user!;
+
+  if (currentUser.role.name !== UserRole.CLIENT) {
+    sendError(res, 403, 'FORBIDDEN', 'Only Clients can access the Client Digital Office Stamp preview');
+    return;
+  }
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: currentUser.id },
+      include: { profile: true, role: true },
+    });
+
+    if (!user) {
+      sendError(res, 404, 'NOT_FOUND', 'Client account not found');
+      return;
+    }
+
+    const clientName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email;
+    const phoneNumber = user.profile?.phoneNumber?.trim() || '';
+
+    sendSuccess(res, 200, {
+      brandWatermark: 'TRUSTPAY',
+      approvedBadge: 'CLIENT APPROVED',
+      profileName: clientName,
+      verifiedMobile: phoneNumber,
+      previewDate: formatStampDate(new Date()),
+      isMobileVerified: !!phoneNumber,
+      clientRole: user.role.name,
+      stampPositionDefault: 'BOTTOM_RIGHT',
+    });
+  } catch (error) {
+    logger.error('Error generating client stamp preview:', error);
+    sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Failed to generate office stamp preview');
+  }
+}
+
+/**
+ * Applies the official circular TrustPay Office Stamp to an approved contract.
+ * Strictly enforces Client ownership, approved contract state, verified mobile snapshot,
+ * server-generated timestamp, duplicate prevention, and Specialist real-time notification.
+ */
+export async function applyClientStamp(req: Request, res: Response): Promise<void> {
+  const { id } = req.params;
+  const currentUser = req.user!;
+  const { stampPosition = 'BOTTOM_RIGHT' } = req.body || {};
+
+  if (currentUser.role.name !== UserRole.CLIENT) {
+    sendError(res, 403, 'FORBIDDEN', 'Only Clients can apply an official office stamp. Specialists use digital signatures.');
+    return;
+  }
+
+  try {
+    const result = await prisma.$transaction(async (tx) => {
+      // 1. Fetch contract with acceptances, client profile, and worker
+      const contract = await tx.contract.findUnique({
+        where: { id },
+        include: {
+          client: {
+            include: { profile: true },
+          },
+          worker: {
+            select: { id: true, firstName: true, email: true },
+          },
+          acceptances: true,
+          clientStamps: {
+            where: { status: 'APPLIED' },
+          },
+        },
+      });
+
+      if (!contract) {
+        throw { statusCode: 404, code: 'NOT_FOUND', message: 'Contract not found' };
+      }
+
+      // 2. Enforce Client ownership
+      if (contract.clientId !== currentUser.id) {
+        throw {
+          statusCode: 403,
+          code: 'FORBIDDEN',
+          message: 'You can only apply an office stamp to your own contracts',
+        };
+      }
+
+      // 3. Enforce Approved contract state
+      const hasClientAccepted = contract.acceptances.some(
+        (a) => a.userId === currentUser.id && a.version === contract.version,
+      );
+      const isApproved =
+        contract.status === ContractStatus.ACTIVE ||
+        contract.status === ContractStatus.COMPLETED ||
+        hasClientAccepted;
+
+      if (!isApproved) {
+        throw {
+          statusCode: 400,
+          code: 'CONTRACT_NOT_APPROVED',
+          message: 'The contract must be approved or digitally signed before applying the official office stamp.',
+        };
+      }
+
+      // 4. Enforce Verified Mobile Number
+      const mobileNumber = contract.client.profile?.phoneNumber?.trim();
+      if (!mobileNumber) {
+        throw {
+          statusCode: 400,
+          code: 'UNVERIFIED_MOBILE_REQUIRED',
+          message: 'A verified mobile number is required to apply the official TrustPay office stamp. Please update your profile.',
+        };
+      }
+
+      // 5. Prevent Duplicate Stamp on same version
+      const existingStamp = contract.clientStamps.find(
+        (s) => s.pdfVersion === contract.version && s.status === 'APPLIED',
+      );
+      if (existingStamp) {
+        throw {
+          statusCode: 409,
+          code: 'STAMP_ALREADY_APPLIED',
+          message: `Official office stamp has already been applied to Contract #${contract.contractNumber} (v${contract.version}).`,
+        };
+      }
+
+      // 6. Create immutable ClientStamp record with server timestamp
+      const clientName =
+        `${contract.client.firstName || ''} ${contract.client.lastName || ''}`.trim() ||
+        contract.client.email;
+      const appliedAt = new Date();
+
+      const newStamp = await tx.clientStamp.create({
+        data: {
+          contractId: contract.id,
+          clientId: currentUser.id,
+          profileNameSnapshot: clientName,
+          verifiedMobileSnapshot: mobileNumber,
+          appliedAt,
+          pdfVersion: contract.version,
+          stampPosition: ['BOTTOM_RIGHT', 'BOTTOM_LEFT', 'BOTTOM_CENTER'].includes(stampPosition)
+            ? stampPosition
+            : 'BOTTOM_RIGHT',
+          documentHash: contract.documentHash,
+          status: 'APPLIED',
+        },
+      });
+
+      // 7. Notify Specialist that contract PDF has been officially stamped
+      await tx.notification.create({
+        data: {
+          recipientId: contract.workerId,
+          title: 'Official Office Stamp Applied',
+          message: `Client ${clientName} applied official TrustPay Office Stamp to Contract #${contract.contractNumber}. The updated shared PDF is ready.`,
+          type: NotificationType.CONTRACT_ACCEPTED,
+          metadata: {
+            contractId: contract.id,
+            stampId: newStamp.id,
+            version: contract.version,
+            appliedAt: appliedAt.toISOString(),
+          },
+        },
+      });
+
+      return { stamp: newStamp, contract, clientName };
+    });
+
+    // 8. Emit Real-time Socket.IO event to contract room
+    emitContractRealtimeEvent(
+      result.contract.id,
+      'contract:stamped',
+      {
+        contractId: result.contract.id,
+        stampId: result.stamp.id,
+        version: result.contract.version,
+        appliedBy: currentUser.id,
+        appliedAt: result.stamp.appliedAt.toISOString(),
+      },
+    );
+
+    // 9. Record Immutable Audit Log
+    await recordAuditLog({
+      actorId: currentUser.id,
+      action: 'CLIENT_OFFICE_STAMP_APPLIED',
+      resource: 'Contract',
+      resourceId: result.contract.id,
+      details: {
+        stampId: result.stamp.id,
+        version: result.contract.version,
+        profileNameSnapshot: result.stamp.profileNameSnapshot,
+        stampPosition: result.stamp.stampPosition,
+      },
+      req,
+    });
+
+    sendSuccess(res, 201, result.stamp);
+  } catch (error: unknown) {
+    const err = error as { statusCode?: number; code?: string; message?: string };
+    if (err?.statusCode) {
+      sendError(res, err.statusCode, err.code || 'ERROR', err.message || 'Failed to apply stamp');
+      return;
+    }
+    logger.error('Error applying client office stamp:', error);
+    sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Failed to apply client office stamp');
+  }
+}
+
+/**
+ * Returns active stamp record for a specific contract.
+ * Accessible by contract participants (Client, Specialist) and Admins.
+ */
+export async function getContractStamp(req: Request, res: Response): Promise<void> {
+  const { id } = req.params;
+  const user = req.user!;
+  const isPrivileged = user.role.name === UserRole.ADMIN || user.role.name === UserRole.SUPERADMIN;
+
+  try {
+    const contract = await prisma.contract.findUnique({
+      where: { id },
+      select: { clientId: true, workerId: true },
+    });
+
+    if (!contract) {
+      sendError(res, 404, 'NOT_FOUND', 'Contract not found');
+      return;
+    }
+
+    if (!isPrivileged && contract.clientId !== user.id && contract.workerId !== user.id) {
+      sendError(res, 403, 'FORBIDDEN', 'Access denied to this contract');
+      return;
+    }
+
+    const stamp = await prisma.clientStamp.findFirst({
+      where: { contractId: id, status: 'APPLIED' },
+      orderBy: { appliedAt: 'desc' },
+      include: {
+        contract: {
+          select: { id: true, contractNumber: true, title: true, status: true },
+        },
+      },
+    });
+
+    sendSuccess(res, 200, stamp || null);
+  } catch (error) {
+    logger.error('Error fetching contract stamp:', error);
+    sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Failed to retrieve contract stamp');
+  }
+}
+
+/**
+ * Lists all stamps applied by the authenticated Client.
+ * Client only.
+ */
+export async function listClientStampHistory(req: Request, res: Response): Promise<void> {
+  const user = req.user!;
+
+  if (user.role.name !== UserRole.CLIENT) {
+    sendError(res, 403, 'FORBIDDEN', 'Only Clients can view office stamp history');
+    return;
+  }
+
+  try {
+    const stamps = await prisma.clientStamp.findMany({
+      where: { clientId: user.id },
+      orderBy: { appliedAt: 'desc' },
+      include: {
+        contract: {
+          select: { id: true, contractNumber: true, title: true, status: true },
+        },
+      },
+    });
+
+    sendSuccess(res, 200, { items: stamps, total: stamps.length });
+  } catch (error) {
+    logger.error('Error fetching client stamp history:', error);
+    sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Failed to list stamp history');
+  }
+}
+
 
 
 

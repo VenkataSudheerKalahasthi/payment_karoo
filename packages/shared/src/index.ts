@@ -470,6 +470,8 @@ export interface ContractDto {
   milestones?: ContractMilestoneDto[];
   acceptances?: ContractAcceptanceDto[];
   versions?: ContractVersionDto[];
+  clientStamps?: ClientStampDto[];
+  activeStamp?: ClientStampDto | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -1456,4 +1458,72 @@ export interface InvoiceDto {
   };
   lineItems: InvoiceLineItemDto[];
 }
+
+export interface ProjectOpportunityDto {
+  id: string;
+  title: string;
+  description: string;
+  scope?: string | null;
+  budget: number;
+  currency: string;
+  category: string;
+  requiredSkills: string[];
+  clientId: string;
+  clientName: string;
+  deadline?: string | null;
+  status: string;
+  milestonesCount: number;
+  createdAt: string;
+}
+
+export interface SubmitOpportunityProposalRequest {
+  opportunityId: string;
+  proposedBudget: number;
+  estimatedDays?: number;
+  proposalScope: string;
+  coverLetter?: string;
+}
+
+// ==============================================================================
+// 15. CLIENT DIGITAL OFFICE STAMP CONTRACTS
+// ==============================================================================
+
+export interface ClientStampDto {
+  id: string;
+  contractId: string;
+  clientId: string;
+  profileNameSnapshot: string;
+  verifiedMobileSnapshot: string;
+  appliedAt: string;
+  pdfVersion: number;
+  stampPosition: string;
+  stampAssetPath?: string | null;
+  documentHash?: string | null;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  contract?: {
+    id: string;
+    contractNumber: string;
+    title: string;
+    status: string;
+  };
+}
+
+export interface ClientStampPreviewDto {
+  brandWatermark: string;
+  approvedBadge: string;
+  profileName: string;
+  verifiedMobile: string;
+  previewDate: string;
+  isMobileVerified: boolean;
+  clientRole: string;
+  stampPositionDefault: string;
+}
+
+export interface ApplyClientStampRequest {
+  stampPosition?: 'BOTTOM_RIGHT' | 'BOTTOM_LEFT' | 'BOTTOM_CENTER';
+}
+
+
 

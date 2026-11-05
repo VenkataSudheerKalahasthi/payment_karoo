@@ -7,6 +7,8 @@ import {
   listProjectsHandler,
   getProjectSummaryHandler,
   getMilestoneActivitiesHandler,
+  listOpportunitiesHandler,
+  submitOpportunityProposalHandler,
 } from './projects.controller.js';
 
 const projectsRoutes = Router();
@@ -14,8 +16,13 @@ const projectsRoutes = Router();
 // All project routes require authentication
 projectsRoutes.use(authenticateUser());
 
+// Opportunities discovery board for specialists
+projectsRoutes.get('/opportunities', listOpportunitiesHandler);
+projectsRoutes.post('/opportunities/proposals', submitOpportunityProposalHandler);
+
 // List projects for the authenticated actor
 projectsRoutes.get('/', listProjectsHandler);
+
 
 // Single project access
 projectsRoutes.get('/:id', getProjectHandler);

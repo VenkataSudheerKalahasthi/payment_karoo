@@ -20,6 +20,10 @@ import {
   getContractVersions,
   verifyContractIntegrityHandler,
   getContractActivityHistoryHandler,
+  getClientStampPreview,
+  applyClientStamp,
+  getContractStamp,
+  listClientStampHistory,
 } from './contracts.controller.js';
 import {
   listAllMyInvoices,
@@ -53,6 +57,22 @@ contractsRoutes.post(
 // List contracts (Role-scoped: Client sees own, Worker sees assigned, Admin sees all)
 contractsRoutes.get('/', authenticateUser(), listContracts);
 
+// Client Digital Office Stamp Preview (Client only)
+contractsRoutes.get(
+  '/stamp/preview',
+  authenticateUser(),
+  requireRole(UserRole.CLIENT),
+  getClientStampPreview,
+);
+
+// Client Digital Office Stamp History (Client only)
+contractsRoutes.get(
+  '/stamps/history',
+  authenticateUser(),
+  requireRole(UserRole.CLIENT),
+  listClientStampHistory,
+);
+
 // List all invoices across user contracts (Client or Worker)
 contractsRoutes.get('/invoices/all', authenticateUser(), listAllMyInvoices);
 
@@ -77,6 +97,17 @@ contractsRoutes.get('/:id/activity-history', authenticateUser(), getContractActi
 
 // Get single contract with milestones & submissions (Strict ownership check in controller)
 contractsRoutes.get('/:id', authenticateUser(), getContractById);
+
+// Get active Client Office Stamp for a contract (Client, Worker, Admin)
+contractsRoutes.get('/:id/stamp', authenticateUser(), getContractStamp);
+
+// Apply official Client Office Stamp to an approved contract (Client only)
+contractsRoutes.post(
+  '/:id/stamp/apply',
+  authenticateUser(),
+  requireRole(UserRole.CLIENT),
+  applyClientStamp,
+);
 
 // Record digital contract acceptance (Client or Worker)
 contractsRoutes.post(

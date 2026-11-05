@@ -18,9 +18,14 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { apiService } from '../services/api';
-import { DisputeDto, DisputeDetailDto, ContractDto, DisputeCategory, DisputeStatus } from '@trustpay/shared';
+import { DisputeDto, DisputeDetailDto, ContractDto, DisputeCategory, DisputeStatus, UserRole } from '@trustpay/shared';
 
-export const ClientDisputes: React.FC = () => {
+interface ClientDisputesProps {
+  userRole?: UserRole;
+}
+
+export const ClientDisputes: React.FC<ClientDisputesProps> = ({ userRole }) => {
+  const isWorker = userRole === UserRole.WORKER;
   const [disputes, setDisputes] = useState<DisputeDto[]>([]);
   const [contracts, setContracts] = useState<ContractDto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,6 +41,12 @@ export const ClientDisputes: React.FC = () => {
   const [detailLoading, setDetailLoading] = useState(false);
   const [responseText, setResponseText] = useState('');
   const [sendingResponse, setSendingResponse] = useState(false);
+
+  // Evidence upload in detail modal
+  const [newEvidenceName, setNewEvidenceName] = useState('');
+  const [newEvidenceUrl, setNewEvidenceUrl] = useState('');
+  const [uploadingEvidence, setUploadingEvidence] = useState(false);
+  const [showAddEvidence, setShowAddEvidence] = useState(false);
 
   // File Dispute Modal
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -127,6 +138,34 @@ export const ClientDisputes: React.FC = () => {
       }
     } catch (err: any) {
       alert(err?.message || 'Error responding to resolution');
+    }
+  };
+
+  // Submit additional evidence or rebuttal documentation
+  const handleUploadAdditionalEvidence = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedDisputeId || !newEvidenceUrl.trim()) return;
+
+    try {
+      setUploadingEvidence(true);
+      const res = await apiService.uploadDisputeEvidence(selectedDisputeId, {
+        fileName: newEvidenceName.trim() || 'Work Evidence & Rebuttal Document',
+        fileKey: 'disputes/' + selectedDisputeId + '/' + Date.now(),
+        fileUrl: newEvidenceUrl.trim(),
+        description: isWorker ? 'Specialist work deliverables and audit rebuttal' : 'Client dispute claim evidence',
+      });
+      if (res.success) {
+        setNewEvidenceName('');
+        setNewEvidenceUrl('');
+        setShowAddEvidence(false);
+        await handleOpenDetail(selectedDisputeId);
+      } else {
+        alert(res.error?.message || 'Failed to upload evidence');
+      }
+    } catch (err: any) {
+      alert(err?.message || 'Error uploading evidence');
+    } finally {
+      setUploadingEvidence(false);
     }
   };
 
@@ -243,9 +282,13 @@ export const ClientDisputes: React.FC = () => {
             <Scale className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Dispute Resolution Center</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+              {isWorker ? 'Specialist Dispute & Arbitration Center' : 'Dispute Resolution Center'}
+            </h1>
             <p className="text-sm text-zinc-400">
-              Fair arbitration, milestone evidence review, and escrow custody hold protection.
+              {isWorker
+                ? 'Review client dispute claims, file formal rebuttals, submit work evidence, and arbitrate escrow releases.'
+                : 'Fair arbitration, milestone evidence review, and escrow custody hold protection.'}
             </p>
           </div>
         </div>
@@ -256,7 +299,7 @@ export const ClientDisputes: React.FC = () => {
             className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#8BFF24] hover:bg-[#78e018] text-black text-xs font-bold transition shadow-[0_0_12px_rgba(139,255,36,0.2)]"
           >
             <Plus className="w-4 h-4" />
-            File a Dispute
+            {isWorker ? 'Raise Issue' : 'File a Dispute'}
           </button>
           <button
             onClick={fetchDisputes}
@@ -440,10 +483,23 @@ export const ClientDisputes: React.FC = () => {
                   <p className="text-zinc-200">{disputeDetail.description}</p>
                 </div>
 
-                {/* Evidence attachments */}
-                {disputeDetail.evidence && disputeDetail.evidence.length > 0 && (
-                  <div className="space-y-2">
-                    <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Submitted Evidence</span>
+                {/* Evidence attachments & Rebuttal Upload */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                      Submitted Evidence & Rebuttals
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setShowAddEvidence(!showAddEvidence)}
+                      className="text-xs text-[#8BFF24] hover:underline flex items-center gap-1 font-medium"
+                    >
+                      <Plus className="w-3 h-3" />
+                      {showAddEvidence ? 'Cancel' : isWorker ? 'Submit Work Rebuttal / Evidence' : 'Attach More Evidence'}
+                    </button>
+                  </div>
+
+                  {disputeDetail.evidence && disputeDetail.evidence.length > 0 ? (
                     <div className="flex flex-wrap gap-2">
                       {disputeDetail.evidence.map((ev, idx) => (
                         <a
@@ -459,8 +515,52 @@ export const ClientDisputes: React.FC = () => {
                         </a>
                       ))}
                     </div>
-                  </div>
-                )}
+                  ) : (
+                    <p className="text-xs text-zinc-500 italic">No formal evidence documents uploaded yet.</p>
+                  )}
+
+                  {showAddEvidence && (
+                    <form onSubmit={handleUploadAdditionalEvidence} className="p-3 bg-[#181a18] rounded-xl border border-[#262926] space-y-2.5 text-xs">
+                      <div className="flex items-center gap-2 text-zinc-300 font-semibold text-xs">
+                        <Upload className="w-3.5 h-3.5 text-[#8BFF24]" />
+                        {isWorker ? 'Upload Specialist Rebuttal or Deliverable Proof' : 'Upload Dispute Evidence Document'}
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <input
+                          type="text"
+                          placeholder="Evidence title (e.g. GitHub PR, Deliverable ZIP, Chat Logs)..."
+                          value={newEvidenceName}
+                          onChange={(e) => setNewEvidenceName(e.target.value)}
+                          className="bg-[#141614] border border-[#2e322e] rounded-lg px-3 py-1.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#8BFF24]/60"
+                        />
+                        <input
+                          type="url"
+                          required
+                          placeholder="Document or storage URL (https://...)..."
+                          value={newEvidenceUrl}
+                          onChange={(e) => setNewEvidenceUrl(e.target.value)}
+                          className="bg-[#141614] border border-[#2e322e] rounded-lg px-3 py-1.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#8BFF24]/60"
+                        />
+                      </div>
+                      <div className="flex justify-end gap-2 pt-1">
+                        <button
+                          type="button"
+                          onClick={() => setShowAddEvidence(false)}
+                          className="px-3 py-1 rounded-lg bg-zinc-800 text-zinc-300 hover:text-white text-xs"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={uploadingEvidence || !newEvidenceUrl.trim()}
+                          className="px-3 py-1 rounded-lg bg-[#8BFF24] text-black font-bold text-xs hover:bg-[#78e018] transition disabled:opacity-50"
+                        >
+                          {uploadingEvidence ? 'Uploading...' : 'Submit Evidence Dossier'}
+                        </button>
+                      </div>
+                    </form>
+                  )}
+                </div>
 
                 {/* Proposed Resolutions */}
                 {disputeDetail.resolutions && disputeDetail.resolutions.length > 0 && (

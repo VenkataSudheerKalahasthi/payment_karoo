@@ -32,6 +32,8 @@ import {
   Folder,
   Scale,
   FileCheck,
+  Compass,
+  Stamp,
 } from 'lucide-react';
 import {
   useAuth,
@@ -78,12 +80,17 @@ import { ClientInvoices } from './components/ClientInvoices';
 import { DocumentsVault } from './components/DocumentsVault';
 import { ClientMessages } from './components/ClientMessages';
 import { ClientDisputes } from './components/ClientDisputes';
+import { SpecialistOpportunities } from './components/SpecialistOpportunities';
+import { ClientStampConsole } from './components/ClientStampConsole';
+import { RoleSelectionModal } from './components/RoleSelectionModal';
 import { UserRole, ContractDto, WorkerProfileDto } from '@trustpay/shared';
 import { useLocation } from 'react-router-dom';
 import { PaymentCallbackPage } from './pages/PaymentCallbackPage';
 
 type AppTab =
   | 'dashboard'
+  | 'stamp'
+  | 'opportunities'
   | 'marketplace'
   | 'contracts'
   | 'projects'
@@ -119,6 +126,7 @@ export const App: React.FC = () => {
   const [contracts, setContracts] = useState<ContractDto[]>([]);
   const [isLoadingContracts, setIsLoadingContracts] = useState(false);
   const [roleSelectionRequired, setRoleSelectionRequired] = useState(false);
+  const [showRoleSwitchModal, setShowRoleSwitchModal] = useState(false);
   const [isSyncingRole, setIsSyncingRole] = useState(false);
   const [selectedRoleInProgress, setSelectedRoleInProgress] = useState<'CLIENT' | 'WORKER' | null>(null);
   const [syncError, setSyncError] = useState<string | null>(null);
@@ -137,56 +145,8 @@ export const App: React.FC = () => {
     }
   }, [isSignedIn, getToken]);
 
-  // Initial authentication check: verify if profile already exists in DB
-  const checkInitialProfile = useCallback(async () => {
-    if (!isSignedIn) return;
-    dispatch(setAuthLoading(true));
-    try {
-      const token = await getToken();
-      if (!token) {
-        return;
-      }
-      const meRes = await apiService.getCurrentUser(token);
-      if (meRes.success && meRes.data) {
-        dispatch(setAuthUser(meRes.data));
-        setRoleSelectionRequired(false);
-        setSyncError(null);
-      } else if (meRes.error?.code === 'USER_NOT_REGISTERED') {
-        setRoleSelectionRequired(true);
-      } else {
-        console.warn('Profile fetch response:', meRes.error);
-        if (!auth.isSynchronized) {
-          setSyncError(meRes.error?.message || 'Could not verify database profile. Ensure backend is reachable.');
-        }
-      }
-    } catch (err: unknown) {
-      console.error('Initial profile check error:', err);
-      setSyncError(err instanceof Error ? err.message : 'Session verification failed.');
-    } finally {
-      dispatch(setAuthLoading(false));
-      setHasCheckedExistingProfile(true);
-    }
-  }, [isSignedIn, getToken, dispatch, auth.isSynchronized]);
-
-  useEffect(() => {
-    if (!isLoaded) return;
-
-    if (!isSignedIn) {
-      dispatch(clearAuthUser());
-      setHasCheckedExistingProfile(false);
-      setRoleSelectionRequired(false);
-      return;
-    }
-
-    if (auth.isSynchronized || hasCheckedExistingProfile) {
-      return;
-    }
-
-    checkInitialProfile();
-  }, [isLoaded, isSignedIn, auth.isSynchronized, hasCheckedExistingProfile, checkInitialProfile]);
-
-  // User explicitly selects their intended role
-  const handleSelectRole = async (chosenRole: 'CLIENT' | 'WORKER') => {
+  // User explicitly selects or switches their intended role
+  const handleSelectRole = useCallback(async (chosenRole: 'CLIENT' | 'WORKER') => {
     if (!isSignedIn) return;
 
     setIsSyncingRole(true);
@@ -204,6 +164,12 @@ export const App: React.FC = () => {
         dispatch(setAuthUser(syncRes.data));
         setRoleSelectionRequired(false);
         setHasCheckedExistingProfile(true);
+        // Clean up any pending role intent from storage
+        try {
+          localStorage.removeItem('trustpay_selected_role');
+        } catch {
+          // ignore storage error
+        }
       } else {
         setSyncError(syncRes.error?.message || 'Account role configuration failed. Try again.');
       }
@@ -214,7 +180,68 @@ export const App: React.FC = () => {
       setIsSyncingRole(false);
       setSelectedRoleInProgress(null);
     }
-  };
+  }, [isSignedIn, getToken, dispatch]);
+
+  // Initial authentication check: verify if profile already exists in DB
+  const checkInitialProfile = useCallback(async () => {
+    if (!isSignedIn) return;
+    dispatch(setAuthLoading(true));
+    try {
+      const token = await getToken();
+      if (!token) {
+        return;
+      }
+      const meRes = await apiService.getCurrentUser(token);
+      if (meRes.success && meRes.data) {
+        dispatch(setAuthUser(meRes.data));
+        setRoleSelectionRequired(false);
+        setSyncError(null);
+      } else if (meRes.error?.code === 'USER_NOT_REGISTERED') {
+        // Check if user pre-selected their role intent during landing page registration/login
+        const savedIntent = (() => {
+          try {
+            return localStorage.getItem('trustpay_selected_role') as 'CLIENT' | 'WORKER' | null;
+          } catch {
+            return null;
+          }
+        })();
+
+        if (savedIntent === 'CLIENT' || savedIntent === 'WORKER') {
+          await handleSelectRole(savedIntent);
+        } else {
+          setRoleSelectionRequired(true);
+        }
+      } else {
+        console.warn('Profile fetch response:', meRes.error);
+        if (!auth.isSynchronized) {
+          setSyncError(meRes.error?.message || 'Could not verify database profile. Ensure backend is reachable.');
+        }
+      }
+    } catch (err: unknown) {
+      console.error('Initial profile check error:', err);
+      setSyncError(err instanceof Error ? err.message : 'Session verification failed.');
+    } finally {
+      dispatch(setAuthLoading(false));
+      setHasCheckedExistingProfile(true);
+    }
+  }, [isSignedIn, getToken, dispatch, auth.isSynchronized, handleSelectRole]);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    if (!isSignedIn) {
+      dispatch(clearAuthUser());
+      setHasCheckedExistingProfile(false);
+      setRoleSelectionRequired(false);
+      return;
+    }
+
+    if (auth.isSynchronized || hasCheckedExistingProfile) {
+      return;
+    }
+
+    checkInitialProfile();
+  }, [isLoaded, isSignedIn, auth.isSynchronized, hasCheckedExistingProfile, checkInitialProfile]);
 
   const refreshUserProfile = async () => {
     try {
@@ -373,6 +400,35 @@ export const App: React.FC = () => {
               >
                 <PlusCircle className="w-4 h-4 text-[#8BFF24]" />
                 <span>+ Create Deal</span>
+              </button>
+            )}
+
+            {/* Client Digital Office Stamp Feature (Client only) */}
+            {isClient && (
+              <button
+                onClick={() => setActiveTab('stamp')}
+                className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer mb-1 ${
+                  activeTab === 'stamp'
+                    ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
+                    : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+                }`}
+              >
+                <Stamp className="w-4 h-4 text-[#8BFF24]" />
+                <span>My Stamp</span>
+              </button>
+            )}
+
+            {isWorker && (
+              <button
+                onClick={() => setActiveTab('opportunities')}
+                className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer mb-1 ${
+                  activeTab === 'opportunities'
+                    ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
+                    : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+                }`}
+              >
+                <Compass className="w-4 h-4" />
+                <span>Browse Opportunities</span>
               </button>
             )}
 
@@ -606,6 +662,24 @@ export const App: React.FC = () => {
                 </button>
               </div>
 
+              {/* Mobile Role Switcher Pill */}
+              <div className="pt-3 pb-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileSidebarOpen(false);
+                    setShowRoleSwitchModal(true);
+                  }}
+                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold dark:bg-[#151715] bg-[#EFF6FF] dark:text-[#8BFF24] text-[#2563EB] border dark:border-[rgba(139,255,36,0.25)] border-[#DBEAFE] cursor-pointer"
+                >
+                  <span className="flex items-center space-x-2">
+                    <span className="w-2 h-2 rounded-full bg-[#8BFF24]" />
+                    <span>{isClient ? 'Client Portal' : isWorker ? 'Specialist Workspace' : 'Select Role'}</span>
+                  </span>
+                  <span className="text-[10px] underline opacity-80">Switch</span>
+                </button>
+              </div>
+
               <nav className="space-y-1.5 pt-4">
                 <button
                   onClick={() => { setActiveTab('dashboard'); setMobileSidebarOpen(false); }}
@@ -614,6 +688,24 @@ export const App: React.FC = () => {
                   <LayoutDashboard className="w-4 h-4" />
                   <span>Dashboard</span>
                 </button>
+                {isWorker && (
+                  <button
+                    onClick={() => { setActiveTab('opportunities'); setMobileSidebarOpen(false); }}
+                    className="w-full flex items-center space-x-3 px-3 py-2 rounded-xl text-xs font-semibold dark:text-[#CDCBCA] text-[#475569]"
+                  >
+                    <Compass className="w-4 h-4" />
+                    <span>Browse Opportunities</span>
+                  </button>
+                )}
+                {isClient && (
+                  <button
+                    onClick={() => { setActiveTab('stamp'); setMobileSidebarOpen(false); }}
+                    className="w-full flex items-center space-x-3 px-3 py-2 rounded-xl text-xs font-semibold dark:text-[#CDCBCA] text-[#475569]"
+                  >
+                    <Stamp className="w-4 h-4 text-[#8BFF24]" />
+                    <span>My Stamp</span>
+                  </button>
+                )}
                 {isClient && (
                   <button
                     onClick={() => { setActiveTab('marketplace'); setMobileSidebarOpen(false); }}
@@ -680,9 +772,18 @@ export const App: React.FC = () => {
                   TrustPay
                 </span>
                 <span className="dark:text-[#A5AAA2] text-[#94A3B8]">/</span>
-                <span className="text-xs px-2.5 py-0.5 rounded-full dark:bg-[#151715] bg-[#EFF6FF] dark:text-[#8BFF24] text-[#2563EB] border dark:border-[rgba(139,255,36,0.25)] border-[#DBEAFE] font-mono font-medium">
-                  {isClient ? 'Client Portal' : isWorker ? 'Specialist Workspace' : 'Escrow Operations'}
-                </span>
+                <button
+                  type="button"
+                  onClick={() => setShowRoleSwitchModal(true)}
+                  title="Switch between Client and Specialist roles"
+                  className="group flex items-center space-x-1.5 text-xs px-2.5 py-1 rounded-full dark:bg-[#151715] bg-[#EFF6FF] dark:text-[#8BFF24] text-[#2563EB] border dark:border-[rgba(139,255,36,0.25)] border-[#DBEAFE] hover:dark:border-[#8BFF24] hover:border-[#2563EB] transition-all cursor-pointer font-mono font-medium active:scale-95 shadow-sm"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#8BFF24] shadow-[0_0_6px_rgba(139,255,36,0.8)]" />
+                  <span>{isClient ? 'Client Portal' : isWorker ? 'Specialist Workspace' : 'Select Role'}</span>
+                  <span className="text-[10px] opacity-75 group-hover:opacity-100 font-sans underline ml-0.5">
+                    Switch
+                  </span>
+                </button>
               </div>
             </div>
 
@@ -762,6 +863,15 @@ export const App: React.FC = () => {
             />
           )}
 
+          {/* Tab: Client Digital Office Stamp (Client only) */}
+          {activeTab === 'stamp' && isClient && (
+            <ClientStampConsole
+              onNavigateToContract={(contractId) => {
+                setActiveTab('contracts');
+              }}
+            />
+          )}
+
           {/* Tab 2: Specialist Marketplace View (Client only) */}
           {activeTab === 'marketplace' && isClient && (
             <WorkerMarketplace
@@ -771,6 +881,13 @@ export const App: React.FC = () => {
               }}
               onOpenHiringModal={(worker) => setHiringTargetWorker(worker)}
               isClient={isClient}
+            />
+          )}
+
+          {/* Tab: Browse Opportunities (Specialist Project Marketplace) */}
+          {activeTab === 'opportunities' && isWorker && (
+            <SpecialistOpportunities
+              onProposalSubmitted={() => setActiveTab('hiring')}
             />
           )}
 
@@ -836,6 +953,7 @@ export const App: React.FC = () => {
           {/* Tab: Milestones & Deliverable Review (Features 1 & 2) */}
           {activeTab === 'milestones' && (
             <MilestoneManagement
+              userRole={auth.role || UserRole.CLIENT}
               onNavigateToContract={(contractId) => {
                 setActiveTab('contracts');
               }}
@@ -844,7 +962,7 @@ export const App: React.FC = () => {
 
           {/* Tab: Invoices & Billing (Feature 4) */}
           {activeTab === 'invoices' && (
-            <ClientInvoices />
+            <ClientInvoices userRole={auth.role || UserRole.CLIENT} />
           )}
 
           {/* Tab: Payment History (Feature 3) */}
@@ -864,7 +982,7 @@ export const App: React.FC = () => {
 
           {/* Tab: Dispute Resolution Center (Feature 7) */}
           {activeTab === 'disputes' && (
-            <ClientDisputes />
+            <ClientDisputes userRole={auth.role || UserRole.CLIENT} />
           )}
 
 
@@ -1003,6 +1121,36 @@ export const App: React.FC = () => {
           onSuccess={() => {
             setActiveTab('hiring');
           }}
+        />
+      )}
+
+      {/* Role Selection Onboarding Modal (Required for unregistered/new users) */}
+      {isSignedIn && roleSelectionRequired && (
+        <RoleSelectionModal
+          isOpen={true}
+          onSelectRole={handleSelectRole}
+          isSubmitting={isSyncingRole}
+          errorMessage={syncError}
+          actionType="sync"
+          title="Choose Your TrustPay Account Role"
+          subtitle="Select whether you are joining to hire specialists as a Client, or offering services as a Specialist."
+        />
+      )}
+
+      {/* Role Switcher Modal (On-demand workspace switcher for active users) */}
+      {isSignedIn && showRoleSwitchModal && (
+        <RoleSelectionModal
+          isOpen={showRoleSwitchModal}
+          onSelectRole={async (chosenRole) => {
+            await handleSelectRole(chosenRole);
+            setShowRoleSwitchModal(false);
+          }}
+          onCancel={() => setShowRoleSwitchModal(false)}
+          isSubmitting={isSyncingRole}
+          errorMessage={syncError}
+          actionType="switch"
+          title="Switch Active Portal Role"
+          subtitle={`Currently operating as ${isClient ? 'Client' : 'Specialist'}. Select a role below to switch your active workspace.`}
         />
       )}
     </div>

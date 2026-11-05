@@ -46,6 +46,13 @@ export interface ContractPdfData {
       email: string;
     };
   }[];
+  clientStamp?: {
+    profileName: string;
+    verifiedMobile: string;
+    appliedAt: Date | string;
+    stampPosition?: string;
+    documentHash?: string | null;
+  } | null;
 }
 
 export interface CanonicalContractHashInput {
@@ -254,6 +261,16 @@ function buildPdfDocument(doc: InstanceType<typeof PDFDocument>, data: ContractP
     doc.font('Helvetica-Oblique').fillColor('#d97706').fontSize(8).text('Pending digital sign-off from required contract parties.');
   }
 
+  // 9. Client Digital Office Stamp (Client only — Official TrustPay Seal)
+  if (data.clientStamp) {
+    if (doc.y > 640) {
+      doc.addPage();
+    }
+    const stampY = doc.y + 10;
+    renderClientOfficeStamp(doc, data.clientStamp, stampY);
+    doc.y = stampY + 115;
+  }
+
   doc.moveDown(1);
   doc.font('Helvetica-Oblique').fillColor('#64748b').fontSize(6.5).text(
     'LEGAL NOTICE: The cryptographic SHA-256 digest recorded herein represents a platform data-integrity and tamper-evidence checksum. It does not constitute a Qualified Electronic Signature (QES) or proof of statutory legal identity under EU eIDAS Regulation (910/2014) or US ESIGN Act.',
@@ -266,4 +283,81 @@ function buildPdfDocument(doc: InstanceType<typeof PDFDocument>, data: ContractP
   );
 
   doc.end();
+}
+
+/**
+ * Formats a timestamp into official office stamp format (e.g. 05 NOV 2026).
+ */
+export function formatStampDate(dateInput: Date | string): string {
+  const d = new Date(dateInput);
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = d.toLocaleString('en-US', { month: 'short' }).toUpperCase();
+  const year = d.getFullYear();
+  return `${day} ${month} ${year}`;
+}
+
+/**
+ * Renders the official circular TrustPay Client Office Stamp.
+ * Pure vector rendering in PDFKit guaranteeing ultra-sharp fidelity and zero pixelation.
+ */
+function renderClientOfficeStamp(
+  doc: InstanceType<typeof PDFDocument>,
+  stamp: NonNullable<ContractPdfData['clientStamp']>,
+  startY: number,
+): void {
+  const position = stamp.stampPosition || 'BOTTOM_RIGHT';
+  let cx = doc.page.width - 105;
+  if (position === 'BOTTOM_LEFT') cx = 105;
+  if (position === 'BOTTOM_CENTER') cx = doc.page.width / 2;
+
+  const cy = startY + 54;
+  const r = 50;
+
+  doc.save();
+
+  // 1. Concentric circular borders
+  doc.circle(cx, cy, r).lineWidth(2).strokeColor('#047857').stroke();
+  doc.circle(cx, cy, r - 3).lineWidth(0.6).strokeColor('#10b981').stroke();
+  doc.circle(cx, cy, r - 6).lineWidth(1).strokeColor('#047857').stroke();
+
+  // 2. Faint diagonal TRUSTPAY watermark
+  doc.save();
+  doc.translate(cx, cy);
+  doc.rotate(-22);
+  doc.font('Helvetica-Bold').fontSize(14).fillColor('#10b981').fillOpacity(0.12)
+    .text('TRUSTPAY', -40, -5, { width: 80, align: 'center' });
+  doc.restore();
+
+  // 3. Header branding
+  doc.fillOpacity(1);
+  doc.font('Helvetica-Bold').fontSize(6.5).fillColor('#047857')
+    .text('TRUSTPAY ENTERPRISE', cx - 44, cy - 35, { width: 88, align: 'center' });
+
+  // 4. Subheader approval badge
+  doc.font('Helvetica-Bold').fontSize(5.5).fillColor('#059669')
+    .text('★ CLIENT APPROVED ★', cx - 44, cy - 25, { width: 88, align: 'center' });
+
+  // 5. Dividing rule
+  doc.moveTo(cx - 32, cy - 17).lineTo(cx + 32, cy - 17).lineWidth(0.5).strokeColor('#10b981').stroke();
+
+  // 6. Client's Authenticated Profile Name
+  const name = (stamp.profileName || 'Verified Client').toUpperCase();
+  doc.font('Helvetica-Bold').fontSize(7.5).fillColor('#0f172a')
+    .text(name, cx - 42, cy - 12, { width: 84, align: 'center', ellipsis: true });
+
+  // 7. Verified mobile number
+  doc.font('Helvetica').fontSize(6).fillColor('#334155')
+    .text(`Mobile: ${stamp.verifiedMobile}`, cx - 42, cy + 1, { width: 84, align: 'center', ellipsis: true });
+
+  // 8. Server-generated approval date
+  const dateStr = formatStampDate(stamp.appliedAt);
+  doc.font('Helvetica-Bold').fontSize(6.5).fillColor('#047857')
+    .text(`Date: ${dateStr}`, cx - 42, cy + 12, { width: 84, align: 'center' });
+
+  // 9. Bottom dividing rule & seal label
+  doc.moveTo(cx - 32, cy + 23).lineTo(cx + 32, cy + 23).lineWidth(0.5).strokeColor('#10b981').stroke();
+  doc.font('Helvetica-Bold').fontSize(5).fillColor('#059669')
+    .text('OFFICIAL OFFICE SEAL', cx - 44, cy + 26, { width: 88, align: 'center' });
+
+  doc.restore();
 }
