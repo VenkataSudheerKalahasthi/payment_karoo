@@ -56,7 +56,7 @@ export const SpecialistWallet: React.FC<SpecialistWalletProps> = ({
   if (isLoading) {
     return (
       <div className="p-16 text-center space-y-3 dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl animate-pulse">
-        <RefreshCw className="w-8 h-8 animate-spin text-[#2563EB] mx-auto" />
+        <RefreshCw className="w-8 h-8 animate-spin text-[#5046E5] mx-auto" />
         <p className="text-xs dark:text-[#A5A5A5] text-[#64748B]">Loading specialist earnings and settlement records...</p>
       </div>
     );
@@ -70,7 +70,7 @@ export const SpecialistWallet: React.FC<SpecialistWalletProps> = ({
         <p className="text-xs dark:text-[#A5A5A5] text-[#64748B]">Could not retrieve specialist earnings records from financial ledger.</p>
         <button
           onClick={loadWallet}
-          className="px-4 py-2 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-xs font-semibold text-white transition shadow-sm"
+          className="px-4 py-2 rounded-xl bg-[#5046E5] hover:bg-[#4338CA] text-xs font-semibold text-white transition shadow-sm"
         >
           Retry
         </button>
@@ -85,7 +85,7 @@ export const SpecialistWallet: React.FC<SpecialistWalletProps> = ({
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-[#2563EB]/10 text-[#2563EB] dark:text-[#CDCBCA] border border-[#2563EB]/20">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-[#5046E5]/10 text-[#5046E5] dark:text-[#CDCBCA] border border-[#5046E5]/20">
                 Specialist Earnings &amp; Virtual Settlement
               </span>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-amber-500/10 text-amber-500 border border-amber-500/20">
@@ -93,7 +93,7 @@ export const SpecialistWallet: React.FC<SpecialistWalletProps> = ({
               </span>
             </div>
             <h1 className="text-2xl font-bold dark:text-[#CDCBCA] text-[#242424] flex items-center gap-2 tracking-tight">
-              <Wallet className="w-6 h-6 text-[#2563EB]" />
+              <Wallet className="w-6 h-6 text-[#5046E5]" />
               Specialist Financial Ledger &amp; Earnings
             </h1>
             <p className="text-xs dark:text-[#A5A5A5] text-[#64748B] mt-1 max-w-2xl leading-relaxed">
@@ -107,7 +107,7 @@ export const SpecialistWallet: React.FC<SpecialistWalletProps> = ({
                 onClick={onNavigateToProjects}
                 className="px-4 py-2 rounded-xl dark:bg-[#202020] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] text-xs font-semibold dark:text-[#CDCBCA] text-[#242424] flex items-center gap-1.5 transition shadow-sm"
               >
-                <Layers className="w-3.5 h-3.5 text-[#2563EB]" />
+                <Layers className="w-3.5 h-3.5 text-[#5046E5]" />
                 View Milestones
               </button>
             )}
@@ -134,10 +134,10 @@ export const SpecialistWallet: React.FC<SpecialistWalletProps> = ({
       {/* 5 KPI Cards Bento */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
         {/* Total Contract Value */}
-        <div className="p-4 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm hover:border-[#2563EB]/40 transition">
+        <div className="interactive-card p-4 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm hover:border-[#5046E5]/40 transition">
           <div className="flex items-center justify-between dark:text-[#A5A5A5] text-[#64748B] text-xs mb-2">
             <span>Contract Value</span>
-            <DollarSign className="w-4 h-4 text-[#2563EB]" />
+            <DollarSign className="w-4 h-4 text-[#5046E5]" />
           </div>
           <div className="text-xl font-bold dark:text-[#CDCBCA] text-[#242424] font-mono tabular-nums tracking-tight">
             ${wallet.totalContractValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -148,7 +148,7 @@ export const SpecialistWallet: React.FC<SpecialistWalletProps> = ({
         </div>
 
         {/* Pending Milestone Earnings */}
-        <div className="p-4 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm hover:border-amber-500/40 transition">
+        <div className="interactive-card p-4 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm hover:border-amber-500/40 transition">
           <div className="flex items-center justify-between dark:text-[#A5A5A5] text-[#64748B] text-xs mb-2">
             <span>Pending Work</span>
             <Clock className="w-4 h-4 text-amber-500" />
@@ -160,10 +160,10 @@ export const SpecialistWallet: React.FC<SpecialistWalletProps> = ({
         </div>
 
         {/* Submitted Deliverables */}
-        <div className="p-4 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm hover:border-[#2563EB]/40 transition">
+        <div className="interactive-card p-4 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm hover:border-[#5046E5]/40 transition">
           <div className="flex items-center justify-between dark:text-[#A5A5A5] text-[#64748B] text-xs mb-2">
             <span>In Review</span>
-            <FileText className="w-4 h-4 text-[#2563EB]" />
+            <FileText className="w-4 h-4 text-[#5046E5]" />
           </div>
           <div className="text-xl font-bold dark:text-[#CDCBCA] text-[#242424] font-mono tabular-nums tracking-tight">
             ${wallet.submittedMilestoneAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -172,7 +172,7 @@ export const SpecialistWallet: React.FC<SpecialistWalletProps> = ({
         </div>
 
         {/* Approved / Settlement Eligible */}
-        <div className="p-4 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm hover:border-emerald-500/40 transition">
+        <div className="interactive-card p-4 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm hover:border-emerald-500/40 transition">
           <div className="flex items-center justify-between text-emerald-500 text-xs mb-2">
             <span>Eligible for Settlement</span>
             <CheckCircle2 className="w-4 h-4 text-emerald-500" />
@@ -184,7 +184,7 @@ export const SpecialistWallet: React.FC<SpecialistWalletProps> = ({
         </div>
 
         {/* Settled Net Earnings */}
-        <div className="p-4 rounded-2xl dark:bg-[#202020] bg-[#EFF6FF] border dark:border-[rgba(205,203,202,0.25)] border-[#DBEAFE] shadow-sm hover:border-emerald-500/50 transition">
+        <div className="interactive-card p-4 rounded-2xl dark:bg-[#202020] bg-[#EEF2FF] border dark:border-[rgba(205,203,202,0.25)] border-[#C7D2FE] shadow-sm hover:border-emerald-500/50 transition">
           <div className="flex items-center justify-between text-emerald-500 text-xs mb-2">
             <span className="font-semibold">Settled Earnings</span>
             <TrendingUp className="w-4 h-4 text-emerald-500" />
@@ -198,8 +198,8 @@ export const SpecialistWallet: React.FC<SpecialistWalletProps> = ({
 
       {/* Financial Health & Commission Transparency Banner */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="p-4 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] flex items-start gap-3 shadow-sm">
-          <div className="p-2.5 rounded-xl bg-[#2563EB]/10 text-[#2563EB] border border-[#2563EB]/20 shrink-0">
+        <div className="interactive-card p-4 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] flex items-start gap-3 shadow-sm">
+          <div className="p-2.5 rounded-xl bg-[#5046E5]/10 text-[#5046E5] border border-[#5046E5]/20 shrink-0">
             <Percent className="w-5 h-5" />
           </div>
           <div>
@@ -210,7 +210,7 @@ export const SpecialistWallet: React.FC<SpecialistWalletProps> = ({
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] flex items-start gap-3 shadow-sm">
+        <div className="interactive-card p-4 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] flex items-start gap-3 shadow-sm">
           <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 shrink-0">
             <ShieldCheck className="w-5 h-5" />
           </div>
@@ -222,7 +222,7 @@ export const SpecialistWallet: React.FC<SpecialistWalletProps> = ({
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] flex items-start gap-3 shadow-sm">
+        <div className="interactive-card p-4 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] flex items-start gap-3 shadow-sm">
           <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20 shrink-0">
             <Clock className="w-5 h-5" />
           </div>
@@ -237,10 +237,10 @@ export const SpecialistWallet: React.FC<SpecialistWalletProps> = ({
       </div>
 
       {/* Transaction & Settlement Ledger Table */}
-      <div className="p-6 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm">
+      <div className="interactive-card p-6 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <ArrowDownLeft className="w-4 h-4 text-[#2563EB]" />
+            <ArrowDownLeft className="w-4 h-4 text-[#5046E5]" />
             <h3 className="text-sm font-bold dark:text-[#CDCBCA] text-[#242424]">Settlement &amp; Earnings Journal</h3>
             <span className="text-xs dark:text-[#777777] text-[#64748B] font-mono">({wallet.recentTransactions.length} records)</span>
           </div>
@@ -302,7 +302,7 @@ export const SpecialistWallet: React.FC<SpecialistWalletProps> = ({
                             onClick={() => setSelectedTx(tx)}
                             className="px-2.5 py-1 rounded-lg dark:bg-[#202020] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] dark:text-[#CDCBCA] text-[#242424] text-[11px] font-medium flex items-center gap-1 transition shadow-sm"
                           >
-                            <Eye className="w-3 h-3 text-[#2563EB]" />
+                            <Eye className="w-3 h-3 text-[#5046E5]" />
                             Details
                           </button>
                           {tx.contractId && onNavigateToContract && (
@@ -336,7 +336,7 @@ export const SpecialistWallet: React.FC<SpecialistWalletProps> = ({
               <X className="w-5 h-5" />
             </button>
             <div className="flex items-center gap-2 mb-4">
-              <FileText className="w-5 h-5 text-[#2563EB]" />
+              <FileText className="w-5 h-5 text-[#5046E5]" />
               <h3 className="text-base font-bold dark:text-[#CDCBCA] text-[#242424]">Settlement Journal Record</h3>
             </div>
 

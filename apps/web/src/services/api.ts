@@ -314,8 +314,22 @@ export const apiService = {
 
   // Contract Management
   createContract: async (data: CreateContractRequest): Promise<ApiResponse<ContractDto>> => {
-    const res = await apiClient.post<ApiResponse<ContractDto>>('/contracts', data);
-    return res.data;
+    try {
+      const res = await apiClient.post<ApiResponse<ContractDto>>('/contracts', data);
+      return res.data;
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err) && err.response) {
+        return err.response.data as ApiResponse<ContractDto>;
+      }
+      return {
+        success: false,
+        error: {
+          code: 'CONTRACT_CREATION_FAILED',
+          message: err instanceof Error ? err.message : 'Failed to initialize contract',
+        },
+        timestamp: new Date().toISOString(),
+      };
+    }
   },
 
   listContracts: async (): Promise<ApiResponse<ContractDto[]>> => {

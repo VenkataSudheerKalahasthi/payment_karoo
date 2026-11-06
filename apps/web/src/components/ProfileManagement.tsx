@@ -55,6 +55,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
   const [workerProfile, setWorkerProfile] = useState<WorkerProfileDto | null>(null);
   const [availableSkills, setAvailableSkills] = useState<SkillDto[]>([]);
   const [selectedSkillId, setSelectedSkillId] = useState('');
+  const [customSkillInput, setCustomSkillInput] = useState('');
   const [skillExperience, setSkillExperience] = useState('1');
 
   // Portfolio Item Form
@@ -162,16 +163,28 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
   };
 
   const handleAddSkill = async () => {
-    if (!selectedSkillId) return;
-    try {
-      const res = await apiService.addWorkerSkill({
-        skillId: selectedSkillId,
-        yearsOfExperience: parseInt(skillExperience, 10) || 1,
-      });
+    const rawInput = customSkillInput.trim();
+    if (!rawInput && !selectedSkillId) return;
 
-      if (res.success) {
-        loadWorkerData();
+    try {
+      const exp = parseInt(skillExperience, 10) || 1;
+      if (rawInput) {
+        // Support comma-separated skills to easily add multiple skills at once
+        const skillNames = rawInput.split(',').map((s) => s.trim()).filter(Boolean);
+        for (const name of skillNames) {
+          await apiService.addWorkerSkill({
+            name,
+            yearsOfExperience: exp,
+          });
+        }
+        setCustomSkillInput('');
+      } else if (selectedSkillId) {
+        await apiService.addWorkerSkill({
+          skillId: selectedSkillId,
+          yearsOfExperience: exp,
+        });
       }
+      loadWorkerData();
     } catch (err) {
       console.error(err);
     }
@@ -288,7 +301,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
       {/* General Personal / Company Profile */}
       <form onSubmit={handleSaveGeneralProfile} className="dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl p-6 space-y-4 shadow-sm">
         <div className="flex items-center space-x-2 border-b dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] pb-3">
-          <User className="w-4 h-4 text-[#2563EB]" />
+          <User className="w-4 h-4 text-[#5046E5]" />
           <h4 className="text-sm font-bold dark:text-[#CDCBCA] text-[#242424]">Identity &amp; Contact Details</h4>
         </div>
 
@@ -300,7 +313,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               placeholder="e.g. Alex"
-              className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
+              className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
             />
           </div>
 
@@ -311,7 +324,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               placeholder="e.g. Morgan"
-              className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
+              className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
             />
           </div>
         </div>
@@ -323,7 +336,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
             value={avatarUrl}
             onChange={(e) => setAvatarUrl(e.target.value)}
             placeholder="https://example.com/avatar.jpg"
-            className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
+            className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
           />
         </div>
 
@@ -335,7 +348,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
               value={companyName}
               onChange={(e) => setCompanyName(e.target.value)}
               placeholder="e.g. Acme Tech Innovations"
-              className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
+              className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
             />
           </div>
 
@@ -346,7 +359,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
               placeholder="+1 (555) 000-0000"
-              className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
+              className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
             />
           </div>
         </div>
@@ -359,7 +372,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
               value={country}
               onChange={(e) => setCountry(e.target.value)}
               placeholder="e.g. United States, Germany, India"
-              className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
+              className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
             />
           </div>
 
@@ -370,7 +383,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
               value={timezone}
               onChange={(e) => setTimezone(e.target.value)}
               placeholder="e.g. America/New_York, UTC"
-              className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
+              className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
             />
           </div>
         </div>
@@ -382,7 +395,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
             onChange={(e) => setBio(e.target.value)}
             rows={3}
             placeholder="Share an overview of your organization or personal technical domain..."
-            className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
+            className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
           />
         </div>
 
@@ -393,7 +406,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
             value={address}
             onChange={(e) => setAddress(e.target.value)}
             placeholder="Street address (Never shared publicly)"
-            className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
+            className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
           />
         </div>
 
@@ -401,7 +414,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
           <button
             type="submit"
             disabled={isSavingGeneral}
-            className="px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] disabled:opacity-50 text-xs font-semibold text-white flex items-center space-x-1.5 shadow-sm transition"
+            className="px-5 py-2.5 rounded-xl bg-[#5046E5] hover:bg-[#4338CA] disabled:opacity-50 text-xs font-semibold text-white flex items-center space-x-1.5 shadow-sm transition"
           >
             <Save className="w-3.5 h-3.5" />
             <span>{isSavingGeneral ? 'Saving...' : 'Save General Details'}</span>
@@ -415,7 +428,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
           <form onSubmit={handleSaveWorkerProfile} className="dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl p-6 space-y-4 shadow-sm">
             <div className="flex items-center justify-between border-b dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] pb-3">
               <div className="flex items-center space-x-2">
-                <Briefcase className="w-4 h-4 text-[#2563EB]" />
+                <Briefcase className="w-4 h-4 text-[#5046E5]" />
                 <h4 className="text-sm font-bold dark:text-[#CDCBCA] text-[#242424]">Specialist Marketplace Parameters</h4>
               </div>
               <button
@@ -423,7 +436,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                 onClick={() => setShowPublicPreview(true)}
                 className="px-3.5 py-1.5 rounded-xl dark:bg-[#202020] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] text-xs font-semibold dark:text-[#CDCBCA] text-[#242424] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] flex items-center space-x-1.5 transition shadow-sm"
               >
-                <Eye className="w-3.5 h-3.5 text-[#2563EB]" />
+                <Eye className="w-3.5 h-3.5 text-[#5046E5]" />
                 <span>Preview Public Profile</span>
               </button>
             </div>
@@ -435,7 +448,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                 value={headline}
                 onChange={(e) => setHeadline(e.target.value)}
                 placeholder="e.g. Senior Fullstack Architect &amp; Distributed Systems Specialist"
-                className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
+                className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
               />
             </div>
 
@@ -448,7 +461,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                   value={hourlyRate}
                   onChange={(e) => setHourlyRate(e.target.value)}
                   placeholder="e.g. 95"
-                  className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] font-mono focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
+                  className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] font-mono focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
                 />
               </div>
 
@@ -457,7 +470,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                 <select
                   value={availability}
                   onChange={(e) => setAvailability(e.target.value as WorkerAvailability)}
-                  className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
+                  className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
                 >
                   <option value="AVAILABLE">Available for Engagements</option>
                   <option value="BUSY">In Active Engagement (Busy)</option>
@@ -470,7 +483,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
               <button
                 type="submit"
                 disabled={isSavingWorker}
-                className="px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] disabled:opacity-50 text-xs font-semibold text-white flex items-center space-x-1.5 shadow-sm transition"
+                className="px-5 py-2.5 rounded-xl bg-[#5046E5] hover:bg-[#4338CA] disabled:opacity-50 text-xs font-semibold text-white flex items-center space-x-1.5 shadow-sm transition"
               >
                 <Save className="w-3.5 h-3.5" />
                 <span>{isSavingWorker ? 'Saving...' : 'Update Marketplace Profile'}</span>
@@ -482,13 +495,18 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
           <div className="dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl p-6 space-y-4 shadow-sm">
             <div className="flex items-center justify-between border-b dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] pb-3">
               <div className="flex items-center space-x-2">
-                <Layers className="w-4 h-4 text-[#2563EB]" />
-                <h4 className="text-sm font-bold dark:text-[#CDCBCA] text-[#242424]">Skills Taxonomy</h4>
+                <Layers className="w-4 h-4 text-[#5046E5]" />
+                <h4 className="text-sm font-bold dark:text-[#CDCBCA] text-[#242424]">
+                  Skills Taxonomy ({workerProfile?.skills?.length || 0})
+                </h4>
               </div>
+              <span className="text-[11px] dark:text-[#A5A5A5] text-[#64748B]">
+                Type custom skills or choose from suggestions
+              </span>
             </div>
 
             {/* Current Skills List */}
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 min-h-[38px] items-center">
               {workerProfile?.skills && workerProfile.skills.length > 0 ? (
                 workerProfile.skills.map((ws) => (
                   <div
@@ -502,53 +520,101 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                       {ws.yearsOfExperience}y
                     </span>
                     <button
+                      type="button"
                       onClick={() => handleRemoveSkill(ws.skillId || (ws as unknown as { skill?: { id: string } }).skill?.id || '')}
-                      className="dark:text-[#777777] text-[#64748B] hover:text-rose-500 transition"
-                      aria-label="Remove skill"
+                      className="dark:text-[#777777] text-[#64748B] hover:text-rose-500 transition p-0.5"
+                      title="Remove skill"
                     >
                       <Trash2 className="w-3 h-3" />
                     </button>
                   </div>
                 ))
               ) : (
-                <p className="text-xs dark:text-[#777777] text-[#64748B] italic">No skills attached to profile yet.</p>
+                <p className="text-xs dark:text-[#777777] text-[#64748B] italic">No skills attached to profile yet. Add your competencies below.</p>
               )}
             </div>
 
-            {/* Add Skill Form */}
-            <div className="pt-3 border-t dark:border-[rgba(205,203,202,0.1)] border-[#E2E8F0] flex flex-wrap items-center gap-3">
-              <select
-                value={selectedSkillId}
-                onChange={(e) => setSelectedSkillId(e.target.value)}
-                className="dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] rounded-xl px-3 py-1.5 text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#2563EB]"
-              >
-                {availableSkills.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name} ({s.category || 'General'})
-                  </option>
-                ))}
-              </select>
+            {/* Add Skill Form: Free-form custom text typing + Dropdown fallback */}
+            <div className="pt-3 border-t dark:border-[rgba(205,203,202,0.1)] border-[#E2E8F0] space-y-3">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                {/* Custom text typing */}
+                <div className="flex-1 relative">
+                  <input
+                    type="text"
+                    value={customSkillInput}
+                    onChange={(e) => setCustomSkillInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddSkill();
+                      }
+                    }}
+                    placeholder="Type skill name (e.g. Next.js, Python, Figma) or comma-separated..."
+                    className="w-full dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] rounded-xl px-3.5 py-2 text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5] transition"
+                  />
+                </div>
 
-              <div className="flex items-center space-x-1 text-xs">
-                <input
-                  type="number"
-                  min="0"
-                  max="40"
-                  value={skillExperience}
-                  onChange={(e) => setSkillExperience(e.target.value)}
-                  className="w-16 px-2 py-1.5 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] text-center font-mono"
-                />
-                <span className="dark:text-[#A5A5A5] text-[#64748B]">years</span>
+                {/* Preset Dropdown Selection (Optional) */}
+                <select
+                  value={selectedSkillId}
+                  onChange={(e) => {
+                    setSelectedSkillId(e.target.value);
+                    const found = availableSkills.find((s) => s.id === e.target.value);
+                    if (found) setCustomSkillInput(found.name);
+                  }}
+                  className="dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] rounded-xl px-3 py-2 text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5]"
+                >
+                  <option value="">Or pick standard skill...</option>
+                  {availableSkills.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name} ({s.category || 'General'})
+                    </option>
+                  ))}
+                </select>
+
+                {/* Experience years */}
+                <div className="flex items-center space-x-1.5 text-xs shrink-0">
+                  <input
+                    type="number"
+                    min="0"
+                    max="40"
+                    value={skillExperience}
+                    onChange={(e) => setSkillExperience(e.target.value)}
+                    className="w-14 px-2 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] text-center font-mono tabular-nums"
+                  />
+                  <span className="dark:text-[#A5A5A5] text-[#64748B]">years</span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleAddSkill}
+                  className="px-4 py-2 rounded-xl bg-[#5046E5] hover:bg-[#4338CA] text-xs font-semibold text-white flex items-center justify-center space-x-1.5 shadow-sm transition shrink-0 active:scale-95"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Add Skill</span>
+                </button>
               </div>
 
-              <button
-                type="button"
-                onClick={handleAddSkill}
-                className="px-3.5 py-1.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-xs font-semibold text-white flex items-center space-x-1 shadow-sm transition"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Add Skill</span>
-              </button>
+              {/* Quick Suggestion Pills */}
+              <div className="flex flex-wrap items-center gap-1.5 text-[11px] pt-1">
+                <span className="dark:text-[#777777] text-[#94A3B8] text-[10px] uppercase font-semibold">Quick add:</span>
+                {['React', 'TypeScript', 'Node.js', 'Python', 'Next.js', 'UI/UX Design', 'Solidity', 'DevOps'].map((skill) => (
+                  <button
+                    key={skill}
+                    type="button"
+                    onClick={async () => {
+                      await apiService.addWorkerSkill({
+                        name: skill,
+                        yearsOfExperience: parseInt(skillExperience, 10) || 1,
+                      });
+                      loadWorkerData();
+                    }}
+                    className="px-2 py-0.5 rounded-lg dark:bg-[#202020] bg-slate-100 hover:dark:bg-[#303030] hover:bg-slate-200 dark:text-[#CDCBCA] text-slate-700 border dark:border-[rgba(205,203,202,0.12)] border-slate-200 transition text-[10px]"
+                  >
+                    + {skill}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -556,7 +622,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
           <div className="dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl p-6 space-y-4 shadow-sm">
             <div className="flex items-center justify-between border-b dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] pb-3">
               <div className="flex items-center space-x-2">
-                <Briefcase className="w-4 h-4 text-[#2563EB]" />
+                <Briefcase className="w-4 h-4 text-[#5046E5]" />
                 <h4 className="text-sm font-bold dark:text-[#CDCBCA] text-[#242424]">Portfolio Showcase</h4>
               </div>
 
@@ -564,7 +630,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsAddingPortfolio(true)}
-                  className="px-3.5 py-1.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-xs font-semibold text-white flex items-center space-x-1 shadow-sm transition"
+                  className="px-3.5 py-1.5 rounded-xl bg-[#5046E5] hover:bg-[#4338CA] text-xs font-semibold text-white flex items-center space-x-1 shadow-sm transition"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Add Project</span>
@@ -588,7 +654,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                     value={portfolioTitle}
                     onChange={(e) => setPortfolioTitle(e.target.value)}
                     placeholder="e.g. Automated Escrow Smart Engine"
-                    className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#2563EB]"
+                    className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5]"
                     required
                   />
                 </div>
@@ -600,7 +666,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                     onChange={(e) => setPortfolioDescription(e.target.value)}
                     rows={3}
                     placeholder="Describe technology stack, your key contributions, and project outcomes..."
-                    className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#2563EB]"
+                    className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5]"
                     required
                   />
                 </div>
@@ -613,7 +679,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                       value={portfolioUrl}
                       onChange={(e) => setPortfolioUrl(e.target.value)}
                       placeholder="https://github.com/... or https://..."
-                      className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#2563EB]"
+                      className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5]"
                     />
                   </div>
 
@@ -624,7 +690,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                       value={portfolioAttachmentUrl}
                       onChange={(e) => setPortfolioAttachmentUrl(e.target.value)}
                       placeholder="https://images.unsplash.com/... or https://..."
-                      className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#2563EB]"
+                      className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5]"
                     />
                   </div>
                 </div>
@@ -646,7 +712,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-1.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold shadow-sm transition"
+                    className="px-4 py-1.5 rounded-xl bg-[#5046E5] hover:bg-[#4338CA] text-white font-semibold shadow-sm transition"
                   >
                     {editingPortfolioId ? 'Save Changes' : 'Create Project'}
                   </button>
@@ -681,7 +747,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                           <button
                             type="button"
                             onClick={() => handleStartEditPortfolio(item)}
-                            className="p-1 dark:text-[#777777] text-[#64748B] hover:text-[#2563EB] transition"
+                            className="p-1 dark:text-[#777777] text-[#64748B] hover:text-[#5046E5] transition"
                             title="Edit Project"
                           >
                             <Pencil className="w-3.5 h-3.5" />
@@ -705,7 +771,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                           href={item.projectUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[#2563EB] hover:underline text-xs inline-flex items-center space-x-1 font-medium"
+                          className="text-[#5046E5] hover:underline text-xs inline-flex items-center space-x-1 font-medium"
                         >
                           <span>Visit Demo / Repo</span>
                           <ExternalLink className="w-3 h-3" />
@@ -718,7 +784,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                           href={item.attachmentUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="dark:text-[#A5A5A5] text-[#64748B] hover:text-[#2563EB] text-[11px] inline-flex items-center space-x-1"
+                          className="dark:text-[#A5A5A5] text-[#64748B] hover:text-[#5046E5] text-[11px] inline-flex items-center space-x-1"
                         >
                           <span>Attachment</span>
                           <ExternalLink className="w-2.5 h-2.5" />
@@ -741,7 +807,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
           <div className="dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl max-w-2xl w-full p-6 space-y-5 dark:text-[#CDCBCA] text-[#242424] shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] pb-3">
               <div className="flex items-center space-x-2">
-                <Eye className="w-4 h-4 text-[#2563EB]" />
+                <Eye className="w-4 h-4 text-[#5046E5]" />
                 <h4 className="text-sm font-bold dark:text-[#CDCBCA] text-[#242424]">Public Specialist Profile Preview</h4>
               </div>
               <button
@@ -768,13 +834,13 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                   <h3 className="text-base font-bold dark:text-[#CDCBCA] text-[#242424]">
                     {firstName || lastName ? `${firstName} ${lastName}`.trim() : 'Anonymous Specialist'}
                   </h3>
-                  <p className="text-xs text-[#2563EB] font-medium">{headline || 'Specialist on TrustPay'}</p>
+                  <p className="text-xs text-[#5046E5] font-medium">{headline || 'Specialist on TrustPay'}</p>
                   <p className="text-[11px] dark:text-[#777777] text-[#64748B] mt-0.5">{country || 'Remote'} • {companyName || 'Independent Consultant'}</p>
                 </div>
               </div>
 
               <div className="text-right">
-                <div className="text-lg font-bold font-mono text-[#2563EB]">
+                <div className="text-lg font-bold font-mono text-[#5046E5]">
                   ${hourlyRate || '0'}<span className="text-xs font-normal dark:text-[#777777] text-[#64748B]">/hr</span>
                 </div>
                 <span className={`inline-block mt-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${
@@ -840,7 +906,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                           href={item.projectUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[#2563EB] text-[10px] inline-flex items-center space-x-1 font-medium hover:underline"
+                          className="text-[#5046E5] text-[10px] inline-flex items-center space-x-1 font-medium hover:underline"
                         >
                           <span>Live Demo</span>
                           <ExternalLink className="w-2.5 h-2.5" />

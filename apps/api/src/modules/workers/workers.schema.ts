@@ -37,8 +37,11 @@ export const updateWorkerProfileSchema = z.object({
 });
 
 export const addWorkerSkillSchema = z.object({
-  skillId: z.string().uuid('Valid skill ID required'),
+  skillId: z.string().uuid('Valid skill ID required').optional(),
+  name: z.string().min(1, 'Skill name must not be empty').max(80).optional(),
   yearsOfExperience: z.number().int().min(0).max(50).default(1),
+}).refine((data) => data.skillId || data.name, {
+  message: 'Either skillId or skill name must be provided',
 });
 
 export const createPortfolioItemSchema = z.object({

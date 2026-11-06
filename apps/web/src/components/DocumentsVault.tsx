@@ -183,14 +183,14 @@ export const DocumentsVault: React.FC = () => {
         );
       case 'DELIVERABLE':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#8BFF24]/10 text-[#8BFF24] border border-[#8BFF24]/30">
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold dark:bg-[#8BFF24]/10 bg-[#EEF2FF] dark:text-[#8BFF24] text-[#5046E5] border dark:border-[#8BFF24]/30 border-[#C7D2FE]">
             <Folder className="w-3 h-3" />
             Deliverable Asset
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-zinc-800 text-zinc-300 border border-zinc-700">
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold dark:bg-zinc-800 bg-[#EEF2FF] dark:text-zinc-300 text-[#475569] dark:border-zinc-700 border-[#C7D2FE]">
             {cat}
           </span>
         );
@@ -200,14 +200,14 @@ export const DocumentsVault: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#121412] dark:bg-[#121412] border border-[#262926] p-6 rounded-2xl">
+      <div className="interactive-card flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm p-6 rounded-2xl">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#8BFF24]/10 border border-[#8BFF24]/30 flex items-center justify-center">
-            <Folder className="w-5 h-5 text-[#8BFF24]" />
+          <div className="w-10 h-10 rounded-xl dark:bg-[#8BFF24]/10 bg-[#EEF2FF] border dark:border-[#8BFF24]/30 border-[#C7D2FE] flex items-center justify-center">
+            <Folder className="w-5 h-5 dark:text-[#8BFF24] text-[#5046E5]" />
           </div>
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Secure Document Vault</h1>
-            <p className="text-sm text-zinc-400">
+            <h1 className="text-xl sm:text-2xl font-bold dark:text-white text-slate-900 tracking-tight">Secure Document Vault</h1>
+            <p className="text-sm dark:text-zinc-400 text-slate-500">
               Encrypted non-custodial repository for contracts, invoices, and deliverable attachments.
             </p>
           </div>
@@ -216,7 +216,7 @@ export const DocumentsVault: React.FC = () => {
         <button
           onClick={fetchData}
           disabled={loading}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1e201e] border border-[#2e322e] text-zinc-300 hover:text-white hover:border-[#8BFF24]/40 transition text-sm font-medium"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl dark:bg-[#1e201e] bg-slate-100 border dark:border-[#2e322e] border-slate-300 dark:text-zinc-300 text-slate-700 hover:dark:text-white hover:text-slate-900 hover:dark:bg-[#282c28] hover:bg-slate-200 hover:dark:border-[#8BFF24]/40 border-[#C7D2FE] transition text-sm font-medium"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           Refresh Vault
@@ -225,30 +225,30 @@ export const DocumentsVault: React.FC = () => {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
-        <div className="bg-[#121412] border border-[#262926] p-4 rounded-xl">
-          <p className="text-xs text-zinc-400 uppercase tracking-wider font-medium">Total Documents</p>
-          <p className="text-2xl font-bold text-white mt-1">{documents.length}</p>
+        <div className="interactive-card dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm p-4 rounded-xl">
+          <p className="text-xs dark:text-zinc-400 text-slate-500 uppercase tracking-wider font-medium">Total Documents</p>
+          <p className="text-2xl font-bold dark:text-white text-slate-900 mt-1">{documents.length}</p>
           <p className="text-xs text-zinc-500 mt-1">Archived in secure storage</p>
         </div>
 
-        <div className="bg-[#121412] border border-[#262926] p-4 rounded-xl">
-          <p className="text-xs text-zinc-400 uppercase tracking-wider font-medium">Executed Agreements</p>
+        <div className="interactive-card dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm p-4 rounded-xl">
+          <p className="text-xs dark:text-zinc-400 text-slate-500 uppercase tracking-wider font-medium">Executed Agreements</p>
           <p className="text-2xl font-bold text-blue-400 mt-1">
             {documents.filter((d) => d.category === 'CONTRACT').length}
           </p>
           <p className="text-xs text-zinc-500 mt-1">Signed contracts</p>
         </div>
 
-        <div className="bg-[#121412] border border-[#262926] p-4 rounded-xl">
-          <p className="text-xs text-zinc-400 uppercase tracking-wider font-medium">Deliverables Stored</p>
-          <p className="text-2xl font-bold text-[#8BFF24] mt-1">
+        <div className="interactive-card dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm p-4 rounded-xl">
+          <p className="text-xs dark:text-zinc-400 text-slate-500 uppercase tracking-wider font-medium">Deliverables Stored</p>
+          <p className="text-2xl font-bold dark:text-[#8BFF24] text-[#5046E5] mt-1">
             {documents.filter((d) => d.category === 'DELIVERABLE').length}
           </p>
           <p className="text-xs text-zinc-500 mt-1">Submitted files & assets</p>
         </div>
 
-        <div className="bg-[#121412] border border-[#262926] p-4 rounded-xl">
-          <p className="text-xs text-zinc-400 uppercase tracking-wider font-medium">Official Invoices</p>
+        <div className="interactive-card dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm p-4 rounded-xl">
+          <p className="text-xs dark:text-zinc-400 text-slate-500 uppercase tracking-wider font-medium">Official Invoices</p>
           <p className="text-2xl font-bold text-emerald-400 mt-1">
             {documents.filter((d) => d.category === 'INVOICE').length}
           </p>
@@ -257,15 +257,15 @@ export const DocumentsVault: React.FC = () => {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-[#121412] border border-[#262926] p-4 rounded-xl flex flex-col md:flex-row gap-3 items-center justify-between">
+      <div className="interactive-card dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm p-4 rounded-xl flex flex-col md:flex-row gap-3 items-center justify-between">
         <div className="relative w-full md:w-80">
-          <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 dark:text-zinc-400 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder="Search document name or contract..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#181a18] border border-[#2e322e] rounded-lg pl-9 pr-4 py-2 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#8BFF24]/60 transition"
+            className="w-full dark:bg-[#181a18] bg-slate-50 border dark:border-[#2e322e] border-slate-300 rounded-lg pl-9 pr-4 py-2 text-sm dark:text-white text-slate-900 placeholder-zinc-400 focus:outline-none focus:dark:border-[#8BFF24]/60 focus:border-[#5046E5] transition"
           />
         </div>
 
@@ -276,8 +276,8 @@ export const DocumentsVault: React.FC = () => {
               onClick={() => setCategoryFilter(cat)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
                 categoryFilter === cat
-                  ? 'bg-[#8BFF24] text-black'
-                  : 'bg-[#181a18] text-zinc-300 hover:text-white border border-[#2e322e]'
+                  ? 'dark:bg-[#8BFF24] bg-[#5046E5] dark:text-black text-white shadow-sm'
+                  : 'dark:bg-[#181a18] bg-slate-50 dark:text-zinc-300 text-slate-700 hover:dark:text-white hover:text-[#5046E5] hover:dark:bg-[#202220] hover:bg-[#EEF2FF] border dark:border-[#2e322e] border-slate-300'
               }`}
             >
               {cat === 'ALL' ? 'All' : cat === 'CONTRACT' ? 'Agreements' : cat === 'DELIVERABLE' ? 'Deliverables' : 'Invoices'}
@@ -288,9 +288,9 @@ export const DocumentsVault: React.FC = () => {
 
       {/* Document List */}
       {loading ? (
-        <div className="bg-[#121412] border border-[#262926] p-12 rounded-2xl flex flex-col items-center justify-center text-center">
-          <RefreshCw className="w-8 h-8 text-[#8BFF24] animate-spin mb-3" />
-          <p className="text-zinc-400 text-sm">Indexing cryptographic vault storage...</p>
+        <div className="dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm p-12 rounded-2xl flex flex-col items-center justify-center text-center">
+          <RefreshCw className="w-8 h-8 dark:text-[#8BFF24] text-[#5046E5] animate-spin mb-3" />
+          <p className="dark:text-zinc-400 text-slate-500 text-sm">Indexing cryptographic vault storage...</p>
         </div>
       ) : error ? (
         <div className="bg-red-500/10 border border-red-500/30 p-6 rounded-2xl flex items-center gap-3 text-red-400">
@@ -298,20 +298,20 @@ export const DocumentsVault: React.FC = () => {
           <p className="text-sm">{error}</p>
         </div>
       ) : filteredDocuments.length === 0 ? (
-        <div className="bg-[#121412] border border-[#262926] p-12 rounded-2xl text-center">
+        <div className="dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm p-12 rounded-2xl text-center">
           <Folder className="w-10 h-10 text-zinc-600 mx-auto mb-3" />
-          <h3 className="text-base font-semibold text-white">No documents found</h3>
-          <p className="text-xs text-zinc-400 mt-1 max-w-sm mx-auto">
+          <h3 className="text-base font-semibold dark:text-white text-slate-900">No documents found</h3>
+          <p className="text-xs dark:text-zinc-400 text-slate-500 mt-1 max-w-sm mx-auto">
             {searchQuery || categoryFilter !== 'ALL'
               ? 'No documents matched your search filter.'
               : 'Executed contracts and submitted deliverables will automatically be indexed here.'}
           </p>
         </div>
       ) : (
-        <div className="bg-[#121412] border border-[#262926] rounded-2xl overflow-hidden">
+        <div className="interactive-card dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm rounded-2xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-[#181a18] border-b border-[#262926] text-xs uppercase text-zinc-400 tracking-wider">
+              <thead className="dark:bg-[#181a18] bg-slate-50 border-b dark:border-[#262926] border-slate-200 text-xs uppercase dark:text-zinc-400 text-slate-500 tracking-wider">
                 <tr>
                   <th className="py-3.5 px-4 font-semibold">Document Name</th>
                   <th className="py-3.5 px-4 font-semibold">Classification</th>
@@ -321,12 +321,12 @@ export const DocumentsVault: React.FC = () => {
                   <th className="py-3.5 px-4 font-semibold text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#262926] text-zinc-300">
+              <tbody className="divide-y dark:divide-[#262926] divide-slate-200 dark:text-zinc-300 text-slate-700">
                 {filteredDocuments.map((doc) => (
-                  <tr key={doc.id} className="hover:bg-[#161816] transition">
-                    <td className="py-3.5 px-4 text-xs font-semibold text-white">
+                  <tr key={doc.id} className="dark:hover:bg-[#161816] hover:bg-[#EEF2FF]/70 transition">
+                    <td className="py-3.5 px-4 text-xs font-semibold dark:text-white text-slate-900">
                       <div className="flex items-center gap-2">
-                        <FileText className="w-4 h-4 text-[#8BFF24]" />
+                        <FileText className="w-4 h-4 dark:text-[#8BFF24] text-[#5046E5]" />
                         <span className="font-mono">{doc.name}</span>
                       </div>
                     </td>
@@ -334,20 +334,20 @@ export const DocumentsVault: React.FC = () => {
                       {getCategoryBadge(doc.category)}
                     </td>
                     <td className="py-3.5 px-4 text-xs max-w-xs truncate">
-                      <span className="text-zinc-300 block truncate">{doc.contractTitle}</span>
+                      <span className="dark:text-zinc-300 text-slate-700 block truncate">{doc.contractTitle}</span>
                       <span className="text-[11px] text-zinc-500 font-mono">{doc.contractNumber}</span>
                     </td>
-                    <td className="py-3.5 px-4 text-xs text-zinc-400">
+                    <td className="py-3.5 px-4 text-xs dark:text-zinc-400 text-slate-500">
                       {doc.fileSize || 'N/A'}
                     </td>
-                    <td className="py-3.5 px-4 text-xs text-zinc-400">
+                    <td className="py-3.5 px-4 text-xs dark:text-zinc-400 text-slate-500">
                       {new Date(doc.createdAt).toLocaleDateString()}
                     </td>
                     <td className="py-3.5 px-4 text-right">
                       <button
                         onClick={() => handleDownload(doc)}
                         disabled={downloadingId === doc.id}
-                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#8BFF24]/10 hover:bg-[#8BFF24]/20 border border-[#8BFF24]/30 text-[#8BFF24] text-xs font-semibold transition"
+                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg dark:bg-[#8BFF24]/10 bg-[#EEF2FF] hover:dark:bg-[#8BFF24]/20 hover:bg-[#E0E7FF] border dark:border-[#8BFF24]/30 border-[#C7D2FE] dark:text-[#8BFF24] text-[#5046E5] text-xs font-semibold transition"
                       >
                         <Download className={`w-3.5 h-3.5 ${downloadingId === doc.id ? 'animate-bounce' : ''}`} />
                         {downloadingId === doc.id ? 'Fetching...' : 'Download'}

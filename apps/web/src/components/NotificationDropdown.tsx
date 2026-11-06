@@ -106,10 +106,10 @@ export const NotificationDropdown: React.FC = () => {
       return <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />;
     }
     if (type.includes('HIRING') || type.includes('PROPOSAL')) {
-      return <Send className="w-3.5 h-3.5 text-[#2563EB] dark:text-[#CDCBCA]" />;
+      return <Send className="w-3.5 h-3.5 text-[#5046E5] dark:text-[#CDCBCA]" />;
     }
     if (type.includes('CONTRACT') || type.includes('AMENDMENT')) {
-      return <FileText className="w-3.5 h-3.5 text-[#2563EB] dark:text-[#CDCBCA]" />;
+      return <FileText className="w-3.5 h-3.5 text-[#5046E5] dark:text-[#CDCBCA]" />;
     }
     return <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />;
   };
@@ -118,7 +118,7 @@ export const NotificationDropdown: React.FC = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 rounded-xl dark:bg-[#171717] bg-white hover:dark:bg-[#202020] hover:bg-[#F1F5F9] dark:text-[#CDCBCA] text-[#242424] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] transition flex items-center justify-center focus:outline-none focus:ring-1 focus:ring-[#2563EB] shadow-sm"
+        className="relative p-2 rounded-xl dark:bg-[#171717] bg-white hover:dark:bg-[#202020] hover:bg-[#F1F5F9] dark:text-[#CDCBCA] text-[#242424] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] transition flex items-center justify-center focus:outline-none focus:ring-1 focus:ring-[#5046E5] shadow-sm"
         title="Notifications"
         aria-label="Toggle notifications dropdown"
       >
@@ -148,7 +148,7 @@ export const NotificationDropdown: React.FC = () => {
                 <button
                   onClick={handleMarkAllRead}
                   disabled={isLoading}
-                  className="text-[11px] dark:text-[#A5A5A5] text-[#64748B] hover:text-[#2563EB] dark:hover:text-white transition font-medium"
+                  className="text-[11px] dark:text-[#A5A5A5] text-[#64748B] hover:text-[#5046E5] dark:hover:text-white transition font-medium"
                 >
                   Mark all read
                 </button>
@@ -177,7 +177,7 @@ export const NotificationDropdown: React.FC = () => {
                   className={`p-3.5 transition cursor-pointer flex items-start space-x-3 ${
                     n.isRead
                       ? 'dark:bg-[#171717] bg-white hover:dark:bg-[#202020] hover:bg-[#F8FAFC]'
-                      : 'dark:bg-[#202020]/70 bg-[#EFF6FF] hover:dark:bg-[#202020] hover:bg-[#DBEAFE]/60'
+                      : 'dark:bg-[#202020]/70 bg-[#EEF2FF] hover:dark:bg-[#202020] hover:bg-[#C7D2FE]/60'
                   }`}
                 >
                   <div className="mt-0.5 shrink-0">{getNotificationIcon(n.type)}</div>
@@ -188,7 +188,7 @@ export const NotificationDropdown: React.FC = () => {
                         {n.title}
                       </span>
                       {!n.isRead && (
-                        <span className="w-2 h-2 rounded-full bg-[#2563EB] shrink-0 ml-1.5" />
+                        <span className="w-2 h-2 rounded-full bg-[#5046E5] shrink-0 ml-1.5" />
                       )}
                     </div>
                     <p className="dark:text-[#A5A5A5] text-[#64748B] text-[11px] leading-relaxed">{n.message}</p>
@@ -206,7 +206,7 @@ export const NotificationDropdown: React.FC = () => {
                     <button
                       onClick={(e) => handleMarkAsRead(n.id, e)}
                       title="Mark as read"
-                      className="p-1 rounded-md dark:text-[#777777] text-[#64748B] hover:text-[#2563EB] dark:hover:text-[#CDCBCA] transition shrink-0"
+                      className="p-1 rounded-md dark:text-[#777777] text-[#64748B] hover:text-[#5046E5] dark:hover:text-[#CDCBCA] transition shrink-0"
                     >
                       <Check className="w-3.5 h-3.5" />
                     </button>

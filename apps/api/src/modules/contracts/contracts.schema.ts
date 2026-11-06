@@ -2,8 +2,8 @@ import { z } from 'zod';
 import { ContractStatus } from '@prisma/client';
 
 export const createMilestoneInputSchema = z.object({
-  title: z.string().min(3, 'Milestone title must be at least 3 characters').max(100),
-  description: z.string().min(5, 'Milestone description must be at least 5 characters').max(2000),
+  title: z.string().min(1, 'Milestone title is required').max(100),
+  description: z.string().max(2000).optional().default('Milestone deliverable'),
   amount: z.number().positive('Milestone amount must be greater than zero'),
   order: z.number().int().min(1).optional(),
   dueDate: z.string().datetime().optional(),
@@ -11,8 +11,8 @@ export const createMilestoneInputSchema = z.object({
 
 export const createContractSchema = z.object({
   workerId: z.string().uuid('Valid worker ID required'),
-  title: z.string().min(5, 'Contract title must be at least 5 characters').max(150),
-  description: z.string().min(20, 'Contract description must be at least 20 characters').max(5000),
+  title: z.string().min(1, 'Contract title is required').max(150),
+  description: z.string().min(1, 'Contract description is required').max(5000),
   currency: z.string().default('USD'),
   scopeOfWork: z.string().max(5000).optional(),
   termsAndConditions: z.string().max(5000).optional(),

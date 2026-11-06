@@ -95,7 +95,7 @@ export const CreateHiringRequestModal: React.FC<CreateHiringRequestModalProps> =
             <div>
               <h3 className="text-base font-bold dark:text-[#E8EAE6] text-[#111827]">Send Hiring Proposal</h3>
               <p className="text-xs dark:text-[#A5AAA2] text-[#64748B] mt-0.5">
-                Target Specialist: <span className="text-[#8BFF24] font-semibold">{workerName}</span> ({worker.headline || 'Specialist'})
+                Target Specialist: <span className="dark:text-[#8BFF24] text-[#5046E5] font-semibold">{workerName}</span> ({worker.headline || 'Specialist'})
               </p>
             </div>
           </div>
@@ -122,7 +122,7 @@ export const CreateHiringRequestModal: React.FC<CreateHiringRequestModalProps> =
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Enterprise Fullstack React & PostgreSQL Architecture"
-              className="w-full px-3 py-2 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] text-xs dark:text-[#E8EAE6] text-[#111827] placeholder:text-[#6A6F68] focus:outline-none focus:border-[#8BFF24] transition"
+              className="w-full px-3 py-2 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] text-xs dark:text-[#E8EAE6] text-[#111827] placeholder:text-[#6A6F68] focus:outline-none dark:focus:border-[#8BFF24] focus:border-[#5046E5] transition"
               required
             />
           </div>
@@ -136,7 +136,7 @@ export const CreateHiringRequestModal: React.FC<CreateHiringRequestModalProps> =
               onChange={(e) => setDescription(e.target.value)}
               rows={4}
               placeholder="Provide clear specifications, technical stack, deliverable requirements..."
-              className="w-full px-3 py-2 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] text-xs dark:text-[#E8EAE6] text-[#111827] placeholder:text-[#6A6F68] focus:outline-none focus:border-[#8BFF24] transition leading-relaxed"
+              className="w-full px-3 py-2 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] text-xs dark:text-[#E8EAE6] text-[#111827] placeholder:text-[#6A6F68] focus:outline-none dark:focus:border-[#8BFF24] focus:border-[#5046E5] transition leading-relaxed"
               required
             />
           </div>
@@ -152,7 +152,7 @@ export const CreateHiringRequestModal: React.FC<CreateHiringRequestModalProps> =
                 value={proposedBudget}
                 onChange={(e) => setProposedBudget(e.target.value)}
                 placeholder="e.g. 2500"
-                className="w-full px-3 py-2 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] text-xs text-[#8BFF24] focus:outline-none focus:border-[#8BFF24] font-mono tabular-nums transition font-semibold"
+                className="w-full px-3 py-2 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] text-xs dark:text-[#8BFF24] text-[#5046E5] focus:outline-none dark:focus:border-[#8BFF24] focus:border-[#5046E5] font-mono tabular-nums transition font-semibold"
                 required
               />
             </div>
@@ -166,7 +166,7 @@ export const CreateHiringRequestModal: React.FC<CreateHiringRequestModalProps> =
                 value={requiredSkills}
                 onChange={(e) => setRequiredSkills(e.target.value)}
                 placeholder="e.g. React, TypeScript, Node.js"
-                className="w-full px-3 py-2 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] text-xs dark:text-[#E8EAE6] text-[#111827] placeholder:text-[#6A6F68] focus:outline-none focus:border-[#8BFF24] transition"
+                className="w-full px-3 py-2 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] text-xs dark:text-[#E8EAE6] text-[#111827] placeholder:text-[#6A6F68] focus:outline-none dark:focus:border-[#8BFF24] focus:border-[#5046E5] transition"
               />
             </div>
           </div>
@@ -178,7 +178,7 @@ export const CreateHiringRequestModal: React.FC<CreateHiringRequestModalProps> =
                 type="date"
                 value={proposedStartDate}
                 onChange={(e) => setProposedStartDate(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] text-xs dark:text-[#E8EAE6] text-[#111827] focus:outline-none focus:border-[#8BFF24] font-mono transition"
+                className="w-full px-3 py-2 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] text-xs dark:text-[#E8EAE6] text-[#111827] focus:outline-none dark:focus:border-[#8BFF24] focus:border-[#5046E5] font-mono transition"
               />
             </div>
 
@@ -188,7 +188,7 @@ export const CreateHiringRequestModal: React.FC<CreateHiringRequestModalProps> =
                 type="date"
                 value={expectedCompletionDate}
                 onChange={(e) => setExpectedCompletionDate(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] text-xs dark:text-[#E8EAE6] text-[#111827] focus:outline-none focus:border-[#8BFF24] font-mono transition"
+                className="w-full px-3 py-2 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] text-xs dark:text-[#E8EAE6] text-[#111827] focus:outline-none dark:focus:border-[#8BFF24] focus:border-[#5046E5] font-mono transition"
               />
             </div>
           </div>
@@ -200,7 +200,7 @@ export const CreateHiringRequestModal: React.FC<CreateHiringRequestModalProps> =
               onChange={(e) => setClientMessage(e.target.value)}
               rows={2}
               placeholder="Introduce your project context and any specific timeline expectations..."
-              className="w-full px-3 py-2 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] text-xs dark:text-[#E8EAE6] text-[#111827] placeholder:text-[#6A6F68] focus:outline-none focus:border-[#8BFF24] transition leading-relaxed"
+              className="w-full px-3 py-2 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] text-xs dark:text-[#E8EAE6] text-[#111827] placeholder:text-[#6A6F68] focus:outline-none dark:focus:border-[#8BFF24] focus:border-[#5046E5] transition leading-relaxed"
             />
           </div>
 
@@ -216,7 +216,7 @@ export const CreateHiringRequestModal: React.FC<CreateHiringRequestModalProps> =
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-5 py-2 rounded-xl bg-[#8BFF24] hover:bg-[#A3FF50] disabled:opacity-50 text-xs font-bold text-[#050605] flex items-center space-x-1.5 shadow-[0_0_15px_rgba(139,255,36,0.2)] transition active:scale-95 cursor-pointer"
+              className="px-5 py-2 rounded-xl dark:bg-[#8BFF24] bg-[#5046E5] hover:dark:bg-[#A3FF50] hover:bg-[#4338CA] disabled:opacity-50 text-xs font-bold dark:text-[#050605] text-white flex items-center space-x-1.5 dark:shadow-[0_0_15px_rgba(139,255,36,0.2)] shadow-md shadow-[#5046E5]/25 transition active:scale-95 cursor-pointer"
             >
               <Send className="w-3.5 h-3.5" />
               <span>{isSubmitting ? 'Submitting...' : 'Send Proposal'}</span>

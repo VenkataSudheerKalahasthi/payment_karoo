@@ -753,7 +753,8 @@ export interface CreateShortlistRequest {
 }
 
 export interface AddWorkerSkillRequest {
-  skillId: string;
+  skillId?: string;
+  name?: string;
   yearsOfExperience: number;
 }
 

@@ -125,25 +125,25 @@ export const RoleSelectionModal: React.FC<RoleSelectionModalProps> = ({
               onClick={() => setSelectedRole('CLIENT')}
               className={`p-5 rounded-2xl border-2 cursor-pointer transition-all relative flex flex-col justify-between ${
                 selectedRole === 'CLIENT'
-                  ? 'dark:bg-[#151a15] bg-[#EFF6FF] dark:border-[#8BFF24] border-[#2563EB] shadow-[0_0_20px_rgba(139,255,36,0.15)] scale-[1.01]'
-                  : 'dark:bg-[#121412] bg-[#F8FAFC] dark:border-[#262926] border-[#E2E8F0] hover:border-zinc-500 dark:hover:border-zinc-700'
+                  ? 'dark:bg-[#151a15] bg-[#EEF2FF] dark:border-[#8BFF24] border-[#5046E5] dark:shadow-[0_0_20px_rgba(139,255,36,0.15)] shadow-[0_4px_20px_rgba(80,70,229,0.12)] scale-[1.01]'
+                  : 'dark:bg-[#121412] bg-[#F8FAFC] dark:border-[#262926] border-[#E2E8F0] hover:border-slate-300 dark:hover:border-zinc-700'
               }`}
             >
               {selectedRole === 'CLIENT' && (
-                <div className="absolute top-3 right-3 w-5 h-5 rounded-full dark:bg-[#8BFF24] bg-[#2563EB] flex items-center justify-center text-black">
+                <div className="absolute top-3 right-3 w-5 h-5 rounded-full dark:bg-[#8BFF24] bg-[#5046E5] flex items-center justify-center">
                   <CheckCircle2 className="w-4 h-4 dark:text-black text-white" />
                 </div>
               )}
 
               <div className="space-y-3">
-                <div className="w-10 h-10 rounded-xl dark:bg-[#8BFF24]/10 bg-[#2563EB]/10 border dark:border-[#8BFF24]/30 border-[#2563EB]/30 flex items-center justify-center">
-                  <Briefcase className="w-5 h-5 dark:text-[#8BFF24] text-[#2563EB]" />
+                <div className="w-10 h-10 rounded-xl dark:bg-[#8BFF24]/10 bg-[#EEF2FF] border dark:border-[#8BFF24]/30 border-[#C7D2FE] flex items-center justify-center">
+                  <Briefcase className="w-5 h-5 dark:text-[#8BFF24] text-[#5046E5]" />
                 </div>
 
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="text-base font-bold dark:text-white text-[#111827]">Client</h3>
-                    <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full dark:bg-[#8BFF24]/10 bg-[#2563EB]/10 dark:text-[#8BFF24] text-[#2563EB] font-bold">
+                    <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full dark:bg-[#8BFF24]/10 bg-[#EEF2FF] dark:text-[#8BFF24] text-[#5046E5] font-bold">
                       Buyer
                     </span>
                   </div>
@@ -154,15 +154,15 @@ export const RoleSelectionModal: React.FC<RoleSelectionModalProps> = ({
 
                 <ul className="space-y-1.5 pt-2 text-[11px] dark:text-zinc-400 text-zinc-600 border-t dark:border-[#262926] border-[#E2E8F0]">
                   <li className="flex items-center gap-1.5">
-                    <ShieldCheck className="w-3.5 h-3.5 text-[#8BFF24]" />
+                    <ShieldCheck className="w-3.5 h-3.5 dark:text-[#8BFF24] text-[#5046E5]" />
                     <span>Create &amp; sign digital contracts</span>
                   </li>
                   <li className="flex items-center gap-1.5">
-                    <Receipt className="w-3.5 h-3.5 text-[#8BFF24]" />
+                    <Receipt className="w-3.5 h-3.5 dark:text-[#8BFF24] text-[#5046E5]" />
                     <span>Non-custodial milestone escrow</span>
                   </li>
                   <li className="flex items-center gap-1.5">
-                    <FileCheck className="w-3.5 h-3.5 text-[#8BFF24]" />
+                    <FileCheck className="w-3.5 h-3.5 dark:text-[#8BFF24] text-[#5046E5]" />
                     <span>Official Client Office Stamp authority</span>
                   </li>
                 </ul>
@@ -174,25 +174,25 @@ export const RoleSelectionModal: React.FC<RoleSelectionModalProps> = ({
               onClick={() => setSelectedRole('WORKER')}
               className={`p-5 rounded-2xl border-2 cursor-pointer transition-all relative flex flex-col justify-between ${
                 selectedRole === 'WORKER'
-                  ? 'dark:bg-[#151a15] bg-[#EFF6FF] dark:border-[#8BFF24] border-[#2563EB] shadow-[0_0_20px_rgba(139,255,36,0.15)] scale-[1.01]'
-                  : 'dark:bg-[#121412] bg-[#F8FAFC] dark:border-[#262926] border-[#E2E8F0] hover:border-zinc-500 dark:hover:border-zinc-700'
+                  ? 'dark:bg-[#151a15] bg-[#EEF2FF] dark:border-[#8BFF24] border-[#5046E5] dark:shadow-[0_0_20px_rgba(139,255,36,0.15)] shadow-[0_4px_20px_rgba(80,70,229,0.12)] scale-[1.01]'
+                  : 'dark:bg-[#121412] bg-[#F8FAFC] dark:border-[#262926] border-[#E2E8F0] hover:border-slate-300 dark:hover:border-zinc-700'
               }`}
             >
               {selectedRole === 'WORKER' && (
-                <div className="absolute top-3 right-3 w-5 h-5 rounded-full dark:bg-[#8BFF24] bg-[#2563EB] flex items-center justify-center text-black">
+                <div className="absolute top-3 right-3 w-5 h-5 rounded-full dark:bg-[#8BFF24] bg-[#5046E5] flex items-center justify-center">
                   <CheckCircle2 className="w-4 h-4 dark:text-black text-white" />
                 </div>
               )}
 
               <div className="space-y-3">
-                <div className="w-10 h-10 rounded-xl dark:bg-[#8BFF24]/10 bg-[#2563EB]/10 border dark:border-[#8BFF24]/30 border-[#2563EB]/30 flex items-center justify-center">
-                  <Compass className="w-5 h-5 dark:text-[#8BFF24] text-[#2563EB]" />
+                <div className="w-10 h-10 rounded-xl dark:bg-[#8BFF24]/10 bg-[#EEF2FF] border dark:border-[#8BFF24]/30 border-[#C7D2FE] flex items-center justify-center">
+                  <Compass className="w-5 h-5 dark:text-[#8BFF24] text-[#5046E5]" />
                 </div>
 
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="text-base font-bold dark:text-white text-[#111827]">Specialist</h3>
-                    <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full dark:bg-[#8BFF24]/10 bg-[#2563EB]/10 dark:text-[#8BFF24] text-[#2563EB] font-bold">
+                    <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full dark:bg-[#8BFF24]/10 bg-[#EEF2FF] dark:text-[#8BFF24] text-[#5046E5] font-bold">
                       Provider
                     </span>
                   </div>
@@ -203,15 +203,15 @@ export const RoleSelectionModal: React.FC<RoleSelectionModalProps> = ({
 
                 <ul className="space-y-1.5 pt-2 text-[11px] dark:text-zinc-400 text-zinc-600 border-t dark:border-[#262926] border-[#E2E8F0]">
                   <li className="flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-[#8BFF24]" />
+                    <Sparkles className="w-3.5 h-3.5 dark:text-[#8BFF24] text-[#5046E5]" />
                     <span>Browse project opportunities feed</span>
                   </li>
                   <li className="flex items-center gap-1.5">
-                    <ShieldCheck className="w-3.5 h-3.5 text-[#8BFF24]" />
+                    <ShieldCheck className="w-3.5 h-3.5 dark:text-[#8BFF24] text-[#5046E5]" />
                     <span>Submit deliverables &amp; revisions</span>
                   </li>
                   <li className="flex items-center gap-1.5">
-                    <Receipt className="w-3.5 h-3.5 text-[#8BFF24]" />
+                    <Receipt className="w-3.5 h-3.5 dark:text-[#8BFF24] text-[#5046E5]" />
                     <span>Guaranteed ledger escrow earnings</span>
                   </li>
                 </ul>
@@ -228,7 +228,7 @@ export const RoleSelectionModal: React.FC<RoleSelectionModalProps> = ({
                   <button
                     type="button"
                     onClick={() => onToggleActionType('login')}
-                    className="dark:text-[#8BFF24] text-[#2563EB] font-bold hover:underline cursor-pointer"
+                    className="dark:text-[#8BFF24] text-[#5046E5] font-bold hover:underline cursor-pointer"
                   >
                     Sign In instead
                   </button>
@@ -239,7 +239,7 @@ export const RoleSelectionModal: React.FC<RoleSelectionModalProps> = ({
                   <button
                     type="button"
                     onClick={() => onToggleActionType('register')}
-                    className="dark:text-[#8BFF24] text-[#2563EB] font-bold hover:underline cursor-pointer"
+                    className="dark:text-[#8BFF24] text-[#5046E5] font-bold hover:underline cursor-pointer"
                   >
                     Register free
                   </button>
@@ -256,7 +256,7 @@ export const RoleSelectionModal: React.FC<RoleSelectionModalProps> = ({
                 <button
                   type="button"
                   onClick={onCancel}
-                  className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl dark:bg-zinc-800 bg-zinc-200 text-xs font-semibold dark:text-zinc-300 text-zinc-700 hover:opacity-90 cursor-pointer"
+                  className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl dark:bg-zinc-800 bg-slate-100 text-xs font-semibold dark:text-zinc-300 text-slate-700 hover:opacity-90 cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -265,7 +265,7 @@ export const RoleSelectionModal: React.FC<RoleSelectionModalProps> = ({
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex-1 sm:flex-none px-6 py-2.5 rounded-xl dark:bg-[#8BFF24] bg-[#2563EB] hover:opacity-90 dark:text-black text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(139,255,36,0.3)] cursor-pointer disabled:opacity-50"
+                className="flex-1 sm:flex-none px-6 py-2.5 rounded-xl dark:bg-[#8BFF24] bg-[#5046E5] hover:bg-[#4338CA] dark:hover:bg-[#A3FF50] dark:text-black text-white text-xs font-bold transition flex items-center justify-center gap-2 dark:shadow-[0_0_15px_rgba(139,255,36,0.3)] shadow-md shadow-[#5046E5]/25 cursor-pointer disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <>

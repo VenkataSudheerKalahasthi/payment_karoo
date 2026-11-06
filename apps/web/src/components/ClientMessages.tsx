@@ -183,14 +183,14 @@ export const ClientMessages: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#121412] dark:bg-[#121412] border border-[#262926] p-6 rounded-2xl">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm p-6 rounded-2xl">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#8BFF24]/10 border border-[#8BFF24]/30 flex items-center justify-center">
-            <MessageSquare className="w-5 h-5 text-[#8BFF24]" />
+          <div className="w-10 h-10 rounded-xl dark:bg-[#8BFF24]/10 bg-[#EEF2FF] border dark:border-[#8BFF24]/30 border-[#C7D2FE] flex items-center justify-center">
+            <MessageSquare className="w-5 h-5 dark:text-[#8BFF24] text-[#5046E5]" />
           </div>
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Direct Project Messages</h1>
-            <p className="text-sm text-zinc-400">
+            <h1 className="text-xl sm:text-2xl font-bold dark:text-white text-slate-900 tracking-tight">Direct Project Messages</h1>
+            <p className="text-sm dark:text-zinc-400 text-slate-500">
               End-to-end encrypted messaging with verified contract specialists.
             </p>
           </div>
@@ -199,7 +199,7 @@ export const ClientMessages: React.FC = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowNewChatModal(true)}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#8BFF24] hover:bg-[#78e018] text-black text-xs font-bold transition shadow-[0_0_12px_rgba(139,255,36,0.2)]"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl dark:bg-[#8BFF24] bg-[#5046E5] hover:dark:bg-[#78e018] hover:bg-[#4338CA] dark:text-black text-white shadow-md shadow-[#5046E5]/25 text-xs font-bold transition shadow-[0_0_12px_rgba(139,255,36,0.2)]"
           >
             <Plus className="w-4 h-4" />
             New Chat
@@ -207,7 +207,7 @@ export const ClientMessages: React.FC = () => {
           <button
             onClick={fetchConversations}
             disabled={loading}
-            className="p-2 rounded-xl bg-[#1e201e] border border-[#2e322e] text-zinc-300 hover:text-white transition"
+            className="p-2 rounded-xl dark:bg-[#1e201e] bg-slate-100 border dark:border-[#2e322e] border-slate-300 dark:text-zinc-300 text-slate-700 hover:dark:text-white hover:text-slate-900 hover:dark:bg-[#282c28] hover:bg-slate-200 transition"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
@@ -215,28 +215,28 @@ export const ClientMessages: React.FC = () => {
       </div>
 
       {/* Main Chat Layout: 2 Columns */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 h-[650px] bg-[#121412] border border-[#262926] rounded-2xl overflow-hidden">
+      <div className="interactive-card grid grid-cols-1 md:grid-cols-12 gap-0 h-[650px] dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm rounded-2xl overflow-hidden">
         {/* Left Column: Conversation List */}
-        <div className="md:col-span-4 border-r border-[#262926] flex flex-col h-full bg-[#101210]">
+        <div className="md:col-span-4 border-r dark:border-[#262926] border-slate-200 flex flex-col h-full dark:bg-[#101210] bg-[#F8FAFC]">
           {/* Search Bar */}
-          <div className="p-3.5 border-b border-[#262926]">
+          <div className="p-3.5 border-b dark:border-[#262926] border-slate-200">
             <div className="relative">
-              <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 dark:text-zinc-400 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 placeholder="Search conversations..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-[#181a18] border border-[#2e322e] rounded-lg pl-9 pr-3 py-1.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#8BFF24]/60"
+                className="w-full dark:bg-[#181a18] bg-white border dark:border-[#2e322e] border-slate-300 rounded-lg pl-9 pr-3 py-1.5 text-xs dark:text-white text-slate-900 placeholder-zinc-400 focus:outline-none focus:dark:border-[#8BFF24]/60 focus:border-[#5046E5]"
               />
             </div>
           </div>
 
           {/* Conversations Scrollable List */}
-          <div className="flex-1 overflow-y-auto divide-y divide-[#202220]">
+          <div className="flex-1 overflow-y-auto divide-y dark:divide-[#202220] divide-slate-200">
             {loading ? (
               <div className="p-8 text-center text-zinc-500 text-xs flex flex-col items-center">
-                <RefreshCw className="w-5 h-5 text-[#8BFF24] animate-spin mb-2" />
+                <RefreshCw className="w-5 h-5 dark:text-[#8BFF24] text-[#5046E5] animate-spin mb-2" />
                 Loading conversations...
               </div>
             ) : filteredConversations.length === 0 ? (
@@ -254,16 +254,16 @@ export const ClientMessages: React.FC = () => {
                     key={conv.id}
                     onClick={() => setActiveConversation(conv)}
                     className={`w-full text-left p-3.5 transition flex items-start gap-3 ${
-                      isActive ? 'bg-[#181a18] border-l-2 border-[#8BFF24]' : 'hover:bg-[#141614]'
+                      isActive ? 'dark:bg-[#181a18] bg-slate-100 border-l-2 dark:border-[#8BFF24] border-[#5046E5]' : 'dark:hover:bg-[#141614] hover:bg-[#EEF2FF]'
                     }`}
                   >
-                    <div className="w-9 h-9 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-300 font-bold text-xs flex-shrink-0">
+                    <div className="w-9 h-9 rounded-full dark:bg-zinc-800 bg-[#EEF2FF] border dark:border-zinc-700 border-[#C7D2FE] flex items-center justify-center dark:text-zinc-300 text-[#5046E5] font-bold text-xs flex-shrink-0">
                       {other?.firstName ? other.firstName[0] : 'S'}
                     </div>
 
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-center">
-                        <span className="font-semibold text-xs text-white truncate">
+                        <span className="font-semibold text-xs dark:text-white text-slate-900 truncate">
                           {other?.firstName ? `${other.firstName} ${other.lastName || ''}` : 'Specialist'}
                         </span>
                         <span className="text-[10px] text-zinc-500">
@@ -272,13 +272,13 @@ export const ClientMessages: React.FC = () => {
                       </div>
 
                       {conv.contract && (
-                        <p className="text-[11px] text-[#8BFF24] truncate flex items-center gap-1 mt-0.5">
+                        <p className="text-[11px] dark:text-[#8BFF24] text-[#5046E5] truncate flex items-center gap-1 mt-0.5">
                           <FileText className="w-3 h-3 flex-shrink-0" />
                           {conv.contract.title}
                         </p>
                       )}
 
-                      <p className="text-xs text-zinc-400 truncate mt-1">
+                      <p className="text-xs dark:text-zinc-400 text-slate-500 truncate mt-1">
                         {lastMsg ? lastMsg.content : 'No messages yet. Say hello!'}
                       </p>
                     </div>
@@ -290,17 +290,17 @@ export const ClientMessages: React.FC = () => {
         </div>
 
         {/* Right Column: Chat Window */}
-        <div className="md:col-span-8 flex flex-col h-full bg-[#121412]">
+        <div className="md:col-span-8 flex flex-col h-full dark:bg-[#121412] bg-white">
           {activeConversation ? (
             <>
               {/* Chat Header */}
-              <div className="p-4 border-b border-[#262926] bg-[#101210] flex justify-between items-center">
+              <div className="p-4 border-b dark:border-[#262926] border-slate-200 dark:bg-[#101210] bg-[#F8FAFC] flex justify-between items-center">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-[#8BFF24]/10 border border-[#8BFF24]/30 flex items-center justify-center text-[#8BFF24] font-bold text-sm">
+                  <div className="w-10 h-10 rounded-full dark:bg-[#8BFF24]/10 bg-[#EEF2FF] border dark:border-[#8BFF24]/30 border-[#C7D2FE] flex items-center justify-center dark:text-[#8BFF24] text-[#5046E5] font-bold text-sm">
                     {getOtherParticipant(activeConversation)?.firstName ? getOtherParticipant(activeConversation)!.firstName![0] : 'S'}
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                    <h3 className="text-sm font-bold dark:text-white text-slate-900 flex items-center gap-2">
                       {getOtherParticipant(activeConversation)?.firstName
                         ? `${getOtherParticipant(activeConversation)!.firstName} ${getOtherParticipant(activeConversation)!.lastName || ''}`
                         : 'Specialist'}
@@ -309,15 +309,15 @@ export const ClientMessages: React.FC = () => {
                       </span>
                     </h3>
                     {activeConversation.contract && (
-                      <p className="text-xs text-zinc-400">
+                      <p className="text-xs dark:text-zinc-400 text-slate-500">
                         Contract: {activeConversation.contract.title} ({activeConversation.contract.contractNumber})
                       </p>
                     )}
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 text-xs text-zinc-400">
-                  <ShieldCheck className="w-4 h-4 text-[#8BFF24]" />
+                <div className="flex items-center gap-2 text-xs dark:text-zinc-400 text-slate-500">
+                  <ShieldCheck className="w-4 h-4 dark:text-[#8BFF24] text-[#5046E5]" />
                   <span>Escrow Safe Chat</span>
                 </div>
               </div>
@@ -339,8 +339,8 @@ export const ClientMessages: React.FC = () => {
                         <div
                           className={`max-w-[75%] rounded-2xl px-4 py-2.5 text-xs ${
                             isMe
-                              ? 'bg-[#8BFF24] text-black font-medium shadow-[0_0_12px_rgba(139,255,36,0.15)] rounded-br-none'
-                              : 'bg-[#181a18] text-white border border-[#2e322e] rounded-bl-none'
+                              ? 'dark:bg-[#8BFF24] bg-[#5046E5] dark:text-black text-white shadow-sm font-medium shadow-[0_0_12px_rgba(139,255,36,0.15)] rounded-br-none'
+                              : 'dark:bg-[#181a18] bg-slate-100 dark:text-zinc-200 text-slate-800 border dark:border-[#2e322e] border-slate-200 rounded-bl-none shadow-sm'
                           }`}
                         >
                           <p className="whitespace-pre-wrap">{m.content}</p>
@@ -356,18 +356,18 @@ export const ClientMessages: React.FC = () => {
               </div>
 
               {/* Chat Input Bar */}
-              <form onSubmit={handleSendMessage} className="p-3 border-t border-[#262926] bg-[#101210] flex gap-2">
+              <form onSubmit={handleSendMessage} className="p-3 border-t dark:border-[#262926] border-slate-200 dark:bg-[#101210] bg-[#F8FAFC] flex gap-2">
                 <input
                   type="text"
                   placeholder="Type your message... (Press Enter to send)"
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
-                  className="flex-1 bg-[#181a18] border border-[#2e322e] rounded-xl px-4 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#8BFF24]/60"
+                  className="flex-1 dark:bg-[#181a18] bg-white border dark:border-[#2e322e] border-slate-300 rounded-xl px-4 py-2.5 text-xs dark:text-white text-slate-900 placeholder-zinc-400 focus:outline-none focus:dark:border-[#8BFF24]/60 focus:border-[#5046E5]"
                 />
                 <button
                   type="submit"
                   disabled={!inputText.trim() || sending}
-                  className="px-4 py-2.5 rounded-xl bg-[#8BFF24] hover:bg-[#78e018] text-black text-xs font-bold transition disabled:opacity-40 flex items-center gap-1.5"
+                  className="px-4 py-2.5 rounded-xl dark:bg-[#8BFF24] bg-[#5046E5] hover:dark:bg-[#78e018] hover:bg-[#4338CA] dark:text-black text-white shadow-md shadow-[#5046E5]/25 text-xs font-bold transition disabled:opacity-40 flex items-center gap-1.5"
                 >
                   <Send className="w-3.5 h-3.5" />
                   {sending ? 'Sending...' : 'Send'}
@@ -386,9 +386,9 @@ export const ClientMessages: React.FC = () => {
       {/* New Chat Modal: Choose Contract / Specialist */}
       {showNewChatModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-[#121412] border border-[#262926] w-full max-w-md rounded-2xl p-6 space-y-4 shadow-2xl">
-            <h3 className="text-base font-bold text-white">Start New Conversation</h3>
-            <p className="text-xs text-zinc-400">Select an active contract to message your assigned specialist:</p>
+          <div className="dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm w-full max-w-md rounded-2xl p-6 space-y-4 shadow-2xl">
+            <h3 className="text-base font-bold dark:text-white text-slate-900">Start New Conversation</h3>
+            <p className="text-xs dark:text-zinc-400 text-slate-500">Select an active contract to message your assigned specialist:</p>
 
             <div className="space-y-2 max-h-60 overflow-y-auto">
               {contracts.length === 0 ? (
@@ -398,13 +398,13 @@ export const ClientMessages: React.FC = () => {
                   <button
                     key={c.id}
                     onClick={() => handleStartConversationForContract(c)}
-                    className="w-full text-left p-3 rounded-xl bg-[#181a18] hover:bg-[#202220] border border-[#262926] transition flex items-center justify-between"
+                    className="w-full text-left p-3 rounded-xl dark:bg-[#181a18] bg-slate-50 hover:dark:bg-[#202220] bg-slate-100 border dark:border-[#262926] border-slate-200 transition flex items-center justify-between"
                   >
                     <div>
-                      <p className="text-xs font-semibold text-white">{c.title}</p>
+                      <p className="text-xs font-semibold dark:text-white text-slate-900">{c.title}</p>
                       <span className="text-[11px] text-zinc-500 font-mono">{c.contractNumber}</span>
                     </div>
-                    <span className="text-[11px] text-[#8BFF24] font-semibold">Start Chat →</span>
+                    <span className="text-[11px] dark:text-[#8BFF24] text-[#5046E5] font-semibold">Start Chat →</span>
                   </button>
                 ))
               )}
@@ -413,7 +413,7 @@ export const ClientMessages: React.FC = () => {
             <div className="flex justify-end pt-2">
               <button
                 onClick={() => setShowNewChatModal(false)}
-                className="px-4 py-2 rounded-xl bg-zinc-800 text-zinc-200 text-xs font-semibold hover:bg-zinc-700"
+                className="px-4 py-2 rounded-xl dark:bg-zinc-800 bg-slate-100 hover:dark:bg-zinc-700 hover:bg-slate-200 dark:text-zinc-200 text-slate-700 hover:dark:text-white hover:text-slate-900 text-xs font-semibold transition"
               >
                 Close
               </button>

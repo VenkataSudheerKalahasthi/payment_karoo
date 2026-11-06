@@ -254,20 +254,42 @@ export async function addWorkerSkill(req: Request, res: Response): Promise<void>
       });
     }
 
+    let targetSkillId = input.skillId;
+    if (!targetSkillId && input.name) {
+      const trimmedName = input.name.trim();
+      let skill = await prisma.skill.findFirst({
+        where: { name: { equals: trimmedName, mode: 'insensitive' } },
+      });
+      if (!skill) {
+        skill = await prisma.skill.create({
+          data: {
+            name: trimmedName,
+            category: 'Technical',
+          },
+        });
+      }
+      targetSkillId = skill.id;
+    }
+
+    if (!targetSkillId) {
+      sendError(res, 400, 'INVALID_INPUT', 'Skill identifier or name required');
+      return;
+    }
+
     const workerSkill = await prisma.workerSkill.upsert({
       where: {
         workerProfileId_skillId: {
           workerProfileId: workerProfile.id,
-          skillId: input.skillId,
+          skillId: targetSkillId,
         },
       },
       update: {
-        yearsOfExperience: input.yearsOfExperience,
+        yearsOfExperience: input.yearsOfExperience ?? 1,
       },
       create: {
         workerProfileId: workerProfile.id,
-        skillId: input.skillId,
-        yearsOfExperience: input.yearsOfExperience,
+        skillId: targetSkillId,
+        yearsOfExperience: input.yearsOfExperience ?? 1,
       },
       include: {
         skill: true,

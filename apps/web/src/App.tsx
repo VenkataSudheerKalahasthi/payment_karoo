@@ -331,22 +331,22 @@ export const App: React.FC = () => {
   }
 
   // Calculate live total contracted balance
-  const totalAgreedBalance = contracts.reduce((sum, c) => sum + (Number(c.totalAmount) || 0), 1197500);
+  const totalAgreedBalance = contracts.reduce((sum, c) => sum + (Number(c.totalAmount) || 0), 0);
 
   return (
-    <div className="min-h-screen flex dark:bg-[#080808] bg-[#F5F7FA] dark:text-[#E8EAE6] text-[#242424] selection:bg-[#8BFF24] selection:text-[#050605] font-sans transition-colors duration-200">
+    <div className="min-h-screen flex dark:bg-[#080808] bg-[#F5F7FA] dark:text-[#E8EAE6] text-[#242424] dark:selection:bg-[#8BFF24] selection:bg-[#5046E5] selection:text-white dark:selection:text-[#050605] font-sans transition-colors duration-200">
       {/* 1. DESKTOP PERMANENT LEFT SIDEBAR (Matching Image 2 Reference) */}
       <aside className="hidden lg:flex flex-col w-64 xl:w-72 border-r dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] dark:bg-[#0B0D0B] bg-white sticky top-0 h-screen overflow-y-auto shrink-0 select-none transition-colors z-40 justify-between">
         <div>
           {/* Top Brand & Home Quick-Return Button */}
-          <div className="p-5 border-b dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] flex items-center justify-between">
-            <div className="cursor-pointer" onClick={() => setActiveTab('dashboard')}>
-              <TrustPayLogo size="sm" />
+          <div className="p-4 sm:p-5 border-b dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] flex items-center justify-between">
+            <div className="cursor-pointer flex items-center gap-2.5" onClick={() => setActiveTab('dashboard')}>
+              <TrustPayLogo size="sm" iconOnly={true} className="scale-110" />
             </div>
             <button
               onClick={() => setViewMode('landing')}
               title="Return to Home Landing Page"
-              className="p-1.5 rounded-lg dark:bg-[#151715] bg-[#F1F5F9] dark:text-[#8BFF24] text-[#16a34a] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] hover:scale-105 transition cursor-pointer"
+              className="p-1.5 rounded-lg dark:bg-[#151715] bg-[#EEF2FF] dark:text-[#8BFF24] text-[#5046E5] border dark:border-[rgba(255,255,255,0.10)] border-[#C7D2FE] hover:scale-105 transition cursor-pointer"
             >
               <Home className="w-4 h-4" />
             </button>
@@ -356,12 +356,17 @@ export const App: React.FC = () => {
           <div className="mx-4 my-3 p-3.5 rounded-2xl dark:bg-[#151715] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] space-y-1 shadow-sm">
             <div className="flex items-center justify-between text-[11px] dark:text-[#A5AAA2] text-[#64748B]">
               <span className="font-mono">Acc. Bal. (Escrow)</span>
-              <span className="w-2 h-2 rounded-full bg-[#8BFF24] shadow-[0_0_8px_rgba(139,255,36,0.6)]" />
+              <span className="w-2 h-2 rounded-full dark:bg-[#8BFF24] bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
             </div>
-            <div className="text-sm font-extrabold font-mono dark:text-[#E8EAE6] text-[#111827] tabular-nums truncate">
-              ${totalAgreedBalance.toLocaleString()}.00 USD
+            <div
+              className="text-sm font-extrabold font-mono dark:text-[#E8EAE6] text-[#111827] tabular-nums truncate"
+              style={{ fontVariantNumeric: 'tabular-nums' }}
+            >
+              {totalAgreedBalance === 0
+                ? '$0.00 USD'
+                : `$${totalAgreedBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD`}
             </div>
-            <div className="text-[10px] text-[#8BFF24] font-mono flex items-center space-x-1">
+            <div className="text-[10px] dark:text-[#8BFF24] text-emerald-600 font-mono flex items-center space-x-1">
               <ShieldCheck className="w-3 h-3" />
               <span>100% Cryptographic Custody</span>
             </div>
@@ -374,8 +379,8 @@ export const App: React.FC = () => {
               onClick={() => setActiveTab('dashboard')}
               className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
                 activeTab === 'dashboard'
-                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
-                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#5046E5] text-white shadow-md shadow-[#5046E5]/25 font-bold'
+                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#EEF2FF] hover:text-[#5046E5]'
               }`}
             >
               <LayoutDashboard className="w-4 h-4" />
@@ -396,9 +401,9 @@ export const App: React.FC = () => {
                   setSelectedWorkerForContract(undefined);
                   setIsCreateModalOpen(true);
                 }}
-                className="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-bold dark:bg-[#151715] bg-[#EFF6FF] text-[#8BFF24] dark:text-[#8BFF24] border dark:border-[rgba(139,255,36,0.3)] border-[#BFDBFE] hover:scale-[1.02] transition cursor-pointer shadow-sm mb-1"
+                className="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-bold dark:bg-[#151715] bg-[#EEF2FF] text-[#5046E5] dark:text-[#8BFF24] border dark:border-[rgba(139,255,36,0.3)] border-[#C7D2FE] hover:bg-[#E0E7FF] transition cursor-pointer shadow-sm mb-1"
               >
-                <PlusCircle className="w-4 h-4 text-[#8BFF24]" />
+                <PlusCircle className="w-4 h-4 dark:text-[#8BFF24] text-[#5046E5]" />
                 <span>+ Create Deal</span>
               </button>
             )}
@@ -409,11 +414,11 @@ export const App: React.FC = () => {
                 onClick={() => setActiveTab('stamp')}
                 className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer mb-1 ${
                   activeTab === 'stamp'
-                    ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
-                    : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+                    ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#5046E5] text-white shadow-md shadow-[#5046E5]/25 font-bold'
+                    : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#EEF2FF] hover:text-[#5046E5]'
                 }`}
               >
-                <Stamp className="w-4 h-4 text-[#8BFF24]" />
+                <Stamp className="w-4 h-4 dark:text-[#8BFF24] text-[#5046E5]" />
                 <span>My Stamp</span>
               </button>
             )}
@@ -423,8 +428,8 @@ export const App: React.FC = () => {
                 onClick={() => setActiveTab('opportunities')}
                 className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer mb-1 ${
                   activeTab === 'opportunities'
-                    ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
-                    : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+                    ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#5046E5] text-white shadow-md shadow-[#5046E5]/25 font-bold'
+                    : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#EEF2FF] hover:text-[#5046E5]'
                 }`}
               >
                 <Compass className="w-4 h-4" />
@@ -437,8 +442,8 @@ export const App: React.FC = () => {
                 onClick={() => setActiveTab('marketplace')}
                 className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
                   activeTab === 'marketplace'
-                    ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
-                    : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+                    ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#5046E5] text-white shadow-md shadow-[#5046E5]/25 font-bold'
+                    : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#EEF2FF] hover:text-[#5046E5]'
                 }`}
               >
                 <Users className="w-4 h-4" />
@@ -451,8 +456,8 @@ export const App: React.FC = () => {
                 onClick={() => setActiveTab('shortlist')}
                 className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
                   activeTab === 'shortlist'
-                    ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
-                    : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+                    ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#5046E5] text-white shadow-md shadow-[#5046E5]/25 font-bold'
+                    : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#EEF2FF] hover:text-[#5046E5]'
                 }`}
               >
                 <Bookmark className="w-4 h-4" />
@@ -464,8 +469,8 @@ export const App: React.FC = () => {
               onClick={() => setActiveTab('hiring')}
               className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
                 activeTab === 'hiring'
-                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
-                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#5046E5] text-white shadow-md shadow-[#5046E5]/25 font-bold'
+                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#EEF2FF] hover:text-[#5046E5]'
               }`}
             >
               <Send className="w-4 h-4" />
@@ -476,15 +481,15 @@ export const App: React.FC = () => {
               onClick={() => setActiveTab('contracts')}
               className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
                 activeTab === 'contracts'
-                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
-                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#5046E5] text-white shadow-md shadow-[#5046E5]/25 font-bold'
+                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#EEF2FF] hover:text-[#5046E5]'
               }`}
             >
               <div className="flex items-center space-x-3">
                 <Briefcase className="w-4 h-4" />
                 <span>My Agreements</span>
               </div>
-              <span className="text-[10px] px-2 py-0.5 rounded-full dark:bg-[#202220] bg-slate-200 dark:text-[#8BFF24] text-slate-800 font-mono font-bold">
+              <span className="text-[10px] px-2 py-0.5 rounded-full dark:bg-[#202220] bg-[#EEF2FF] dark:text-[#8BFF24] text-[#5046E5] font-mono font-bold">
                 {contracts.length}
               </span>
             </button>
@@ -494,8 +499,8 @@ export const App: React.FC = () => {
               onClick={() => setActiveTab('milestones')}
               className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
                 activeTab === 'milestones'
-                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
-                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#5046E5] text-white shadow-md shadow-[#5046E5]/25 font-bold'
+                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#EEF2FF] hover:text-[#5046E5]'
               }`}
             >
               <CheckCircle2 className="w-4 h-4" />
@@ -506,8 +511,8 @@ export const App: React.FC = () => {
               onClick={() => setActiveTab('projects')}
               className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
                 activeTab === 'projects'
-                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
-                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#5046E5] text-white shadow-md shadow-[#5046E5]/25 font-bold'
+                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#EEF2FF] hover:text-[#5046E5]'
               }`}
             >
               <FolderKanban className="w-4 h-4" />
@@ -519,8 +524,8 @@ export const App: React.FC = () => {
               onClick={() => setActiveTab('invoices')}
               className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
                 activeTab === 'invoices'
-                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
-                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#5046E5] text-white shadow-md shadow-[#5046E5]/25 font-bold'
+                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#EEF2FF] hover:text-[#5046E5]'
               }`}
             >
               <Receipt className="w-4 h-4" />
@@ -532,8 +537,8 @@ export const App: React.FC = () => {
               onClick={() => setActiveTab('payments')}
               className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
                 activeTab === 'payments'
-                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
-                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#5046E5] text-white shadow-md shadow-[#5046E5]/25 font-bold'
+                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#EEF2FF] hover:text-[#5046E5]'
               }`}
             >
               <CreditCard className="w-4 h-4" />
@@ -545,8 +550,8 @@ export const App: React.FC = () => {
               onClick={() => setActiveTab('documents')}
               className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
                 activeTab === 'documents'
-                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
-                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#5046E5] text-white shadow-md shadow-[#5046E5]/25 font-bold'
+                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#EEF2FF] hover:text-[#5046E5]'
               }`}
             >
               <Folder className="w-4 h-4" />
@@ -558,8 +563,8 @@ export const App: React.FC = () => {
               onClick={() => setActiveTab('messages')}
               className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
                 activeTab === 'messages'
-                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
-                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#5046E5] text-white shadow-md shadow-[#5046E5]/25 font-bold'
+                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#EEF2FF] hover:text-[#5046E5]'
               }`}
             >
               <MessageSquare className="w-4 h-4" />
@@ -571,8 +576,8 @@ export const App: React.FC = () => {
               onClick={() => setActiveTab('disputes')}
               className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
                 activeTab === 'disputes'
-                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
-                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#5046E5] text-white shadow-md shadow-[#5046E5]/25 font-bold'
+                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#EEF2FF] hover:text-[#5046E5]'
               }`}
             >
               <Scale className="w-4 h-4" />
@@ -583,8 +588,8 @@ export const App: React.FC = () => {
               onClick={() => setActiveTab('wallet')}
               className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
                 activeTab === 'wallet'
-                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
-                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#5046E5] text-white shadow-md shadow-[#5046E5]/25 font-bold'
+                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#EEF2FF] hover:text-[#5046E5]'
               }`}
             >
               <Wallet className="w-4 h-4" />
@@ -603,8 +608,8 @@ export const App: React.FC = () => {
               onClick={() => setActiveTab('profile')}
               className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
                 activeTab === 'profile'
-                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
-                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#5046E5] text-white shadow-md shadow-[#5046E5]/25 font-bold'
+                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#EEF2FF] hover:text-[#5046E5]'
               }`}
             >
               <User className="w-4 h-4" />
@@ -615,8 +620,8 @@ export const App: React.FC = () => {
               onClick={() => setActiveTab('system')}
               className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
                 activeTab === 'system'
-                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#2563EB] text-white shadow-[0_0_15px_rgba(139,255,36,0.25)] font-bold'
-                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+                  ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#5046E5] text-white shadow-md shadow-[#5046E5]/25 font-bold'
+                  : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#EEF2FF] hover:text-[#5046E5]'
               }`}
             >
               <Activity className="w-4 h-4" />
@@ -634,7 +639,7 @@ export const App: React.FC = () => {
             </div>
             <button
               onClick={() => setIsContactModalOpen(true)}
-              className="w-full py-1.5 px-3 rounded-lg bg-[#8BFF24] hover:bg-[#A3FF50] text-[11px] font-bold text-[#050605] transition flex items-center justify-center space-x-1.5 shadow-[0_0_10px_rgba(139,255,36,0.25)] cursor-pointer active:scale-95"
+              className="w-full py-1.5 px-3 rounded-lg dark:bg-[#8BFF24] dark:hover:bg-[#A3FF50] dark:text-[#050605] bg-[#5046E5] hover:bg-[#4338CA] text-white text-[11px] font-bold transition flex items-center justify-center space-x-1.5 shadow-md shadow-[#5046E5]/25 cursor-pointer active:scale-95"
             >
               <HelpCircle className="w-3.5 h-3.5" />
               <span>Get Support</span>
@@ -653,7 +658,7 @@ export const App: React.FC = () => {
           <div className="relative w-72 max-w-[80%] dark:bg-[#0B0D0B] bg-white h-full z-10 flex flex-col justify-between p-4 overflow-y-auto border-r dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0]">
             <div>
               <div className="flex items-center justify-between pb-4 border-b dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0]">
-                <TrustPayLogo size="sm" />
+                <TrustPayLogo size="sm" iconOnly={true} className="scale-110" />
                 <button
                   onClick={() => setMobileSidebarOpen(false)}
                   className="p-1 rounded-lg dark:bg-[#151715] bg-[#F1F5F9] dark:text-[#E8EAE6] text-[#111827]"
@@ -670,10 +675,10 @@ export const App: React.FC = () => {
                     setMobileSidebarOpen(false);
                     setShowRoleSwitchModal(true);
                   }}
-                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold dark:bg-[#151715] bg-[#EFF6FF] dark:text-[#8BFF24] text-[#2563EB] border dark:border-[rgba(139,255,36,0.25)] border-[#DBEAFE] cursor-pointer"
+                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold dark:bg-[#151715] bg-[#EEF2FF] dark:text-[#8BFF24] text-[#5046E5] border dark:border-[rgba(139,255,36,0.25)] border-[#C7D2FE] cursor-pointer"
                 >
                   <span className="flex items-center space-x-2">
-                    <span className="w-2 h-2 rounded-full bg-[#8BFF24]" />
+                    <span className="w-2 h-2 rounded-full dark:bg-[#8BFF24] bg-[#5046E5]" />
                     <span>{isClient ? 'Client Portal' : isWorker ? 'Specialist Workspace' : 'Select Role'}</span>
                   </span>
                   <span className="text-[10px] underline opacity-80">Switch</span>
@@ -702,7 +707,7 @@ export const App: React.FC = () => {
                     onClick={() => { setActiveTab('stamp'); setMobileSidebarOpen(false); }}
                     className="w-full flex items-center space-x-3 px-3 py-2 rounded-xl text-xs font-semibold dark:text-[#CDCBCA] text-[#475569]"
                   >
-                    <Stamp className="w-4 h-4 text-[#8BFF24]" />
+                    <Stamp className="w-4 h-4 dark:text-[#8BFF24] text-[#5046E5]" />
                     <span>My Stamp</span>
                   </button>
                 )}
@@ -742,7 +747,7 @@ export const App: React.FC = () => {
             <div className="pt-4 border-t dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0]">
               <button
                 onClick={() => { setViewMode('landing'); setMobileSidebarOpen(false); }}
-                className="w-full py-2 rounded-xl bg-[#8BFF24] text-xs font-bold text-[#050605] flex items-center justify-center space-x-1"
+                className="w-full py-2 rounded-xl dark:bg-[#8BFF24] dark:text-[#050605] bg-[#5046E5] text-white text-xs font-bold flex items-center justify-center space-x-1 shadow-md shadow-[#5046E5]/25"
               >
                 <Home className="w-4 h-4" />
                 <span>Return to Home Page</span>
@@ -776,9 +781,9 @@ export const App: React.FC = () => {
                   type="button"
                   onClick={() => setShowRoleSwitchModal(true)}
                   title="Switch between Client and Specialist roles"
-                  className="group flex items-center space-x-1.5 text-xs px-2.5 py-1 rounded-full dark:bg-[#151715] bg-[#EFF6FF] dark:text-[#8BFF24] text-[#2563EB] border dark:border-[rgba(139,255,36,0.25)] border-[#DBEAFE] hover:dark:border-[#8BFF24] hover:border-[#2563EB] transition-all cursor-pointer font-mono font-medium active:scale-95 shadow-sm"
+                  className="group flex items-center space-x-1.5 text-xs px-2.5 py-1 rounded-full dark:bg-[#151715] bg-[#EEF2FF] dark:text-[#8BFF24] text-[#5046E5] border dark:border-[rgba(139,255,36,0.25)] border-[#C7D2FE] hover:dark:border-[#8BFF24] hover:border-[#5046E5] transition-all cursor-pointer font-mono font-medium active:scale-95 shadow-sm"
                 >
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#8BFF24] shadow-[0_0_6px_rgba(139,255,36,0.8)]" />
+                  <span className="w-1.5 h-1.5 rounded-full dark:bg-[#8BFF24] bg-[#5046E5] shadow-[0_0_6px_rgba(79,70,229,0.8)]" />
                   <span>{isClient ? 'Client Portal' : isWorker ? 'Specialist Workspace' : 'Select Role'}</span>
                   <span className="text-[10px] opacity-75 group-hover:opacity-100 font-sans underline ml-0.5">
                     Switch
@@ -787,46 +792,19 @@ export const App: React.FC = () => {
               </div>
             </div>
 
-            {/* Right: Home, Profile, Contact Links + Home Symbol + Theme Toggle + User */}
+            {/* Right: Profile Link + Theme Toggle + Refresh + User */}
             <div className="flex items-center space-x-2 sm:space-x-3">
-              {/* Home Link (Clicks to go to home landing page) */}
-              <button
-                onClick={() => setViewMode('landing')}
-                className="hidden sm:flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-semibold dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9] transition cursor-pointer"
-              >
-                <Home className="w-3.5 h-3.5 text-[#8BFF24]" />
-                <span>Home</span>
-              </button>
-
               {/* Profile Link */}
               <button
                 onClick={() => setActiveTab('profile')}
-                className={`hidden sm:flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
+                className={`flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
                   activeTab === 'profile'
-                    ? 'dark:bg-[#8BFF24]/10 dark:text-[#8BFF24] bg-blue-50 text-[#2563EB]'
-                    : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9]'
+                    ? 'dark:bg-[#8BFF24]/10 dark:text-[#8BFF24] bg-[#EEF2FF] text-[#5046E5]'
+                    : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#EEF2FF] hover:text-[#5046E5]'
                 }`}
               >
-                <User className="w-3.5 h-3.5" />
+                <User className="w-3.5 h-3.5 dark:text-[#8BFF24] text-[#5046E5]" />
                 <span>Profile</span>
-              </button>
-
-              {/* Contact Link */}
-              <button
-                onClick={() => setIsContactModalOpen(true)}
-                className="hidden sm:flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-semibold dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#F1F5F9] transition cursor-pointer"
-              >
-                <MessageSquare className="w-3.5 h-3.5 text-[#8BFF24]" />
-                <span>Contact</span>
-              </button>
-
-              {/* Home Symbol / Brand Emblem button ("pakkana symbol click cheste appudu home page ki vellali") */}
-              <button
-                onClick={() => setViewMode('landing')}
-                title="Go to Home Landing Page"
-                className="p-1.5 rounded-xl dark:bg-[#151715] bg-[#F1F5F9] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] hover:dark:border-[#8BFF24]/50 hover:border-[#8BFF24]/50 transition cursor-pointer active:scale-95 shadow-sm"
-              >
-                <TrustPayLogo size="sm" showSubtitle={false} />
               </button>
 
               {/* Global Theme Toggle (Symbols Only) */}
@@ -837,9 +815,9 @@ export const App: React.FC = () => {
                 onClick={runHealthCheck}
                 disabled={isRefreshing}
                 title="Verify API &amp; Database Connectivity"
-                className="p-2 rounded-xl dark:bg-[#151715] bg-[#F8FAFC] dark:hover:bg-[#202220] hover:bg-[#F1F5F9] text-xs font-medium dark:text-[#CDCBCA] text-[#242424] transition border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] shadow-sm cursor-pointer"
+                className="p-2 rounded-xl dark:bg-[#151715] bg-white hover:bg-[#EEF2FF] text-xs font-medium dark:text-[#CDCBCA] text-[#475569] transition border dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] shadow-sm cursor-pointer"
               >
-                <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-[#8BFF24]' : 'text-[#8BFF24]'}`} />
+                <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin dark:text-[#8BFF24] text-[#5046E5]' : 'dark:text-[#8BFF24] text-[#5046E5]'}`} />
               </button>
 
               {/* Notifications & Clerk User Button */}
@@ -855,6 +833,7 @@ export const App: React.FC = () => {
 
         {/* Main Content Body */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
+          <div key={activeTab} className="feature-enter space-y-6">
           {/* Tab 1: Dashboard Overview View */}
           {activeTab === 'dashboard' && (
             <DashboardOverview
@@ -1015,29 +994,29 @@ export const App: React.FC = () => {
           {/* Tab 7: System Health Diagnostics */}
           {activeTab === 'system' && (
             <div className="space-y-6">
-              <div className="flex items-center space-x-2 text-sm font-semibold text-[#E8EAE6]">
-                <Activity className="w-4 h-4 text-[#8BFF24]" />
+              <div className="flex items-center space-x-2 text-sm font-semibold dark:text-[#E8EAE6] text-slate-900">
+                <Activity className="w-4 h-4 dark:text-[#8BFF24] text-[#5046E5]" />
                 <span>Backend &amp; Database Real-Time Telemetry</span>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Express API Card */}
-                <div className="p-6 rounded-2xl dark:bg-[#151715] bg-white border dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] space-y-4 shadow-sm">
+                <div className="p-6 rounded-2xl dark:bg-[#151715] bg-white border dark:border-[rgba(255,255,255,0.10)] border-slate-200 space-y-4 shadow-sm">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <div className="w-9 h-9 rounded-lg dark:bg-[#202220] bg-[#EFF6FF] border dark:border-[rgba(139,255,36,0.25)] border-[#DBEAFE] flex items-center justify-center text-[#8BFF24]">
+                      <div className="w-9 h-9 rounded-lg dark:bg-[#202220] bg-[#EEF2FF] border dark:border-[rgba(139,255,36,0.25)] border-[#C7D2FE] flex items-center justify-center dark:text-[#8BFF24] text-[#5046E5]">
                         <Server className="w-5 h-5" />
                       </div>
                       <div>
-                        <h4 className="text-sm font-semibold dark:text-[#E8EAE6] text-[#111827]">Central Express API</h4>
-                        <span className="text-xs dark:text-[#A5AAA2] text-[#64748B] font-mono">http://localhost:5000/api/v1</span>
+                        <h4 className="text-sm font-semibold dark:text-[#E8EAE6] text-slate-900">Central Express API</h4>
+                        <span className="text-xs dark:text-[#A5AAA2] text-slate-500 font-mono">http://localhost:5000/api/v1</span>
                       </div>
                     </div>
                     <span
                       className={`text-xs px-2.5 py-0.5 rounded-full font-mono font-medium ${
                         system.apiStatus === 'healthy'
-                          ? 'bg-[#8BFF24]/10 text-[#8BFF24] border border-[rgba(139,255,36,0.25)]'
-                          : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                          ? 'dark:bg-[#8BFF24]/10 bg-[#EEF2FF] dark:text-[#8BFF24] text-[#5046E5] dark:border-[rgba(139,255,36,0.25)] border-[#C7D2FE]'
+                          : 'bg-rose-500/10 text-rose-500 border border-rose-500/20'
                       }`}
                     >
                       {system.apiStatus.toUpperCase()}
@@ -1045,7 +1024,7 @@ export const App: React.FC = () => {
                   </div>
 
                   {system.systemDetails && (
-                    <div className="text-xs dark:text-[#A5AAA2] text-[#64748B] space-y-1 dark:bg-[#202220] bg-[#F8FAFC] p-3 rounded-lg border dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] font-mono">
+                    <div className="text-xs dark:text-[#A5AAA2] text-slate-600 space-y-1 dark:bg-[#202220] bg-slate-50 p-3 rounded-lg border dark:border-[rgba(255,255,255,0.08)] border-slate-200 font-mono">
                       <div>Service: {system.systemDetails.service}</div>
                       <div>Version: {system.systemDetails.version}</div>
                       <div>Uptime: {system.systemDetails.uptimeSeconds}s</div>
@@ -1055,22 +1034,22 @@ export const App: React.FC = () => {
                 </div>
 
                 {/* Supabase PostgreSQL Card */}
-                <div className="p-6 rounded-2xl dark:bg-[#151715] bg-white border dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] space-y-4 shadow-sm">
+                <div className="p-6 rounded-2xl dark:bg-[#151715] bg-white border dark:border-[rgba(255,255,255,0.10)] border-slate-200 space-y-4 shadow-sm">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <div className="w-9 h-9 rounded-lg dark:bg-[#202220] bg-[#EFF6FF] border dark:border-[rgba(139,255,36,0.25)] border-[#DBEAFE] flex items-center justify-center text-[#8BFF24]">
+                      <div className="w-9 h-9 rounded-lg dark:bg-[#202220] bg-[#EEF2FF] border dark:border-[rgba(139,255,36,0.25)] border-[#C7D2FE] flex items-center justify-center dark:text-[#8BFF24] text-[#5046E5]">
                         <Database className="w-5 h-5" />
                       </div>
                       <div>
-                        <h4 className="text-sm font-semibold dark:text-[#E8EAE6] text-[#111827]">Supabase PostgreSQL</h4>
-                        <span className="text-xs dark:text-[#A5AAA2] text-[#64748B] font-mono">Prisma Driver Adapter</span>
+                        <h4 className="text-sm font-semibold dark:text-[#E8EAE6] text-slate-900">Supabase PostgreSQL</h4>
+                        <span className="text-xs dark:text-[#A5AAA2] text-slate-500 font-mono">Prisma Driver Adapter</span>
                       </div>
                     </div>
                     <span
                       className={`text-xs px-2.5 py-0.5 rounded-full font-mono font-medium ${
                         system.dbStatus === 'connected'
-                          ? 'bg-[#8BFF24]/10 text-[#8BFF24] border border-[rgba(139,255,36,0.25)]'
-                          : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                          ? 'dark:bg-[#8BFF24]/10 bg-[#EEF2FF] dark:text-[#8BFF24] text-[#5046E5] dark:border-[rgba(139,255,36,0.25)] border-[#C7D2FE]'
+                          : 'bg-rose-500/10 text-rose-500 border border-rose-500/20'
                       }`}
                     >
                       {system.dbStatus.toUpperCase()}
@@ -1090,6 +1069,7 @@ export const App: React.FC = () => {
               </div>
             </div>
           )}
+          </div>
         </main>
       </div>
 

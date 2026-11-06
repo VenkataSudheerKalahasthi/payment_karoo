@@ -477,14 +477,14 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
           <div className="flex items-center space-x-2 shrink-0">
             {isClient && isApproved && (
               hasClientStamp ? (
-                <span className="px-3 py-1.5 rounded-lg bg-[#8BFF24]/10 text-[#8BFF24] border border-[#8BFF24]/30 text-xs font-bold flex items-center gap-1.5">
+                <span className="px-3 py-1.5 rounded-lg dark:bg-[#8BFF24]/10 bg-[#EEF2FF] dark:text-[#8BFF24] text-[#5046E5] border dark:border-[#8BFF24]/30 border-[#C7D2FE] text-xs font-bold flex items-center gap-1.5">
                   <Stamp className="w-3.5 h-3.5" />
                   <span>Stamp Applied</span>
                 </span>
               ) : (
                 <button
                   onClick={() => setShowStampModal(true)}
-                  className="px-3 py-1.5 rounded-lg bg-[#8BFF24] hover:bg-[#78e018] text-black text-xs font-bold flex items-center gap-1.5 transition shadow-[0_0_12px_rgba(139,255,36,0.25)] cursor-pointer"
+                  className="px-3 py-1.5 rounded-lg dark:bg-[#8BFF24] bg-[#5046E5] hover:dark:bg-[#78e018] hover:bg-[#4338CA] dark:text-black text-white shadow-md shadow-[#5046E5]/25 text-xs font-bold flex items-center gap-1.5 transition shadow-[0_0_12px_rgba(139,255,36,0.25)] cursor-pointer"
                 >
                   <Stamp className="w-3.5 h-3.5" />
                   <span>Add Stamp</span>
@@ -933,25 +933,25 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
 
             {/* Client Office Stamp Status Banner */}
             {isApproved && (
-              <div className="p-4 rounded-xl bg-[#141614] border border-[#262926] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+              <div className="p-4 rounded-xl bg-[#141614] border dark:border-[#262926] border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-[#8BFF24]/10 border border-[#8BFF24]/30 flex items-center justify-center text-[#8BFF24]">
+                  <div className="w-9 h-9 rounded-lg dark:bg-[#8BFF24]/10 bg-[#EEF2FF] border dark:border-[#8BFF24]/30 border-[#C7D2FE] flex items-center justify-center dark:text-[#8BFF24] text-[#5046E5]">
                     <Stamp className="w-5 h-5" />
                   </div>
                   <div>
-                    <span className="font-bold text-white flex items-center gap-1.5">
+                    <span className="font-bold dark:text-white text-slate-900 flex items-center gap-1.5">
                       Client Digital Office Stamp
                       {hasClientStamp ? (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#8BFF24]/10 text-[#8BFF24] border border-[#8BFF24]/30 font-semibold">
+                        <span className="text-[10px] px-2 py-0.5 rounded-full dark:bg-[#8BFF24]/10 bg-[#EEF2FF] dark:text-[#8BFF24] text-[#5046E5] border dark:border-[#8BFF24]/30 border-[#C7D2FE] font-semibold">
                           Applied ✓
                         </span>
                       ) : (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700 font-semibold">
+                        <span className="text-[10px] px-2 py-0.5 rounded-full dark:bg-zinc-800 bg-slate-100 dark:text-zinc-400 text-slate-600 border dark:border-zinc-700 border-slate-300 font-semibold">
                           Ready to Apply
                         </span>
                       )}
                     </span>
-                    <p className="text-zinc-400 mt-0.5">
+                    <p className="dark:text-zinc-400 text-slate-500 mt-0.5">
                       {hasClientStamp
                         ? 'Official TrustPay office seal is embedded in the reserved space at the bottom of the shared PDF.'
                         : isClient
@@ -964,7 +964,7 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
                 {isClient && !hasClientStamp && (
                   <button
                     onClick={() => setShowStampModal(true)}
-                    className="px-4 py-2 rounded-xl bg-[#8BFF24] hover:bg-[#78e018] text-black text-xs font-bold transition shrink-0 flex items-center gap-1.5 shadow-[0_0_12px_rgba(139,255,36,0.2)]"
+                    className="px-4 py-2 rounded-xl dark:bg-[#8BFF24] bg-[#5046E5] hover:dark:bg-[#78e018] hover:bg-[#4338CA] dark:text-black text-white shadow-md shadow-[#5046E5]/25 text-xs font-bold transition shrink-0 flex items-center gap-1.5 shadow-[0_0_12px_rgba(139,255,36,0.2)]"
                   >
                     <Stamp className="w-4 h-4" />
                     <span>Apply Office Stamp</span>
@@ -1165,27 +1165,27 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
       {/* CLIENT STAMP APPLICATION MODAL */}
       {showStampModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-[#121412] border border-[#262926] w-full max-w-lg rounded-2xl p-6 space-y-4 shadow-2xl relative">
+          <div className="dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm w-full max-w-lg rounded-2xl p-6 space-y-4 shadow-2xl relative">
             <button
               onClick={() => setShowStampModal(false)}
-              className="absolute top-4 right-4 text-zinc-400 hover:text-white p-1 rounded-lg hover:bg-zinc-800"
+              className="absolute top-4 right-4 dark:text-zinc-400 text-slate-500 hover:dark:text-white hover:text-slate-900 p-1 rounded-lg hover:dark:bg-zinc-800 hover:bg-slate-100"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#8BFF24]/10 border border-[#8BFF24]/30 flex items-center justify-center text-[#8BFF24]">
+              <div className="w-10 h-10 rounded-xl dark:bg-[#8BFF24]/10 bg-[#EEF2FF] border dark:border-[#8BFF24]/30 border-[#C7D2FE] flex items-center justify-center dark:text-[#8BFF24] text-[#5046E5]">
                 <Stamp className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-white">Apply Client Digital Office Stamp</h3>
-                <p className="text-xs text-zinc-400">Embed your official seal into Contract #{detailedContract.contractNumber}</p>
+                <h3 className="text-base font-bold dark:text-white text-slate-900">Apply Client Digital Office Stamp</h3>
+                <p className="text-xs dark:text-zinc-400 text-slate-500">Embed your official seal into Contract #{detailedContract.contractNumber}</p>
               </div>
             </div>
 
             {/* Placement selection */}
             <div className="space-y-2 text-xs">
-              <label className="text-zinc-300 font-semibold block">Placement in Reserved Empty Space</label>
+              <label className="dark:text-zinc-300 text-slate-700 font-semibold block">Placement in Reserved Empty Space</label>
               <div className="grid grid-cols-3 gap-2">
                 {[
                   { id: 'BOTTOM_RIGHT', label: 'Bottom Right' },
@@ -1198,8 +1198,8 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
                     onClick={() => setStampPosition(pos.id as any)}
                     className={`p-2.5 rounded-xl border text-center font-medium transition ${
                       stampPosition === pos.id
-                        ? 'bg-[#8BFF24]/10 border-[#8BFF24] text-white shadow-sm'
-                        : 'bg-[#181a18] border-[#262926] text-zinc-400 hover:text-white'
+                        ? 'dark:bg-[#8BFF24]/10 bg-[#EEF2FF] dark:border-[#8BFF24] border-[#5046E5] dark:text-white text-[#5046E5] shadow-sm'
+                        : 'dark:bg-[#181a18] bg-slate-50 dark:border-[#262926] border-slate-200 dark:text-zinc-400 text-slate-600 hover:dark:text-white hover:text-slate-900'
                     }`}
                   >
                     {pos.label}
@@ -1208,25 +1208,25 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
               </div>
             </div>
 
-            <div className="p-3.5 bg-[#181a18] rounded-xl border border-[#262926] text-xs text-zinc-400 space-y-1.5">
-              <div className="flex justify-between text-zinc-300">
+            <div className="p-3.5 dark:bg-[#181a18] bg-slate-50 rounded-xl border dark:border-[#262926] border-slate-200 text-xs dark:text-zinc-400 text-slate-500 space-y-1.5">
+              <div className="flex justify-between dark:text-zinc-300 text-slate-700">
                 <span>Signer:</span>
-                <span className="font-semibold text-white">Authenticated Client</span>
+                <span className="font-semibold dark:text-white text-slate-900">Authenticated Client</span>
               </div>
-              <div className="flex justify-between text-zinc-300">
+              <div className="flex justify-between dark:text-zinc-300 text-slate-700">
                 <span>Timestamp:</span>
                 <span className="font-mono text-emerald-400">Server Live UTC</span>
               </div>
-              <p className="text-[11px] text-zinc-500 pt-1 border-t border-[#262926]">
+              <p className="text-[11px] text-zinc-500 pt-1 border-t dark:border-[#262926] border-slate-200">
                 The stamp contains TRUSTPAY watermark, Client name, verified mobile, and server date. Embedded directly into the final PDF.
               </p>
             </div>
 
-            <div className="flex justify-end gap-2.5 pt-2 border-t border-[#262926]">
+            <div className="flex justify-end gap-2.5 pt-2 border-t dark:border-[#262926] border-slate-200">
               <button
                 type="button"
                 onClick={() => setShowStampModal(false)}
-                className="px-4 py-2 rounded-xl bg-zinc-800 text-zinc-300 hover:text-white text-xs font-semibold"
+                className="px-4 py-2 rounded-xl dark:bg-zinc-800 bg-slate-100 hover:dark:bg-zinc-700 hover:bg-slate-200 dark:text-zinc-200 text-slate-700 border dark:border-transparent border-slate-300 text-xs font-semibold"
               >
                 Cancel
               </button>
@@ -1234,7 +1234,7 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
                 type="button"
                 onClick={handleApplyStampFromModal}
                 disabled={isApplyingStamp}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#8BFF24] hover:bg-[#78e018] text-black text-xs font-bold transition disabled:opacity-50"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl dark:bg-[#8BFF24] bg-[#5046E5] hover:dark:bg-[#78e018] hover:bg-[#4338CA] dark:text-black text-white shadow-md shadow-[#5046E5]/25 text-xs font-bold transition disabled:opacity-50"
               >
                 <Stamp className="w-3.5 h-3.5" />
                 <span>{isApplyingStamp ? 'Applying Stamp...' : 'Confirm & Apply Stamp'}</span>

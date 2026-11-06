@@ -43,8 +43,8 @@ export const ContactSupportModal: React.FC<ContactSupportModalProps> = ({
       <div className="dark:bg-[#151715] bg-white border dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl relative">
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl dark:bg-[#202220] bg-[#EFF6FF] border dark:border-[rgba(139,255,36,0.25)] border-[#DBEAFE] flex items-center justify-center text-[#8BFF24] dark:text-[#8BFF24]">
-              <MessageSquare className="w-5 h-5 text-[#8BFF24]" />
+            <div className="w-10 h-10 rounded-xl dark:bg-[#202220] bg-[#EFF6FF] border dark:border-[rgba(139,255,36,0.25)] border-[#DBEAFE] flex items-center justify-center dark:text-[#8BFF24] text-[#5046E5] dark:text-[#8BFF24]">
+              <MessageSquare className="w-5 h-5 dark:text-[#8BFF24] text-[#5046E5]" />
             </div>
             <div>
               <h3 className="text-base font-bold dark:text-[#E8EAE6] text-[#111827]">
@@ -65,7 +65,7 @@ export const ContactSupportModal: React.FC<ContactSupportModalProps> = ({
 
         {submitted ? (
           <div className="py-8 text-center space-y-3">
-            <CheckCircle2 className="w-12 h-12 text-[#8BFF24] mx-auto animate-bounce" />
+            <CheckCircle2 className="w-12 h-12 dark:text-[#8BFF24] text-[#5046E5] mx-auto animate-bounce" />
             <h4 className="text-sm font-bold dark:text-[#E8EAE6] text-[#111827]">Inquiry Dispatched</h4>
             <p className="text-xs dark:text-[#A5AAA2] text-[#64748B] max-w-xs mx-auto">
               Your support ticket has been registered on the ledger. A TrustPay Escrow Officer will contact you at {userEmail || 'your email'}.
@@ -90,8 +90,8 @@ export const ContactSupportModal: React.FC<ContactSupportModalProps> = ({
                     onClick={() => setCategory(item.id as typeof category)}
                     className={`py-2 px-3 rounded-xl border text-xs font-medium transition cursor-pointer text-left ${
                       category === item.id
-                        ? 'dark:bg-[#8BFF24]/10 bg-[#8BFF24]/15 border-[#8BFF24] text-[#050605] dark:text-[#8BFF24] font-bold'
-                        : 'dark:bg-[#202220] bg-[#F8FAFC] dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] dark:text-[#A5AAA2] text-[#64748B]'
+                        ? 'dark:bg-[#8BFF24]/10 bg-[#EEF2FF] dark:border-[#8BFF24] border-[#5046E5] text-[#5046E5] dark:text-[#8BFF24] font-bold shadow-sm'
+                        : 'dark:bg-[#202220] bg-slate-50 dark:border-[rgba(255,255,255,0.08)] border-slate-200 dark:text-[#A5AAA2] text-slate-600'
                     }`}
                   >
                     {item.label}
@@ -101,7 +101,7 @@ export const ContactSupportModal: React.FC<ContactSupportModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold dark:text-[#CDCBCA] text-[#475569] mb-1">
+              <label className="block text-xs font-semibold dark:text-[#CDCBCA] text-slate-700 mb-1">
                 Subject
               </label>
               <input
@@ -110,12 +110,12 @@ export const ContactSupportModal: React.FC<ContactSupportModalProps> = ({
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 placeholder="Brief summary of request..."
-                className="w-full px-3.5 py-2.5 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] dark:text-[#E8EAE6] text-[#111827] text-xs focus:outline-none focus:border-[#8BFF24]"
+                className="w-full px-3.5 py-2.5 rounded-xl dark:bg-[#202220] bg-slate-50 border dark:border-[rgba(255,255,255,0.10)] border-slate-300 dark:text-[#E8EAE6] text-slate-900 text-xs focus:outline-none dark:focus:border-[#8BFF24] focus:border-[#5046E5]"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold dark:text-[#CDCBCA] text-[#475569] mb-1">
+              <label className="block text-xs font-semibold dark:text-[#CDCBCA] text-slate-700 mb-1">
                 Details
               </label>
               <textarea
@@ -124,19 +124,19 @@ export const ContactSupportModal: React.FC<ContactSupportModalProps> = ({
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Include contract numbers, milestone details, or transaction references..."
-                className="w-full px-3.5 py-2.5 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] dark:text-[#E8EAE6] text-[#111827] text-xs focus:outline-none focus:border-[#8BFF24]"
+                className="w-full px-3.5 py-2.5 rounded-xl dark:bg-[#202220] bg-slate-50 border dark:border-[rgba(255,255,255,0.10)] border-slate-300 dark:text-[#E8EAE6] text-slate-900 text-xs focus:outline-none dark:focus:border-[#8BFF24] focus:border-[#5046E5]"
               />
             </div>
 
-            <div className="pt-2 flex items-center justify-between text-[11px] dark:text-[#A5AAA2] text-[#64748B]">
+            <div className="pt-2 flex items-center justify-between text-[11px] dark:text-[#A5AAA2] text-slate-500">
               <span className="flex items-center space-x-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#8BFF24]" />
+                <ShieldCheck className="w-3.5 h-3.5 dark:text-[#8BFF24] text-[#5046E5]" />
                 <span>24/7 Monitored Protocol</span>
               </span>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-5 py-2.5 rounded-xl bg-[#8BFF24] hover:bg-[#A3FF50] text-xs font-bold text-[#050605] transition flex items-center space-x-1.5 shadow-[0_0_15px_rgba(139,255,36,0.3)] cursor-pointer active:scale-95 disabled:opacity-50"
+                className="px-5 py-2.5 rounded-xl dark:bg-[#8BFF24] bg-[#5046E5] hover:dark:bg-[#A3FF50] hover:bg-[#4338CA] text-xs font-bold dark:text-[#050605] text-white transition flex items-center space-x-1.5 dark:shadow-[0_0_15px_rgba(139,255,36,0.3)] shadow-md shadow-[#5046E5]/25 cursor-pointer active:scale-95 disabled:opacity-50"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>{isSubmitting ? 'Dispatching...' : 'Submit Inquiry'}</span>

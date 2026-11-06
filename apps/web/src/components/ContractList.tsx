@@ -58,7 +58,7 @@ export const ContractList: React.FC<ContractListProps> = ({
         );
       case ContractStatus.COMPLETED:
         return (
-          <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-[#2563EB]/10 text-[#2563EB] border border-[#2563EB]/20">
+          <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-[#5046E5]/10 text-[#5046E5] border border-[#5046E5]/20">
             COMPLETED
           </span>
         );
@@ -96,7 +96,7 @@ export const ContractList: React.FC<ContractListProps> = ({
     <div className="space-y-5">
       {/* Portfolio Summary Stats Bar */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-4 rounded-xl bg-[#FFFFFF] dark:bg-[#171717] border border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)] flex items-center justify-between shadow-sm">
+        <div className="interactive-card p-4 rounded-xl bg-[#FFFFFF] dark:bg-[#171717] border border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)] flex items-center justify-between shadow-sm">
           <div>
             <span className="text-[11px] font-semibold text-[#64748B] dark:text-[#A5A5A5] uppercase tracking-wider block">
               Total Contracted Volume
@@ -105,12 +105,12 @@ export const ContractList: React.FC<ContractListProps> = ({
               ${totalAgreedValue.toLocaleString()} USD
             </span>
           </div>
-          <div className="w-8 h-8 rounded-lg bg-[#EFF6FF] dark:bg-[#202020] border border-[#DBEAFE] dark:border-[rgba(205,203,202,0.18)] flex items-center justify-center text-[#2563EB]">
+          <div className="w-8 h-8 rounded-lg bg-[#EEF2FF] dark:bg-[#202020] border border-[#C7D2FE] dark:border-[rgba(205,203,202,0.18)] flex items-center justify-center text-[#5046E5]">
             <Briefcase className="w-4 h-4" />
           </div>
         </div>
 
-        <div className="p-4 rounded-xl bg-[#FFFFFF] dark:bg-[#171717] border border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)] flex items-center justify-between shadow-sm">
+        <div className="interactive-card p-4 rounded-xl bg-[#FFFFFF] dark:bg-[#171717] border border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)] flex items-center justify-between shadow-sm">
           <div>
             <span className="text-[11px] font-semibold text-[#64748B] dark:text-[#A5A5A5] uppercase tracking-wider block">
               Active Agreements
@@ -124,7 +124,7 @@ export const ContractList: React.FC<ContractListProps> = ({
           </div>
         </div>
 
-        <div className="p-4 rounded-xl bg-[#FFFFFF] dark:bg-[#171717] border border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)] flex items-center justify-between shadow-sm">
+        <div className="interactive-card p-4 rounded-xl bg-[#FFFFFF] dark:bg-[#171717] border border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)] flex items-center justify-between shadow-sm">
           <div>
             <span className="text-[11px] font-semibold text-[#64748B] dark:text-[#A5A5A5] uppercase tracking-wider block">
               Pending Signatures
@@ -153,7 +153,7 @@ export const ContractList: React.FC<ContractListProps> = ({
             onClick={() => setActiveFilter(tab.value as typeof activeFilter)}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer whitespace-nowrap ${
               activeFilter === tab.value
-                ? 'bg-[#2563EB] text-white shadow-sm dark:bg-[#202020] dark:text-[#CDCBCA] dark:border dark:border-[rgba(205,203,202,0.18)]'
+                ? 'bg-[#5046E5] text-white shadow-sm dark:bg-[#202020] dark:text-[#CDCBCA] dark:border dark:border-[rgba(205,203,202,0.18)]'
                 : 'text-[#64748B] dark:text-[#A5A5A5] hover:text-[#242424] dark:hover:text-[#CDCBCA] hover:bg-[#F1F5F9] dark:hover:bg-[#202020]'
             }`}
           >
@@ -188,12 +188,12 @@ export const ContractList: React.FC<ContractListProps> = ({
                   setSelectedContract(c);
                   setIsDetailOpen(true);
                 }}
-                className="bg-[#FFFFFF] dark:bg-[#171717] border border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)] hover:border-[#2563EB]/40 dark:hover:border-[#2563EB]/40 rounded-xl p-5 cursor-pointer transition-all flex flex-col justify-between space-y-4 shadow-sm hover:shadow-md group"
+                className="interactive-card bg-[#FFFFFF] dark:bg-[#171717] border border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)] hover:border-[#5046E5]/40 dark:hover:border-[#5046E5]/40 rounded-xl p-5 cursor-pointer transition-all flex flex-col justify-between space-y-4 shadow-sm hover:shadow-md group"
               >
                 <div className="space-y-3">
                   <div className="flex items-start justify-between">
                     <div>
-                      <span className="font-mono text-xs text-[#2563EB] group-hover:underline font-semibold block">
+                      <span className="font-mono text-xs text-[#5046E5] group-hover:underline font-semibold block">
                         {c.contractNumber} (v{c.version})
                       </span>
                       <h4 className="text-sm font-bold text-[#242424] dark:text-[#CDCBCA] mt-0.5 line-clamp-1">{c.title}</h4>
@@ -220,7 +220,7 @@ export const ContractList: React.FC<ContractListProps> = ({
                   )}
 
                   <div className="flex items-center space-x-2 text-xs text-[#64748B] dark:text-[#A5A5A5] pt-1">
-                    <User className="w-3.5 h-3.5 text-[#2563EB]" />
+                    <User className="w-3.5 h-3.5 text-[#5046E5]" />
                     <span>
                       {partyLabel}: <span className="text-[#242424] dark:text-[#CDCBCA] font-medium">{partyName}</span>
                     </span>
@@ -244,7 +244,7 @@ export const ContractList: React.FC<ContractListProps> = ({
                       title="Download PDF"
                       className="p-1.5 rounded-lg bg-[#F8FAFC] dark:bg-[#202020] hover:bg-[#F1F5F9] dark:hover:bg-[#303030] text-[#242424] dark:text-[#CDCBCA] border border-[#CBD5E1] dark:border-[rgba(205,203,202,0.18)] transition cursor-pointer"
                     >
-                      <Download className="w-3.5 h-3.5 text-[#2563EB]" />
+                      <Download className="w-3.5 h-3.5 text-[#5046E5]" />
                     </button>
 
                     <button
@@ -252,7 +252,7 @@ export const ContractList: React.FC<ContractListProps> = ({
                         setSelectedContract(c);
                         setIsDetailOpen(true);
                       }}
-                      className="px-3 py-1.5 rounded-lg bg-[#EFF6FF] dark:bg-[#202020] hover:bg-[#DBEAFE] dark:hover:bg-[#303030] text-xs font-semibold text-[#2563EB] border border-[#DBEAFE] dark:border-[rgba(205,203,202,0.18)] transition flex items-center space-x-1 cursor-pointer"
+                      className="px-3 py-1.5 rounded-lg bg-[#EEF2FF] dark:bg-[#202020] hover:bg-[#C7D2FE] dark:hover:bg-[#303030] text-xs font-semibold text-[#5046E5] border border-[#C7D2FE] dark:border-[rgba(205,203,202,0.18)] transition flex items-center space-x-1 cursor-pointer"
                     >
                       <span>Manage</span>
                       <ExternalLink className="w-3 h-3" />

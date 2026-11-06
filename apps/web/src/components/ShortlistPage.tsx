@@ -60,7 +60,7 @@ export const ShortlistPage: React.FC<ShortlistPageProps> = ({
               Client Specialist Shortlist
             </h3>
             <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold dark:bg-[#202220] bg-[#F1F5F9] dark:text-[#8BFF24] text-[#16a34a] border dark:border-[rgba(139,255,36,0.25)] border-[#E2E8F0] font-mono">
-              <BookmarkCheck className="w-3 h-3 text-[#8BFF24]" />
+              <BookmarkCheck className="w-3 h-3 dark:text-[#8BFF24] text-[#5046E5]" />
               <span className="font-mono tabular-nums">{items.length}</span> Bookmarked
             </span>
           </div>
@@ -91,7 +91,7 @@ export const ShortlistPage: React.FC<ShortlistPageProps> = ({
             return (
               <div
                 key={item.id}
-                className="dark:bg-[#151715] bg-white border dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] rounded-xl p-5 hover:border-[rgba(139,255,36,0.4)] transition-all flex flex-col justify-between space-y-4 shadow-sm group"
+                className="interactive-card dark:bg-[#151715] bg-white border dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] rounded-xl p-5 hover:border-[rgba(139,255,36,0.4)] transition-all flex flex-col justify-between space-y-4 shadow-sm group"
               >
                 <div className="space-y-3">
                   <div className="flex items-start justify-between">
@@ -126,7 +126,7 @@ export const ShortlistPage: React.FC<ShortlistPageProps> = ({
                     </span>
 
                     {worker.hourlyRate && (
-                      <span className="font-semibold text-[#8BFF24] dark:text-[#8BFF24] font-mono tabular-nums">
+                      <span className="font-semibold dark:text-[#8BFF24] text-[#5046E5] dark:text-[#8BFF24] font-mono tabular-nums">
                         ${Number(worker.hourlyRate).toFixed(0)}
                         <span className="text-[11px] font-normal dark:text-[#A5AAA2] text-[#64748B]">/hr</span>
                       </span>
@@ -162,7 +162,7 @@ export const ShortlistPage: React.FC<ShortlistPageProps> = ({
                 <div className="pt-3 border-t dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] flex items-center space-x-2">
                   <button
                     onClick={() => onOpenHiringModal(worker)}
-                    className="flex-1 py-1.5 px-3 rounded-xl bg-[#8BFF24] hover:bg-[#A3FF50] text-xs font-bold text-[#050605] transition flex items-center justify-center space-x-1 shadow-[0_0_15px_rgba(139,255,36,0.2)] active:scale-95"
+                    className="flex-1 py-1.5 px-3 rounded-xl dark:bg-[#8BFF24] bg-[#5046E5] hover:dark:bg-[#A3FF50] hover:bg-[#4338CA] text-xs font-bold dark:text-[#050605] text-white transition flex items-center justify-center space-x-1 dark:shadow-[0_0_15px_rgba(139,255,36,0.2)] shadow-md shadow-[#5046E5]/25 active:scale-95 cursor-pointer"
                   >
                     <Send className="w-3.5 h-3.5" />
                     <span>Send Proposal</span>
@@ -170,7 +170,7 @@ export const ShortlistPage: React.FC<ShortlistPageProps> = ({
 
                   <button
                     onClick={() => onSelectWorkerForContract(worker.userId)}
-                    className="py-1.5 px-3 rounded-xl dark:bg-[#202220] bg-[#F1F5F9] hover:dark:bg-[#292C28] hover:bg-[#E2E8F0] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] text-xs font-medium text-[#8BFF24] transition flex items-center space-x-1 hover:border-[rgba(139,255,36,0.3)]"
+                    className="py-1.5 px-3 rounded-xl dark:bg-[#202220] bg-[#F1F5F9] hover:dark:bg-[#292C28] hover:bg-[#E2E8F0] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] text-xs font-medium dark:text-[#8BFF24] text-[#5046E5] transition flex items-center space-x-1 hover:border-[rgba(139,255,36,0.3)]"
                     title="Draft Direct Contract"
                   >
                     <FileText className="w-3.5 h-3.5" />

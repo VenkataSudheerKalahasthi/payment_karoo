@@ -246,7 +246,7 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
     switch (status) {
       case 'SUBMITTED':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#8BFF24]/20 text-[#8BFF24] border border-[#8BFF24]/40 animate-pulse">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold dark:bg-[#8BFF24]/20 bg-[#EEF2FF] dark:text-[#8BFF24] text-[#5046E5] border dark:border-[#8BFF24]/40 border-[#C7D2FE] animate-pulse">
             <Clock className="w-3.5 h-3.5" />
             Deliverable Ready for Review
           </span>
@@ -281,7 +281,7 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-zinc-800 text-zinc-400 border border-zinc-700">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold dark:bg-zinc-800 bg-[#EEF2FF] dark:text-zinc-400 text-[#475569] dark:border-zinc-700 border-[#C7D2FE]">
             <Clock className="w-3.5 h-3.5" />
             {status}
           </span>
@@ -292,17 +292,17 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#121412] dark:bg-[#121412] border border-[#262926] p-6 rounded-2xl">
+      <div className="interactive-card flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm p-6 rounded-2xl">
         <div>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#8BFF24]/10 border border-[#8BFF24]/30 flex items-center justify-center">
-              <CheckCircle2 className="w-5 h-5 text-[#8BFF24]" />
+            <div className="w-10 h-10 rounded-xl dark:bg-[#8BFF24]/10 bg-[#EEF2FF] border dark:border-[#8BFF24]/30 border-[#C7D2FE] flex items-center justify-center">
+              <CheckCircle2 className="w-5 h-5 dark:text-[#8BFF24] text-[#5046E5]" />
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+              <h1 className="text-xl sm:text-2xl font-bold dark:text-white text-slate-900 tracking-tight">
                 {isWorker ? 'Specialist Milestone Deliverables' : 'Milestone Management & Review'}
               </h1>
-              <p className="text-sm text-zinc-400">
+              <p className="text-sm dark:text-zinc-400 text-slate-500">
                 {isWorker
                   ? 'Commence milestone work, upload deliverable evidence, address client feedback, and track escrow settlements.'
                   : 'Track deliverables, inspect submitted work, and authorize escrow release.'}
@@ -314,7 +314,7 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
         <button
           onClick={fetchContracts}
           disabled={loading}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1e201e] border border-[#2e322e] text-zinc-300 hover:text-white hover:border-[#8BFF24]/40 transition text-sm font-medium"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl dark:bg-[#1e201e] bg-slate-100 border dark:border-[#2e322e] border-slate-200 dark:text-zinc-300 text-slate-700 hover:dark:text-white hover:text-slate-900 hover:dark:bg-[#282c28] hover:bg-slate-200 hover:dark:border-[#8BFF24]/40 border-[#C7D2FE] transition text-sm font-medium"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           Refresh
@@ -323,48 +323,48 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3.5">
-        <div className="bg-[#121412] border border-[#262926] p-4 rounded-xl">
-          <p className="text-xs text-zinc-400 uppercase tracking-wider font-medium">Total Milestones</p>
-          <p className="text-2xl font-bold text-white mt-1">{metrics.total}</p>
+        <div className="interactive-card dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm p-4 rounded-xl">
+          <p className="text-xs dark:text-zinc-400 text-slate-500 uppercase tracking-wider font-medium">Total Milestones</p>
+          <p className="text-2xl font-bold dark:text-white text-slate-900 mt-1">{metrics.total}</p>
           <p className="text-xs text-zinc-500 mt-1">${metrics.totalAmount.toLocaleString()} Allocated</p>
         </div>
 
-        <div className="bg-[#121412] border border-[#8BFF24]/30 p-4 rounded-xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-16 h-16 bg-[#8BFF24]/10 rounded-full blur-xl pointer-events-none" />
-          <p className="text-xs text-[#8BFF24] uppercase tracking-wider font-semibold">Ready for Review</p>
-          <p className="text-2xl font-bold text-[#8BFF24] mt-1">{metrics.reviewNeeded}</p>
-          <p className="text-xs text-zinc-400 mt-1">Pending Approval</p>
+        <div className="interactive-card dark:bg-[#121412] bg-white border dark:border-[#8BFF24]/30 border-[#C7D2FE] shadow-sm p-4 rounded-xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-16 h-16 dark:bg-[#8BFF24]/10 bg-[#EEF2FF] rounded-full blur-xl pointer-events-none" />
+          <p className="text-xs dark:text-[#8BFF24] text-[#5046E5] uppercase tracking-wider font-semibold">Ready for Review</p>
+          <p className="text-2xl font-bold dark:text-[#8BFF24] text-[#5046E5] mt-1">{metrics.reviewNeeded}</p>
+          <p className="text-xs dark:text-zinc-400 text-slate-500 mt-1">Pending Approval</p>
         </div>
 
-        <div className="bg-[#121412] border border-[#262926] p-4 rounded-xl">
-          <p className="text-xs text-zinc-400 uppercase tracking-wider font-medium">In Progress</p>
+        <div className="interactive-card dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm p-4 rounded-xl">
+          <p className="text-xs dark:text-zinc-400 text-slate-500 uppercase tracking-wider font-medium">In Progress</p>
           <p className="text-2xl font-bold text-blue-400 mt-1">{metrics.inProgress}</p>
           <p className="text-xs text-zinc-500 mt-1">Work in development</p>
         </div>
 
-        <div className="bg-[#121412] border border-[#262926] p-4 rounded-xl">
-          <p className="text-xs text-zinc-400 uppercase tracking-wider font-medium">Revisions Open</p>
+        <div className="interactive-card dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm p-4 rounded-xl">
+          <p className="text-xs dark:text-zinc-400 text-slate-500 uppercase tracking-wider font-medium">Revisions Open</p>
           <p className="text-2xl font-bold text-amber-400 mt-1">{metrics.inRevision}</p>
           <p className="text-xs text-zinc-500 mt-1">Awaiting updates</p>
         </div>
 
-        <div className="bg-[#121412] border border-[#262926] p-4 rounded-xl col-span-2 md:col-span-1">
-          <p className="text-xs text-zinc-400 uppercase tracking-wider font-medium">Settled / Approved</p>
+        <div className="interactive-card dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm p-4 rounded-xl col-span-2 md:col-span-1">
+          <p className="text-xs dark:text-zinc-400 text-slate-500 uppercase tracking-wider font-medium">Settled / Approved</p>
           <p className="text-2xl font-bold text-emerald-400 mt-1">{metrics.approved}</p>
           <p className="text-xs text-zinc-500 mt-1">Escrow Disbursed</p>
         </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-[#121412] border border-[#262926] p-4 rounded-xl flex flex-col md:flex-row gap-3 items-center justify-between">
+      <div className="interactive-card dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm p-4 rounded-xl flex flex-col md:flex-row gap-3 items-center justify-between">
         <div className="relative w-full md:w-80">
-          <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 dark:text-zinc-400 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder="Search milestones or contracts..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#181a18] border border-[#2e322e] rounded-lg pl-9 pr-4 py-2 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#8BFF24]/60 transition"
+            className="w-full dark:bg-[#181a18] bg-slate-50 border dark:border-[#2e322e] border-slate-200 rounded-lg pl-9 pr-4 py-2 text-sm dark:text-white text-slate-900 placeholder-zinc-500 focus:outline-none focus:dark:border-[#8BFF24]/60 border-[#5046E5] transition"
           />
         </div>
 
@@ -374,8 +374,8 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
             onClick={() => setStatusFilter('ALL')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
               statusFilter === 'ALL'
-                ? 'bg-[#8BFF24] text-black'
-                : 'bg-[#181a18] text-zinc-300 hover:text-white border border-[#2e322e]'
+                ? 'dark:bg-[#8BFF24] bg-[#5046E5] dark:text-black text-white shadow-sm'
+                : 'dark:bg-[#181a18] bg-slate-50 dark:text-zinc-300 text-slate-700 hover:dark:text-white hover:text-slate-900 border dark:border-[#2e322e] border-slate-200'
             }`}
           >
             All ({allMilestones.length})
@@ -385,8 +385,8 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
             onClick={() => setStatusFilter('REVIEW_NEEDED')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 ${
               statusFilter === 'REVIEW_NEEDED'
-                ? 'bg-[#8BFF24] text-black'
-                : 'bg-[#181a18] text-[#8BFF24] hover:bg-[#8BFF24]/10 border border-[#8BFF24]/30'
+                ? 'dark:bg-[#8BFF24] bg-[#5046E5] dark:text-black text-white shadow-sm'
+                : 'dark:bg-[#181a18] bg-slate-50 dark:text-[#8BFF24] text-[#5046E5] hover:dark:bg-[#8BFF24]/10 bg-[#EEF2FF] border dark:border-[#8BFF24]/30 border-[#C7D2FE]'
             }`}
           >
             Review Needed ({metrics.reviewNeeded})
@@ -397,7 +397,7 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
               statusFilter === 'IN_PROGRESS'
                 ? 'bg-blue-500 text-white'
-                : 'bg-[#181a18] text-zinc-300 hover:text-white border border-[#2e322e]'
+                : 'dark:bg-[#181a18] bg-slate-50 dark:text-zinc-300 text-slate-700 hover:dark:text-white hover:text-slate-900 border dark:border-[#2e322e] border-slate-200'
             }`}
           >
             In Progress ({metrics.inProgress})
@@ -408,7 +408,7 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
               statusFilter === 'APPROVED'
                 ? 'bg-emerald-500 text-white'
-                : 'bg-[#181a18] text-zinc-300 hover:text-white border border-[#2e322e]'
+                : 'dark:bg-[#181a18] bg-slate-50 dark:text-zinc-300 text-slate-700 hover:dark:text-white hover:text-slate-900 border dark:border-[#2e322e] border-slate-200'
             }`}
           >
             Approved ({metrics.approved})
@@ -418,7 +418,7 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
           <select
             value={contractFilter}
             onChange={(e) => setContractFilter(e.target.value)}
-            className="bg-[#181a18] border border-[#2e322e] rounded-lg px-3 py-1.5 text-xs text-zinc-300 focus:outline-none focus:border-[#8BFF24]/60"
+            className="dark:bg-[#181a18] bg-slate-50 border dark:border-[#2e322e] border-slate-200 rounded-lg px-3 py-1.5 text-xs dark:text-zinc-300 text-slate-700 focus:outline-none focus:dark:border-[#8BFF24]/60 border-[#5046E5]"
           >
             <option value="ALL">All Contracts ({contracts.length})</option>
             {contracts.map((c) => (
@@ -432,9 +432,9 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
 
       {/* Milestones List */}
       {loading ? (
-        <div className="bg-[#121412] border border-[#262926] p-12 rounded-2xl flex flex-col items-center justify-center text-center">
-          <RefreshCw className="w-8 h-8 text-[#8BFF24] animate-spin mb-3" />
-          <p className="text-zinc-400 text-sm">Loading contract milestones & deliverables...</p>
+        <div className="dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm p-12 rounded-2xl flex flex-col items-center justify-center text-center">
+          <RefreshCw className="w-8 h-8 dark:text-[#8BFF24] text-[#5046E5] animate-spin mb-3" />
+          <p className="dark:text-zinc-400 text-slate-500 text-sm">Loading contract milestones & deliverables...</p>
         </div>
       ) : error ? (
         <div className="bg-red-500/10 border border-red-500/30 p-6 rounded-2xl flex items-center gap-3 text-red-400">
@@ -442,10 +442,10 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
           <p className="text-sm">{error}</p>
         </div>
       ) : filteredMilestones.length === 0 ? (
-        <div className="bg-[#121412] border border-[#262926] p-12 rounded-2xl text-center">
+        <div className="dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm p-12 rounded-2xl text-center">
           <FileText className="w-10 h-10 text-zinc-600 mx-auto mb-3" />
-          <h3 className="text-base font-semibold text-white">No milestones found</h3>
-          <p className="text-xs text-zinc-400 mt-1 max-w-sm mx-auto">
+          <h3 className="text-base font-semibold dark:text-white text-slate-900">No milestones found</h3>
+          <p className="text-xs dark:text-zinc-400 text-slate-500 mt-1 max-w-sm mx-auto">
             {searchQuery || statusFilter !== 'ALL' || contractFilter !== 'ALL'
               ? 'Try adjusting your search criteria or status filter.'
               : 'Create a contract to generate escrow-protected milestones.'}
@@ -460,35 +460,35 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
             return (
               <div
                 key={m.id}
-                className={`bg-[#121412] border transition rounded-xl p-5 ${
+                className={`interactive-card dark:bg-[#121412] bg-white border transition rounded-xl p-5 ${
                   isReviewable
-                    ? 'border-[#8BFF24]/40 shadow-[0_0_15px_rgba(139,255,36,0.06)]'
-                    : 'border-[#262926] hover:border-[#383d38]'
+                    ? 'dark:border-[#8BFF24]/40 border-[#C7D2FE] shadow-[0_0_15px_rgba(139,255,36,0.06)]'
+                    : 'dark:border-[#262926] border-slate-200 hover:dark:border-[#383d38] hover:border-slate-300'
                 }`}
               >
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                   {/* Left Column: Info */}
                   <div className="space-y-1.5 flex-1">
                     <div className="flex flex-wrap items-center gap-2.5">
-                      <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-zinc-800 text-zinc-300">
+                      <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded dark:bg-zinc-800 bg-[#EEF2FF] dark:text-zinc-300 text-[#475569] border border-transparent dark:border-transparent border-[#C7D2FE]">
                         Milestone #{m.order}
                       </span>
-                      <h3 className="text-base font-semibold text-white">{m.title}</h3>
+                      <h3 className="text-base font-semibold dark:text-white text-slate-900">{m.title}</h3>
                       {getStatusBadge(m.status)}
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-4 text-xs text-zinc-400 pt-0.5">
-                      <span className="flex items-center gap-1 text-zinc-300">
+                    <div className="flex flex-wrap items-center gap-4 text-xs dark:text-zinc-400 text-slate-500 pt-0.5">
+                      <span className="flex items-center gap-1 dark:text-zinc-300 text-slate-700">
                         <FileText className="w-3.5 h-3.5 text-zinc-500" />
                         <button
                           onClick={() => onNavigateToContract?.(m.contractId)}
-                          className="hover:text-[#8BFF24] underline-offset-2 hover:underline transition"
+                          className="hover:dark:text-[#8BFF24] text-[#5046E5] underline-offset-2 hover:underline transition"
                         >
                           {m.contractNumber} — {m.contractTitle}
                         </button>
                       </span>
 
-                      <span>Specialist: <strong className="text-zinc-200">{m.workerName}</strong></span>
+                      <span>Specialist: <strong className="dark:text-zinc-200 text-slate-800">{m.workerName}</strong></span>
 
                       {m.dueDate && (
                         <span className="flex items-center gap-1">
@@ -499,14 +499,14 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
                     </div>
 
                     {m.description && (
-                      <p className="text-xs text-zinc-400 line-clamp-2 pt-1">{m.description}</p>
+                      <p className="text-xs dark:text-zinc-400 text-slate-500 line-clamp-2 pt-1">{m.description}</p>
                     )}
 
                     {/* Latest Submission Banner preview if submitted */}
                     {latestSubmission && (
-                      <div className="mt-2.5 p-3 rounded-lg bg-[#181a18] border border-[#2e322e] text-xs space-y-1">
-                        <div className="flex items-center justify-between text-zinc-300 font-medium">
-                          <span className="flex items-center gap-1.5 text-[#8BFF24]">
+                      <div className="mt-2.5 p-3 rounded-lg dark:bg-[#181a18] bg-slate-50 border dark:border-[#2e322e] border-slate-200 text-xs space-y-1">
+                        <div className="flex items-center justify-between dark:text-zinc-300 text-slate-700 font-medium">
+                          <span className="flex items-center gap-1.5 dark:text-[#8BFF24] text-[#5046E5]">
                             <CheckCircle2 className="w-3.5 h-3.5" />
                             Deliverable submitted:
                           </span>
@@ -514,7 +514,7 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
                             {latestSubmission.createdAt ? new Date(latestSubmission.createdAt).toLocaleString() : 'Recently'}
                           </span>
                         </div>
-                        <p className="text-zinc-300 italic">{latestSubmission.notes || 'Deliverable files submitted for review.'}</p>
+                        <p className="dark:text-zinc-300 text-slate-700 italic">{latestSubmission.notes || 'Deliverable files submitted for review.'}</p>
                         {latestSubmission.attachmentUrls && latestSubmission.attachmentUrls.length > 0 && (
                           <div className="flex flex-wrap gap-2 pt-1">
                             {latestSubmission.attachmentUrls.map((url: string, idx: number) => (
@@ -523,7 +523,7 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
                                 href={url}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="inline-flex items-center gap-1 text-[11px] text-[#8BFF24] hover:underline bg-[#8BFF24]/10 px-2 py-0.5 rounded border border-[#8BFF24]/20"
+                                className="inline-flex items-center gap-1 text-[11px] dark:text-[#8BFF24] text-[#5046E5] hover:underline dark:bg-[#8BFF24]/10 bg-[#EEF2FF] px-2 py-0.5 rounded border dark:border-[#8BFF24]/20 border-[#C7D2FE]"
                               >
                                 <ExternalLink className="w-3 h-3" />
                                 Attachment {idx + 1}
@@ -536,11 +536,11 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
                   </div>
 
                   {/* Right Column: Financials & Action Buttons */}
-                  <div className="flex flex-row lg:flex-col items-center lg:items-end justify-between gap-3 border-t lg:border-t-0 border-[#262926] pt-3 lg:pt-0">
+                  <div className="flex flex-row lg:flex-col items-center lg:items-end justify-between gap-3 border-t lg:border-t-0 dark:border-[#262926] border-slate-200 pt-3 lg:pt-0">
                     <div className="text-left lg:text-right">
                       <span className="text-xs text-zinc-500 uppercase tracking-wider block">Escrow Allocation</span>
-                      <span className="text-xl font-bold font-mono text-white">
-                        ${Number(m.amount).toLocaleString()} <span className="text-xs text-zinc-400 font-normal">{m.currency}</span>
+                      <span className="text-xl font-bold font-mono dark:text-white text-slate-900">
+                        ${Number(m.amount).toLocaleString()} <span className="text-xs dark:text-zinc-400 text-slate-500 font-normal">{m.currency}</span>
                       </span>
                     </div>
 
@@ -551,7 +551,7 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
                             <button
                               onClick={() => handleStartMilestone(m)}
                               disabled={actionLoading === m.id}
-                              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#8BFF24] hover:bg-[#78e018] text-black text-xs font-bold transition shadow-[0_0_12px_rgba(139,255,36,0.25)]"
+                              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg dark:bg-[#8BFF24] bg-[#5046E5] hover:dark:bg-[#78e018] hover:bg-[#4338CA] dark:text-black text-white shadow-md shadow-[#5046E5]/25 text-xs font-bold transition shadow-[0_0_12px_rgba(139,255,36,0.25)]"
                             >
                               <Play className="w-3.5 h-3.5" />
                               {actionLoading === m.id ? 'Starting...' : 'Commence Work'}
@@ -564,7 +564,7 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
                                 setSelectedMilestone(m);
                                 setShowSubmissionModal(true);
                               }}
-                              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#8BFF24] hover:bg-[#78e018] text-black text-xs font-bold transition shadow-[0_0_12px_rgba(139,255,36,0.25)]"
+                              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg dark:bg-[#8BFF24] bg-[#5046E5] hover:dark:bg-[#78e018] hover:bg-[#4338CA] dark:text-black text-white shadow-md shadow-[#5046E5]/25 text-xs font-bold transition shadow-[0_0_12px_rgba(139,255,36,0.25)]"
                             >
                               <Upload className="w-3.5 h-3.5" />
                               {m.status === 'IN_REVISION' ? 'Resubmit Work' : 'Submit Deliverable'}
@@ -573,7 +573,7 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
 
                           <button
                             onClick={() => setSelectedMilestone(m)}
-                            className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#181a18] hover:bg-[#202220] border border-[#2e322e] text-zinc-300 hover:text-white text-xs font-medium transition"
+                            className="flex items-center gap-1 px-3 py-1.5 rounded-lg dark:bg-[#181a18] bg-slate-50 hover:dark:bg-[#202220] hover:bg-slate-100 border dark:border-[#2e322e] border-slate-200 dark:text-zinc-300 text-slate-700 hover:dark:text-white hover:text-slate-900 text-xs font-medium transition"
                           >
                             Details
                             <ChevronRight className="w-3.5 h-3.5" />
@@ -587,7 +587,7 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
                               setShowRevisionModal(true);
                             }}
                             disabled={actionLoading === m.id}
-                            className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 text-xs font-semibold transition"
+                            className="px-3 py-1.5 rounded-lg dark:bg-zinc-800 bg-slate-100 hover:dark:bg-zinc-700 hover:bg-slate-200 dark:text-zinc-200 text-slate-700 border dark:border-zinc-700 border-slate-300 text-xs font-semibold transition"
                           >
                             Request Revision
                           </button>
@@ -595,7 +595,7 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
                           <button
                             onClick={() => handleApprove(m)}
                             disabled={actionLoading === m.id}
-                            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#8BFF24] hover:bg-[#78e018] text-black text-xs font-bold transition shadow-[0_0_12px_rgba(139,255,36,0.25)]"
+                            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg dark:bg-[#8BFF24] bg-[#5046E5] hover:dark:bg-[#78e018] hover:bg-[#4338CA] dark:text-black text-white shadow-md shadow-[#5046E5]/25 text-xs font-bold transition shadow-[0_0_12px_rgba(139,255,36,0.25)]"
                           >
                             <ShieldCheck className="w-3.5 h-3.5" />
                             {actionLoading === m.id ? 'Approving...' : 'Approve & Release'}
@@ -604,7 +604,7 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
                       ) : (
                         <button
                           onClick={() => setSelectedMilestone(m)}
-                          className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#181a18] hover:bg-[#202220] border border-[#2e322e] text-zinc-300 hover:text-white text-xs font-medium transition"
+                          className="flex items-center gap-1 px-3 py-1.5 rounded-lg dark:bg-[#181a18] bg-slate-50 hover:dark:bg-[#202220] hover:bg-slate-100 border dark:border-[#2e322e] border-slate-200 dark:text-zinc-300 text-slate-700 hover:dark:text-white hover:text-slate-900 text-xs font-medium transition"
                         >
                           View Details
                           <ChevronRight className="w-3.5 h-3.5" />
@@ -622,61 +622,61 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
       {/* Deliverable Details / Modal */}
       {selectedMilestone && !showRevisionModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-[#121412] border border-[#262926] w-full max-w-xl rounded-2xl p-6 space-y-4 shadow-2xl relative">
+          <div className="dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm w-full max-w-xl rounded-2xl p-6 space-y-4 shadow-2xl relative">
             <button
               onClick={() => setSelectedMilestone(null)}
-              className="absolute top-4 right-4 text-zinc-400 hover:text-white p-1 rounded-lg hover:bg-zinc-800"
+              className="absolute top-4 right-4 dark:text-zinc-400 text-slate-500 hover:dark:text-white hover:text-slate-900 p-1 rounded-lg hover:dark:bg-zinc-800 hover:bg-slate-100"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#8BFF24]/10 border border-[#8BFF24]/30 flex items-center justify-center text-[#8BFF24]">
+              <div className="w-10 h-10 rounded-xl dark:bg-[#8BFF24]/10 bg-[#EEF2FF] border dark:border-[#8BFF24]/30 border-[#C7D2FE] flex items-center justify-center dark:text-[#8BFF24] text-[#5046E5]">
                 <FileText className="w-5 h-5" />
               </div>
               <div>
-                <span className="text-xs text-zinc-400 font-mono">Milestone #{selectedMilestone.order}</span>
-                <h3 className="text-lg font-bold text-white">{selectedMilestone.title}</h3>
+                <span className="text-xs dark:text-zinc-400 text-slate-500 font-mono">Milestone #{selectedMilestone.order}</span>
+                <h3 className="text-lg font-bold dark:text-white text-slate-900">{selectedMilestone.title}</h3>
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-[#181a18] border border-[#262926] space-y-3">
+            <div className="p-4 rounded-xl dark:bg-[#181a18] bg-slate-50 border dark:border-[#262926] border-slate-200 space-y-3">
               <div className="flex justify-between items-center text-xs">
-                <span className="text-zinc-400">Contract:</span>
-                <span className="font-semibold text-white">{selectedMilestone.contractTitle} ({selectedMilestone.contractNumber})</span>
+                <span className="dark:text-zinc-400 text-slate-500">Contract:</span>
+                <span className="font-semibold dark:text-white text-slate-900">{selectedMilestone.contractTitle} ({selectedMilestone.contractNumber})</span>
               </div>
               <div className="flex justify-between items-center text-xs">
-                <span className="text-zinc-400">Specialist:</span>
-                <span className="font-semibold text-white">{selectedMilestone.workerName}</span>
+                <span className="dark:text-zinc-400 text-slate-500">Specialist:</span>
+                <span className="font-semibold dark:text-white text-slate-900">{selectedMilestone.workerName}</span>
               </div>
               <div className="flex justify-between items-center text-xs">
-                <span className="text-zinc-400">Escrow Value:</span>
-                <span className="font-mono font-bold text-[#8BFF24]">${Number(selectedMilestone.amount).toLocaleString()} {selectedMilestone.currency}</span>
+                <span className="dark:text-zinc-400 text-slate-500">Escrow Value:</span>
+                <span className="font-mono font-bold dark:text-[#8BFF24] text-[#5046E5]">${Number(selectedMilestone.amount).toLocaleString()} {selectedMilestone.currency}</span>
               </div>
               <div className="flex justify-between items-center text-xs">
-                <span className="text-zinc-400">Status:</span>
+                <span className="dark:text-zinc-400 text-slate-500">Status:</span>
                 <div>{getStatusBadge(selectedMilestone.status)}</div>
               </div>
             </div>
 
             {selectedMilestone.description && (
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Scope & Instructions</label>
-                <p className="text-xs text-zinc-300 bg-[#181a18] p-3 rounded-lg border border-[#262926]">{selectedMilestone.description}</p>
+                <label className="text-xs font-semibold dark:text-zinc-400 text-slate-500 uppercase tracking-wider">Scope & Instructions</label>
+                <p className="text-xs dark:text-zinc-300 text-slate-700 dark:bg-[#181a18] bg-slate-50 p-3 rounded-lg border dark:border-[#262926] border-slate-200">{selectedMilestone.description}</p>
               </div>
             )}
 
             {/* Submissions list */}
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Submissions History</label>
+              <label className="text-xs font-semibold dark:text-zinc-400 text-slate-500 uppercase tracking-wider">Submissions History</label>
               {selectedMilestone.submissions && selectedMilestone.submissions.length > 0 ? (
                 selectedMilestone.submissions.map((sub: any, idx: number) => (
-                  <div key={sub.id || idx} className="p-3 bg-[#181a18] border border-[#262926] rounded-lg text-xs space-y-1.5">
+                  <div key={sub.id || idx} className="p-3 dark:bg-[#181a18] bg-slate-50 border dark:border-[#262926] border-slate-200 rounded-lg text-xs space-y-1.5">
                     <div className="flex justify-between items-center">
-                      <span className="font-semibold text-zinc-200">Submission #{selectedMilestone.submissions!.length - idx}</span>
+                      <span className="font-semibold dark:text-zinc-200 text-slate-800">Submission #{selectedMilestone.submissions!.length - idx}</span>
                       <span className="text-zinc-500 text-[11px]">{new Date(sub.createdAt).toLocaleString()}</span>
                     </div>
-                    <p className="text-zinc-300">{sub.notes || 'No description provided with this submission.'}</p>
+                    <p className="dark:text-zinc-300 text-slate-700">{sub.notes || 'No description provided with this submission.'}</p>
                     {sub.attachmentUrls && sub.attachmentUrls.length > 0 && (
                       <div className="flex flex-wrap gap-2 pt-1">
                         {sub.attachmentUrls.map((url: string, aIdx: number) => (
@@ -685,7 +685,7 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
                             href={url}
                             target="_blank"
                             rel="noreferrer"
-                            className="inline-flex items-center gap-1 text-[11px] text-[#8BFF24] hover:underline bg-[#8BFF24]/10 px-2 py-0.5 rounded border border-[#8BFF24]/20"
+                            className="inline-flex items-center gap-1 text-[11px] dark:text-[#8BFF24] text-[#5046E5] hover:underline dark:bg-[#8BFF24]/10 bg-[#EEF2FF] px-2 py-0.5 rounded border dark:border-[#8BFF24]/20 border-[#C7D2FE]"
                           >
                             <ExternalLink className="w-3 h-3" />
                             Deliverable File {aIdx + 1}
@@ -696,17 +696,17 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
                   </div>
                 ))
               ) : (
-                <p className="text-xs text-zinc-500 italic p-3 bg-[#181a18] rounded-lg border border-[#262926]">
+                <p className="text-xs text-zinc-500 italic p-3 dark:bg-[#181a18] bg-slate-50 rounded-lg border dark:border-[#262926] border-slate-200">
                   No deliverables submitted for this milestone yet.
                 </p>
               )}
             </div>
 
             {/* Actions in modal */}
-            <div className="flex justify-end gap-2.5 pt-3 border-t border-[#262926]">
+            <div className="flex justify-end gap-2.5 pt-3 border-t dark:border-[#262926] border-slate-200">
               <button
                 onClick={() => setSelectedMilestone(null)}
-                className="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-semibold"
+                className="px-4 py-2 rounded-xl dark:bg-zinc-800 bg-slate-100 hover:dark:bg-zinc-700 hover:bg-slate-200 dark:text-zinc-200 text-slate-700 border dark:border-transparent border-slate-300 text-xs font-semibold"
               >
                 Close
               </button>
@@ -714,14 +714,14 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
                 <>
                   <button
                     onClick={() => setShowRevisionModal(true)}
-                    className="px-4 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/40 text-xs font-semibold"
+                    className="px-4 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-500 dark:text-amber-400 border border-amber-500/40 text-xs font-semibold"
                   >
                     Request Revision
                   </button>
                   <button
                     onClick={() => handleApprove(selectedMilestone)}
                     disabled={actionLoading === selectedMilestone.id}
-                    className="px-4 py-2 rounded-xl bg-[#8BFF24] hover:bg-[#78e018] text-black text-xs font-bold"
+                    className="px-4 py-2 rounded-xl dark:bg-[#8BFF24] bg-[#5046E5] hover:dark:bg-[#78e018] hover:bg-[#4338CA] dark:text-black text-white shadow-md shadow-[#5046E5]/25 text-xs font-bold"
                   >
                     {actionLoading === selectedMilestone.id ? 'Approving...' : 'Approve & Release'}
                   </button>
@@ -735,28 +735,28 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
       {/* Revision Request Dialog Modal */}
       {showRevisionModal && selectedMilestone && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-[#121412] border border-[#262926] w-full max-w-lg rounded-2xl p-6 space-y-4 shadow-2xl relative">
+          <div className="dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm w-full max-w-lg rounded-2xl p-6 space-y-4 shadow-2xl relative">
             <button
               onClick={() => setShowRevisionModal(false)}
-              className="absolute top-4 right-4 text-zinc-400 hover:text-white p-1 rounded-lg hover:bg-zinc-800"
+              className="absolute top-4 right-4 dark:text-zinc-400 text-slate-500 hover:dark:text-white hover:text-slate-900 p-1 rounded-lg hover:dark:bg-zinc-800 hover:bg-slate-100"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-500 dark:text-amber-400">
                 <History className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">Request Milestone Revision</h3>
-                <p className="text-xs text-zinc-400">
+                <h3 className="text-lg font-bold dark:text-white text-slate-900">Request Milestone Revision</h3>
+                <p className="text-xs dark:text-zinc-400 text-slate-500">
                   Provide actionable feedback to the specialist explaining required adjustments.
                 </p>
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-zinc-300">
+              <label className="text-xs font-semibold dark:text-zinc-300 text-slate-700">
                 Revision Details & Feedback <span className="text-red-400">*</span>
               </label>
               <textarea
@@ -764,21 +764,21 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
                 value={revisionFeedback}
                 onChange={(e) => setRevisionFeedback(e.target.value)}
                 placeholder="Describe what needs to be changed, added, or verified before approval..."
-                className="w-full bg-[#181a18] border border-[#2e322e] rounded-xl p-3 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#8BFF24]/60 transition"
+                className="w-full dark:bg-[#181a18] bg-slate-50 border dark:border-[#2e322e] border-slate-200 rounded-xl p-3 text-xs dark:text-white text-slate-900 placeholder-zinc-500 focus:outline-none focus:dark:border-[#8BFF24]/60 border-[#5046E5] transition"
               />
             </div>
 
-            <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-start gap-2.5 text-xs text-amber-300">
+            <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-start gap-2.5 text-xs text-amber-500 dark:text-amber-300">
               <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
               <p>
                 Escrow funds remain locked in custody. The milestone status will transition to <strong>REVISION_REQUESTED</strong> and notify the specialist.
               </p>
             </div>
 
-            <div className="flex justify-end gap-2.5 pt-2 border-t border-[#262926]">
+            <div className="flex justify-end gap-2.5 pt-2 border-t dark:border-[#262926] border-slate-200">
               <button
                 onClick={() => setShowRevisionModal(false)}
-                className="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-semibold"
+                className="px-4 py-2 rounded-xl dark:bg-zinc-800 bg-slate-100 hover:dark:bg-zinc-700 hover:bg-slate-200 dark:text-zinc-200 text-slate-700 border dark:border-transparent border-slate-300 text-xs font-semibold"
               >
                 Cancel
               </button>
@@ -797,35 +797,35 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
       {/* Specialist Deliverable Submission Modal (Phase 14 & 15) */}
       {showSubmissionModal && selectedMilestone && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-[#121412] border border-[#262926] w-full max-w-lg rounded-2xl p-6 space-y-4 shadow-2xl relative">
+          <div className="dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm w-full max-w-lg rounded-2xl p-6 space-y-4 shadow-2xl relative">
             <button
               onClick={() => setShowSubmissionModal(false)}
-              className="absolute top-4 right-4 text-zinc-400 hover:text-white p-1 rounded-lg hover:bg-zinc-800"
+              className="absolute top-4 right-4 dark:text-zinc-400 text-slate-500 hover:dark:text-white hover:text-slate-900 p-1 rounded-lg hover:dark:bg-zinc-800 hover:bg-slate-100"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#8BFF24]/10 border border-[#8BFF24]/30 flex items-center justify-center text-[#8BFF24]">
+              <div className="w-10 h-10 rounded-xl dark:bg-[#8BFF24]/10 bg-[#EEF2FF] border dark:border-[#8BFF24]/30 border-[#C7D2FE] flex items-center justify-center dark:text-[#8BFF24] text-[#5046E5]">
                 <Upload className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">
+                <h3 className="text-lg font-bold dark:text-white text-slate-900">
                   {selectedMilestone.status === 'IN_REVISION' ? 'Resubmit Revised Deliverable' : 'Submit Milestone Deliverable'}
                 </h3>
-                <p className="text-xs text-zinc-400">
+                <p className="text-xs dark:text-zinc-400 text-slate-500">
                   Milestone #{selectedMilestone.order}: {selectedMilestone.title} (${Number(selectedMilestone.amount).toLocaleString()} {selectedMilestone.currency})
                 </p>
               </div>
             </div>
 
             {selectedMilestone.status === 'IN_REVISION' && (
-              <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl space-y-1 text-xs text-amber-300">
+              <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl space-y-1 text-xs text-amber-500 dark:text-amber-300">
                 <span className="font-bold flex items-center gap-1">
                   <AlertTriangle className="w-3.5 h-3.5" />
                   Client Requested Changes
                 </span>
-                <p className="text-zinc-300">
+                <p className="dark:text-zinc-300 text-slate-700">
                   Ensure all requested revisions and feedback from the client have been addressed before submitting.
                 </p>
               </div>
@@ -833,7 +833,7 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
 
             <div className="space-y-3 text-xs">
               <div>
-                <label className="text-zinc-300 font-semibold block mb-1">
+                <label className="dark:text-zinc-300 text-slate-700 font-semibold block mb-1">
                   Deliverable Notes & Summary of Work <span className="text-red-400">*</span>
                 </label>
                 <textarea
@@ -841,13 +841,13 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
                   value={submissionNotes}
                   onChange={(e) => setSubmissionNotes(e.target.value)}
                   placeholder="Detail the work completed, feature implementations, and testing outcomes..."
-                  className="w-full bg-[#181a18] border border-[#2e322e] rounded-xl p-3 text-white placeholder-zinc-500 focus:outline-none focus:border-[#8BFF24]/60"
+                  className="w-full dark:bg-[#181a18] bg-slate-50 border dark:border-[#2e322e] border-slate-200 rounded-xl p-3 dark:text-white text-slate-900 placeholder-zinc-500 focus:outline-none focus:dark:border-[#8BFF24]/60 border-[#5046E5]"
                   required
                 />
               </div>
 
               <div>
-                <label className="text-zinc-300 font-semibold block mb-1">
+                <label className="dark:text-zinc-300 text-slate-700 font-semibold block mb-1">
                   Deliverable File Attachment / URL (Supabase Storage / GitHub / Figma)
                 </label>
                 <input
@@ -855,21 +855,21 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
                   value={submissionAttachmentUrl}
                   onChange={(e) => setSubmissionAttachmentUrl(e.target.value)}
                   placeholder="https://..."
-                  className="w-full bg-[#181a18] border border-[#2e322e] rounded-xl p-2.5 text-white placeholder-zinc-500 focus:outline-none focus:border-[#8BFF24]/60"
+                  className="w-full dark:bg-[#181a18] bg-slate-50 border dark:border-[#2e322e] border-slate-200 rounded-xl p-2.5 dark:text-white text-slate-900 placeholder-zinc-500 focus:outline-none focus:dark:border-[#8BFF24]/60 border-[#5046E5]"
                 />
               </div>
             </div>
 
-            <div className="p-3 bg-[#181a18] rounded-xl border border-[#262926] flex items-center gap-2 text-xs text-zinc-400">
-              <ShieldCheck className="w-4 h-4 text-[#8BFF24] flex-shrink-0" />
+            <div className="p-3 dark:bg-[#181a18] bg-slate-50 rounded-xl border dark:border-[#262926] border-slate-200 flex items-center gap-2 text-xs dark:text-zinc-400 text-slate-500">
+              <ShieldCheck className="w-4 h-4 dark:text-[#8BFF24] text-[#5046E5] flex-shrink-0" />
               <span>Submission will transition the milestone to SUBMITTED and notify the client for escrow release.</span>
             </div>
 
-            <div className="flex justify-end gap-2.5 pt-2 border-t border-[#262926]">
+            <div className="flex justify-end gap-2.5 pt-2 border-t dark:border-[#262926] border-slate-200">
               <button
                 type="button"
                 onClick={() => setShowSubmissionModal(false)}
-                className="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-semibold"
+                className="px-4 py-2 rounded-xl dark:bg-zinc-800 bg-slate-100 hover:dark:bg-zinc-700 hover:bg-slate-200 dark:text-zinc-200 text-slate-700 border dark:border-transparent border-slate-300 text-xs font-semibold"
               >
                 Cancel
               </button>
@@ -877,7 +877,7 @@ export const MilestoneManagement: React.FC<MilestoneManagementProps> = ({
                 type="button"
                 onClick={handleSubmitDeliverable}
                 disabled={actionLoading === selectedMilestone.id || !submissionNotes.trim()}
-                className="px-5 py-2 rounded-xl bg-[#8BFF24] hover:bg-[#78e018] text-black text-xs font-bold transition disabled:opacity-50"
+                className="px-5 py-2 rounded-xl dark:bg-[#8BFF24] bg-[#5046E5] hover:dark:bg-[#78e018] hover:bg-[#4338CA] dark:text-black text-white shadow-md shadow-[#5046E5]/25 text-xs font-bold transition disabled:opacity-50"
               >
                 {actionLoading === selectedMilestone.id ? 'Submitting...' : 'Transmit Deliverable'}
               </button>

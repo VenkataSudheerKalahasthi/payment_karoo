@@ -350,10 +350,10 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
   return (
     <div className="space-y-6 font-sans">
       {/* Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl p-6 shadow-sm">
+      <div className="interactive-card flex flex-col md:flex-row md:items-center justify-between gap-4 dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl p-6 shadow-sm">
         <div className="space-y-1">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-[#2563EB]/10 border border-[#2563EB]/20 text-[#2563EB] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-[#5046E5]/10 border border-[#5046E5]/20 text-[#5046E5] flex items-center justify-center">
               <FolderKanban className="w-5 h-5" />
             </div>
             <div>
@@ -373,7 +373,7 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
             }}
             className="px-4 py-2 rounded-xl dark:bg-[#202020] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] text-xs font-semibold dark:text-[#CDCBCA] text-[#242424] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] flex items-center space-x-2 transition shadow-sm"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isLoadingDetails ? 'animate-spin text-[#2563EB]' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${isLoadingDetails ? 'animate-spin text-[#5046E5]' : ''}`} />
             <span>Refresh State</span>
           </button>
         </div>
@@ -403,14 +403,14 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Projects List */}
         <div className="lg:col-span-4 space-y-4">
-          <div className="dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl p-4 shadow-sm space-y-3">
+          <div className="interactive-card dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl p-4 shadow-sm space-y-3">
             <h2 className="text-xs font-bold dark:text-[#A5A5A5] text-[#64748B] uppercase tracking-wider px-1">
               Active Engagements ({projects.length})
             </h2>
 
             {isLoadingList ? (
               <div className="py-8 text-center text-xs dark:text-[#777777] text-[#64748B] flex items-center justify-center space-x-2">
-                <RefreshCw className="w-4 h-4 animate-spin text-[#2563EB]" />
+                <RefreshCw className="w-4 h-4 animate-spin text-[#5046E5]" />
                 <span>Loading projects...</span>
               </div>
             ) : projects.length === 0 ? (
@@ -427,8 +427,8 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
                       onClick={() => setSelectedProjectId(p.id)}
                       className={`w-full text-left p-3.5 rounded-xl border transition flex flex-col space-y-2 ${
                         isSelected
-                          ? 'dark:bg-[#202020] bg-[#EFF6FF] border-[#2563EB] shadow-sm ring-1 ring-[#2563EB]'
-                          : 'dark:bg-[#080808]/40 bg-white dark:border-[rgba(205,203,202,0.15)] border-[#E2E8F0] hover:border-[#2563EB]/40'
+                          ? 'dark:bg-[#202020] bg-[#EEF2FF] border-[#5046E5] shadow-sm ring-1 ring-[#5046E5]'
+                          : 'dark:bg-[#080808]/40 bg-white dark:border-[rgba(205,203,202,0.15)] border-[#E2E8F0] hover:border-[#5046E5]/40'
                       }`}
                     >
                       <div className="flex items-center justify-between">
@@ -437,7 +437,7 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
                           className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
                             p.status === 'COMPLETED'
                               ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
-                              : 'bg-[#2563EB]/10 text-[#2563EB] border border-[#2563EB]/20'
+                              : 'bg-[#5046E5]/10 text-[#5046E5] border border-[#5046E5]/20'
                           }`}
                         >
                           {p.status}
@@ -463,12 +463,12 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
           {selectedProject ? (
             <div className="space-y-6">
               {/* Project Card & Progress Metric Summary */}
-              <div className="dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl p-6 shadow-sm space-y-6">
+              <div className="interactive-card dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl p-6 shadow-sm space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] pb-4">
                   <div>
                     <h2 className="text-lg font-bold dark:text-[#CDCBCA] text-[#242424]">{selectedProject.title}</h2>
                     <p className="text-xs dark:text-[#A5A5A5] text-[#64748B] mt-0.5">
-                      Contract Ref: <span className="font-mono text-[#2563EB] font-semibold">#{selectedProject.contract?.contractNumber}</span>
+                      Contract Ref: <span className="font-mono text-[#5046E5] font-semibold">#{selectedProject.contract?.contractNumber}</span>
                     </p>
                   </div>
 
@@ -540,9 +540,9 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
                         <span className="text-[10px] dark:text-[#777777] text-[#64748B] font-mono">{summary.completedMilestones} Completed</span>
                       </div>
 
-                      <div className="p-3.5 rounded-xl bg-[#2563EB]/5 border border-[#2563EB]/20">
-                        <span className="text-[10px] uppercase font-bold text-[#2563EB]">In Review</span>
-                        <p className="text-sm font-bold font-mono text-[#2563EB] mt-0.5">
+                      <div className="p-3.5 rounded-xl bg-[#5046E5]/5 border border-[#5046E5]/20">
+                        <span className="text-[10px] uppercase font-bold text-[#5046E5]">In Review</span>
+                        <p className="text-sm font-bold font-mono text-[#5046E5] mt-0.5">
                           {formatCurrencyMinor(summary.pendingValueMinor, summary.currency)}
                         </p>
                         <span className="text-[10px] dark:text-[#777777] text-[#64748B] font-mono">{summary.inProgressMilestones + summary.inRevisionMilestones} In Progress</span>
@@ -566,7 +566,7 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
                   onClick={() => setActiveTab('milestones')}
                   className={`pb-3 transition flex items-center space-x-2 border-b-2 ${
                     activeTab === 'milestones'
-                      ? 'border-[#2563EB] text-[#2563EB]'
+                      ? 'border-[#5046E5] text-[#5046E5]'
                       : 'border-transparent dark:text-[#A5A5A5] text-[#64748B] hover:dark:text-white hover:text-black'
                   }`}
                 >
@@ -578,7 +578,7 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
                   onClick={() => setActiveTab('activity')}
                   className={`pb-3 transition flex items-center space-x-2 border-b-2 ${
                     activeTab === 'activity'
-                      ? 'border-[#2563EB] text-[#2563EB]'
+                      ? 'border-[#5046E5] text-[#5046E5]'
                       : 'border-transparent dark:text-[#A5A5A5] text-[#64748B] hover:dark:text-white hover:text-black'
                   }`}
                 >
@@ -600,7 +600,7 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
                     return (
                       <div
                         key={m.id}
-                        className="dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl p-5 shadow-sm space-y-4 hover:border-[#2563EB]/40 transition"
+                        className="interactive-card dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl p-5 shadow-sm space-y-4 hover:border-[#5046E5]/40 transition"
                       >
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                           <div className="flex items-center space-x-3">
@@ -626,7 +626,7 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
                                 isCompleted
                                   ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
                                   : isSubmitted
-                                  ? 'bg-[#2563EB]/10 text-[#2563EB] border-[#2563EB]/20'
+                                  ? 'bg-[#5046E5]/10 text-[#5046E5] border-[#5046E5]/20'
                                   : isInRevision
                                   ? 'bg-amber-500/10 text-amber-500 border-amber-500/20'
                                   : 'dark:bg-[#202020] bg-[#F1F5F9] dark:text-[#777777] text-[#64748B] dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]'
@@ -664,7 +664,7 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
                                       onClick={() => handleDownloadAttachment(att)}
                                       className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-lg dark:bg-[#202020] bg-white hover:dark:bg-[#303030] hover:bg-[#F1F5F9] dark:text-[#CDCBCA] text-[#242424] text-[11px] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] transition shadow-sm"
                                     >
-                                      <Download className="w-3 h-3 text-[#2563EB]" />
+                                      <Download className="w-3 h-3 text-[#5046E5]" />
                                       <span>{att.split('/').pop() || 'Attachment'}</span>
                                       <ExternalLink className="w-2.5 h-2.5 dark:text-[#777777] text-[#64748B]" />
                                     </button>
@@ -692,7 +692,7 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
                           {isWorker && isPending && (
                             <button
                               onClick={() => handleStartMilestone(m)}
-                              className="px-4 py-2 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-xs font-semibold text-white flex items-center space-x-1.5 transition shadow-sm"
+                              className="px-4 py-2 rounded-xl bg-[#5046E5] hover:bg-[#4338CA] text-xs font-semibold text-white flex items-center space-x-1.5 transition shadow-sm"
                             >
                               <Play className="w-3.5 h-3.5" />
                               <span>Start Work</span>
@@ -705,7 +705,7 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
                                 setSelectedMilestone(m);
                                 setSubmissionModalOpen(true);
                               }}
-                              className="px-4 py-2 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-xs font-semibold text-white flex items-center space-x-1.5 transition shadow-sm"
+                              className="px-4 py-2 rounded-xl bg-[#5046E5] hover:bg-[#4338CA] text-xs font-semibold text-white flex items-center space-x-1.5 transition shadow-sm"
                             >
                               <Send className="w-3.5 h-3.5" />
                               <span>Submit Deliverable</span>
@@ -780,7 +780,7 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
               {activeTab === 'activity' && (
                 <div className="dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl p-6 shadow-sm space-y-4">
                   <h3 className="text-sm font-bold dark:text-[#CDCBCA] text-[#242424] flex items-center space-x-2">
-                    <History className="w-4 h-4 text-[#2563EB]" />
+                    <History className="w-4 h-4 text-[#5046E5]" />
                     <span>Chronological Milestone Activity Log</span>
                   </h3>
 
@@ -834,7 +834,7 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
           <div className="dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl">
             <div className="flex items-center justify-between border-b dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] pb-3">
               <h3 className="text-base font-bold dark:text-[#CDCBCA] text-[#242424] flex items-center space-x-2">
-                <Send className="w-5 h-5 text-[#2563EB]" />
+                <Send className="w-5 h-5 text-[#5046E5]" />
                 <span>Submit Deliverable: {selectedMilestone.title}</span>
               </h3>
               <button onClick={() => setSubmissionModalOpen(false)} className="dark:text-[#777777] text-[#64748B] hover:text-black hover:dark:text-white" aria-label="Close modal">✕</button>
@@ -848,7 +848,7 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
                   value={submissionNotes}
                   onChange={(e) => setSubmissionNotes(e.target.value)}
                   placeholder="Detail completed deliverables, implementation highlights, and testing notes..."
-                  className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#2563EB] text-xs"
+                  className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5] text-xs"
                 />
               </div>
 
@@ -858,10 +858,10 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
                   type="file"
                   onChange={handleFileUpload}
                   disabled={isUploading}
-                  className="w-full text-xs dark:text-[#A5A5A5] text-[#64748B] file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#2563EB] file:text-white hover:file:bg-[#1D4ED8] cursor-pointer"
+                  className="w-full text-xs dark:text-[#A5A5A5] text-[#64748B] file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#5046E5] file:text-white hover:file:bg-[#4338CA] cursor-pointer"
                 />
                 {isUploading && (
-                  <p className="text-[11px] text-[#2563EB] flex items-center space-x-1.5">
+                  <p className="text-[11px] text-[#5046E5] flex items-center space-x-1.5">
                     <RefreshCw className="w-3.5 h-3.5 animate-spin" />
                     <span>Authorizing secure storage upload...</span>
                   </p>
@@ -894,7 +894,7 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
                 type="button"
                 disabled={isSubmitting || isUploading || !submissionNotes.trim()}
                 onClick={handleSubmitDeliverable}
-                className="px-5 py-2 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] disabled:opacity-50 text-xs font-bold text-white transition flex items-center space-x-2 shadow-sm"
+                className="px-5 py-2 rounded-xl bg-[#5046E5] hover:bg-[#4338CA] disabled:opacity-50 text-xs font-bold text-white transition flex items-center space-x-2 shadow-sm"
               >
                 {isSubmitting && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
                 <span>Submit Deliverable</span>

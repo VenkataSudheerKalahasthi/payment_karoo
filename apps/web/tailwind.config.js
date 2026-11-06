@@ -22,21 +22,22 @@ export default {
           muted: '#777777',
           border: 'rgba(205, 203, 202, 0.18)',
         },
-        // Light Theme — Pearl White + Royal Blue
+        // Light Theme — Pearl White + Royal Indigo / Violet-Blue (Matching Reference)
         pearl: {
-          DEFAULT: '#F5F7FA',
-          bg: '#F5F7FA',
+          DEFAULT: '#F8FAFC',
+          bg: '#F8FAFC',
           sidebar: '#FFFFFF',
           card: '#FFFFFF',
           elevated: '#F1F5F9',
-          hover: '#EFF6FF',
-          text: '#242424',
+          hover: '#EEF2FF',
+          text: '#111827',
           secondary: '#475569',
           muted: '#64748B',
-          brand: '#2563EB',
-          brandHover: '#1D4ED8',
-          brandSoft: '#DBEAFE',
+          brand: '#5046E5',
+          brandHover: '#4338CA',
+          brandSoft: '#EEF2FF',
           border: '#E2E8F0',
+          accent: '#6366F1',
         },
         // Strict Semantic Financial Status Tokens
         finance: {

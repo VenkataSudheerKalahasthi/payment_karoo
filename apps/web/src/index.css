@@ -4,18 +4,18 @@
 
 :root {
   color-scheme: light;
-  --bg-main: #F5F7FA;
+  --bg-main: #F8FAFC;
   --bg-sidebar: #FFFFFF;
   --bg-card: #FFFFFF;
   --bg-elevated: #F1F5F9;
-  --bg-hover: #EFF6FF;
-  --text-primary: #242424;
+  --bg-hover: #EEF2FF;
+  --text-primary: #111827;
   --text-secondary: #475569;
   --text-muted: #64748B;
   --border-color: #E2E8F0;
-  --brand-primary: #2563EB;
-  --brand-hover: #1D4ED8;
-  --brand-soft: #DBEAFE;
+  --brand-primary: #5046E5;
+  --brand-hover: #4338CA;
+  --brand-soft: #EEF2FF;
 }
 
 html.dark {
@@ -35,7 +35,7 @@ html.dark {
 }
 
 html {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Inter', sans-serif;
   letter-spacing: -0.015em;
   scroll-behavior: smooth;
 }
@@ -43,8 +43,14 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
+  font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Tabular figures for all numbers, monetary figures, and counts */
+.tabular-nums, [data-numeric], .font-mono, .stat-number, input[type="number"] {
+  font-variant-numeric: tabular-nums;
 }
 
 /* Custom scrollbars */
@@ -75,4 +81,93 @@ html:not(.dark) ::-webkit-scrollbar-thumb {
 
 html:not(.dark) ::-webkit-scrollbar-thumb:hover {
   background: #94A3B8;
+}
+
+/* Feature View Entrance Animations */
+@keyframes cardFadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.99);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.feature-enter {
+  animation: cardFadeInUp 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+/* Interactive Forward-Lift Effect on Card Hover */
+.interactive-card {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease !important;
+  will-change: transform;
+}
+
+.interactive-card:hover {
+  transform: translateY(-3px) scale(1.006);
+}
+
+html:not(.dark) .interactive-card:hover {
+  box-shadow: 0 12px 28px -6px rgba(80, 70, 229, 0.12), 0 6px 12px -4px rgba(0, 0, 0, 0.04) !important;
+  border-color: rgba(80, 70, 229, 0.4) !important;
+}
+
+html.dark .interactive-card:hover {
+  box-shadow: 0 14px 32px -6px rgba(0, 0, 0, 0.6), 0 0 18px -2px rgba(139, 255, 36, 0.16) !important;
+  border-color: rgba(139, 255, 36, 0.35) !important;
+}
+
+/* Dashboard Top-to-Bottom Drop-In Staggered Animation */
+@keyframes cardDropIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-32px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.card-drop-in {
+  animation: cardDropIn 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity;
+}
+
+/* Charts Growing from Base Animation */
+@keyframes chartGrowFromBase {
+  0% {
+    transform: scaleY(0);
+    opacity: 0.2;
+  }
+  100% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+.chart-grow-base {
+  transform-origin: bottom center;
+  animation: chartGrowFromBase 0.95s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity;
+}
+
+@keyframes barGrowHeight {
+  0% {
+    transform: scaleY(0);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+.bar-grow {
+  transform-origin: bottom center;
+  animation: barGrowHeight 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform;
 }

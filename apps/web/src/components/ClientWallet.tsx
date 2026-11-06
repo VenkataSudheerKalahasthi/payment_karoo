@@ -79,7 +79,7 @@ export const ClientWallet: React.FC<ClientWalletProps> = ({ onNavigateToContract
   if (isLoading) {
     return (
       <div className="p-16 text-center space-y-3 dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl animate-pulse">
-        <RefreshCw className="w-8 h-8 animate-spin text-[#2563EB] mx-auto" />
+        <RefreshCw className="w-8 h-8 animate-spin text-[#5046E5] mx-auto" />
         <p className="text-xs dark:text-[#A5A5A5] text-[#64748B]">Loading ledger-verified wallet metrics...</p>
       </div>
     );
@@ -93,7 +93,7 @@ export const ClientWallet: React.FC<ClientWalletProps> = ({ onNavigateToContract
         <p className="text-xs dark:text-[#A5A5A5] text-[#64748B]">Could not retrieve client wallet records from financial ledger.</p>
         <button
           onClick={loadWallet}
-          className="px-4 py-2 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-xs font-semibold text-white transition shadow-sm"
+          className="px-4 py-2 rounded-lg bg-[#5046E5] hover:bg-[#4338CA] text-xs font-semibold text-white transition shadow-sm"
         >
           Retry
         </button>
@@ -107,7 +107,7 @@ export const ClientWallet: React.FC<ClientWalletProps> = ({ onNavigateToContract
       <div className="p-6 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
         <div className="space-y-1">
           <div className="flex items-center space-x-2.5">
-            <div className="w-9 h-9 rounded-lg dark:bg-[#202020] bg-[#EFF6FF] border dark:border-[rgba(205,203,202,0.18)] border-[#DBEAFE] flex items-center justify-center text-[#2563EB]">
+            <div className="w-9 h-9 rounded-lg dark:bg-[#202020] bg-[#EEF2FF] border dark:border-[rgba(205,203,202,0.18)] border-[#C7D2FE] flex items-center justify-center text-[#5046E5]">
               <Wallet className="w-5 h-5" />
             </div>
             <h2 className="text-lg font-bold dark:text-[#CDCBCA] text-[#242424] tracking-tight">Client Virtual Wallet</h2>
@@ -124,7 +124,7 @@ export const ClientWallet: React.FC<ClientWalletProps> = ({ onNavigateToContract
           onClick={loadWallet}
           className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-lg dark:bg-[#202020] bg-[#F8FAFC] dark:hover:bg-[#303030] hover:bg-[#F1F5F9] text-xs font-semibold dark:text-[#CDCBCA] text-[#242424] transition border dark:border-[rgba(205,203,202,0.18)] border-[#CBD5E1] shrink-0"
         >
-          <RefreshCw className="w-3.5 h-3.5 text-[#2563EB]" />
+          <RefreshCw className="w-3.5 h-3.5 text-[#5046E5]" />
           <span>Refresh Ledger</span>
         </button>
       </div>
@@ -169,9 +169,9 @@ export const ClientWallet: React.FC<ClientWalletProps> = ({ onNavigateToContract
         <div className="p-5 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] space-y-2 shadow-sm">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium dark:text-[#A5A5A5] text-[#64748B]">Active Escrow Balance</span>
-            <ShieldCheck className="w-4 h-4 text-[#2563EB]" />
+            <ShieldCheck className="w-4 h-4 text-[#5046E5]" />
           </div>
-          <div className="text-2xl font-bold text-[#2563EB] font-mono tabular-nums">
+          <div className="text-2xl font-bold text-[#5046E5] font-mono tabular-nums">
             ${wallet.activeContractFunding.toLocaleString(undefined, { minimumFractionDigits: 2 })}
           </div>
           <p className="text-[11px] dark:text-[#777777] text-[#94A3B8]">Held in secure milestone custody</p>
@@ -204,7 +204,7 @@ export const ClientWallet: React.FC<ClientWalletProps> = ({ onNavigateToContract
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <FileText className="w-4 h-4 text-[#2563EB]" />
+            <FileText className="w-4 h-4 text-[#5046E5]" />
             <h3 className="text-sm font-bold dark:text-[#CDCBCA] text-[#242424]">Contract-Wise Financial Breakdown</h3>
           </div>
           <span className="text-xs font-mono dark:text-[#A5A5A5] text-[#64748B]">
@@ -249,7 +249,7 @@ export const ClientWallet: React.FC<ClientWalletProps> = ({ onNavigateToContract
                       <td className="py-3 px-4 font-mono text-blue-600 dark:text-blue-400 tabular-nums">
                         ${c.releasedAmount.toFixed(2)}
                       </td>
-                      <td className="py-3 px-4 font-mono font-bold text-[#2563EB] tabular-nums">
+                      <td className="py-3 px-4 font-mono font-bold text-[#5046E5] tabular-nums">
                         ${c.remainingInEscrow.toFixed(2)}
                       </td>
                       <td className="py-3 px-4">
@@ -260,7 +260,7 @@ export const ClientWallet: React.FC<ClientWalletProps> = ({ onNavigateToContract
                               : c.escrowStatus === 'DISPUTED'
                                 ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'
                                 : c.escrowStatus === 'RELEASED'
-                                  ? 'bg-[#2563EB]/10 text-[#2563EB] border border-[#2563EB]/20'
+                                  ? 'bg-[#5046E5]/10 text-[#5046E5] border border-[#5046E5]/20'
                                   : 'bg-amber-500/10 text-amber-500 dark:text-amber-400 border border-amber-500/20'
                           }`}
                         >
@@ -300,7 +300,7 @@ export const ClientWallet: React.FC<ClientWalletProps> = ({ onNavigateToContract
       {/* Payment Transactions History */}
       <div className="space-y-3">
         <div className="flex items-center space-x-2">
-          <Clock className="w-4 h-4 text-[#2563EB]" />
+          <Clock className="w-4 h-4 text-[#5046E5]" />
           <h3 className="text-sm font-bold dark:text-[#CDCBCA] text-[#242424]">Payment Transaction Ledger History</h3>
         </div>
 
@@ -364,7 +364,7 @@ export const ClientWallet: React.FC<ClientWalletProps> = ({ onNavigateToContract
                           onClick={() => setSelectedTx(tx)}
                           className="px-2.5 py-1 rounded-md dark:bg-[#202020] bg-[#F1F5F9] dark:hover:bg-[#303030] hover:bg-[#E2E8F0] dark:text-[#CDCBCA] text-[#242424] text-xs transition inline-flex items-center space-x-1 border dark:border-[rgba(205,203,202,0.18)] border-[#CBD5E1]"
                         >
-                          <Eye className="w-3.5 h-3.5 text-[#2563EB]" />
+                          <Eye className="w-3.5 h-3.5 text-[#5046E5]" />
                           <span>Inspect</span>
                         </button>
                       </td>
@@ -383,7 +383,7 @@ export const ClientWallet: React.FC<ClientWalletProps> = ({ onNavigateToContract
           <div className="dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl dark:text-[#CDCBCA] text-[#242424]">
             <div className="flex items-center justify-between border-b dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] pb-3">
               <div className="flex items-center space-x-2">
-                <FileText className="w-4 h-4 text-[#2563EB]" />
+                <FileText className="w-4 h-4 text-[#5046E5]" />
                 <h3 className="text-sm font-bold dark:text-[#CDCBCA] text-[#242424]">Transaction Record Inspection</h3>
               </div>
               <button onClick={() => setSelectedTx(null)} className="dark:text-[#777777] text-[#64748B] hover:dark:text-[#CDCBCA] hover:text-[#242424]">
@@ -398,7 +398,7 @@ export const ClientWallet: React.FC<ClientWalletProps> = ({ onNavigateToContract
               </div>
               <div className="flex justify-between py-1.5 border-b dark:border-[rgba(205,203,202,0.18)] border-[#F1F5F9]">
                 <span className="dark:text-[#A5A5A5] text-[#64748B]">Transaction Type:</span>
-                <span className="font-mono text-[#2563EB] font-semibold">{selectedTx.type}</span>
+                <span className="font-mono text-[#5046E5] font-semibold">{selectedTx.type}</span>
               </div>
               <div className="flex justify-between py-1.5 border-b dark:border-[rgba(205,203,202,0.18)] border-[#F1F5F9]">
                 <span className="dark:text-[#A5A5A5] text-[#64748B]">Monetary Value:</span>
@@ -462,7 +462,7 @@ export const ClientWallet: React.FC<ClientWalletProps> = ({ onNavigateToContract
                   value={refundReason}
                   onChange={(e) => setRefundReason(e.target.value)}
                   placeholder="Explain the cancellation or refund justification (minimum 5 characters)..."
-                  className="w-full p-2.5 rounded-xl dark:bg-[#202020] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#CBD5E1] text-xs dark:text-[#CDCBCA] text-[#242424] placeholder:dark:text-[#777777] placeholder:text-[#94A3B8] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] transition leading-relaxed"
+                  className="w-full p-2.5 rounded-xl dark:bg-[#202020] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#CBD5E1] text-xs dark:text-[#CDCBCA] text-[#242424] placeholder:dark:text-[#777777] placeholder:text-[#94A3B8] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5046E5] transition leading-relaxed"
                   required
                 />
               </div>

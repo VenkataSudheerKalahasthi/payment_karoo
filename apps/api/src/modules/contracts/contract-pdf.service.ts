@@ -340,13 +340,13 @@ function renderClientOfficeStamp(
   // 5. Dividing rule
   doc.moveTo(cx - 32, cy - 17).lineTo(cx + 32, cy - 17).lineWidth(0.5).strokeColor('#10b981').stroke();
 
-  // 6. Client's Authenticated Profile Name
+  // 6. Client's Authenticated Profile Name (Pure Green Ink)
   const name = (stamp.profileName || 'Verified Client').toUpperCase();
-  doc.font('Helvetica-Bold').fontSize(7.5).fillColor('#0f172a')
+  doc.font('Helvetica-Bold').fontSize(7.5).fillColor('#047857')
     .text(name, cx - 42, cy - 12, { width: 84, align: 'center', ellipsis: true });
 
-  // 7. Verified mobile number
-  doc.font('Helvetica').fontSize(6).fillColor('#334155')
+  // 7. Verified mobile number (Pure Green Ink)
+  doc.font('Helvetica').fontSize(6).fillColor('#059669')
     .text(`Mobile: ${stamp.verifiedMobile}`, cx - 42, cy + 1, { width: 84, align: 'center', ellipsis: true });
 
   // 8. Server-generated approval date

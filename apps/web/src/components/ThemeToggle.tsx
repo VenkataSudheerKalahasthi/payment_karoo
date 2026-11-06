@@ -35,13 +35,13 @@ export const ThemeToggle: React.FC<{ className?: string }> = ({ className = '' }
       className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer active:scale-90 ${
         theme === 'dark'
           ? 'bg-white/5 hover:bg-white/10 text-[#CDCBCA] hover:text-[#8BFF24] border border-white/10 shadow-sm'
-          : 'bg-black/5 hover:bg-black/10 text-[#242424] hover:text-[#16a34a] border border-black/10 shadow-sm'
+          : 'bg-black/5 hover:bg-black/10 text-[#475569] hover:text-[#5046E5] border border-black/10 shadow-sm'
       } ${className}`}
     >
       {theme === 'dark' ? (
         <Sun className="w-4 h-4 text-[#CDCBCA] hover:text-[#8BFF24] transition-colors" />
       ) : (
-        <Moon className="w-4 h-4 text-[#242424] hover:text-[#16a34a] transition-colors" />
+        <Moon className="w-4 h-4 text-[#475569] hover:text-[#5046E5] transition-colors" />
       )}
     </button>
   );
