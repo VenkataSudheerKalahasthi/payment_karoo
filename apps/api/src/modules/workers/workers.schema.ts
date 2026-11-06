@@ -14,6 +14,10 @@ export const listWorkersQuerySchema = z.object({
     .optional()
     .transform((val) => (val ? parseFloat(val) : undefined)),
   country: z.string().optional(),
+  state: z.string().optional(),
+  district: z.string().optional(),
+  city: z.string().optional(),
+  workMode: z.enum(['ON_SITE', 'REMOTE', 'HYBRID']).optional(),
   sortBy: z.enum(['rating', 'hourlyRate', 'totalCompletedContracts', 'createdAt']).default('rating'),
   sortOrder: z.enum(['asc', 'desc']).default('desc'),
   page: z
@@ -34,6 +38,15 @@ export const updateWorkerProfileSchema = z.object({
   headline: z.string().max(120, 'Headline cannot exceed 120 characters').optional(),
   hourlyRate: z.number().min(0, 'Hourly rate cannot be negative').optional(),
   availability: z.enum([WorkerAvailability.AVAILABLE, WorkerAvailability.BUSY, WorkerAvailability.UNAVAILABLE]).optional(),
+  country: z.string().max(80).optional(),
+  state: z.string().max(80).optional(),
+  district: z.string().max(80).optional(),
+  city: z.string().max(80).optional(),
+  area: z.string().max(80).optional(),
+  postalCode: z.string().max(20).optional(),
+  workMode: z.enum(['ON_SITE', 'REMOTE', 'HYBRID']).optional(),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
 });
 
 export const addWorkerSkillSchema = z.object({

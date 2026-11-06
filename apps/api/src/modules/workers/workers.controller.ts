@@ -39,14 +39,19 @@ export async function listWorkers(req: Request, res: Response): Promise<void> {
   }
 
   if (query.country) {
-    where.user = {
-      status: 'ACTIVE',
-      profile: {
-        is: {
-          country: { equals: query.country, mode: 'insensitive' },
-        },
-      },
-    };
+    where.country = { equals: query.country, mode: 'insensitive' };
+  }
+  if (query.state) {
+    where.state = { equals: query.state, mode: 'insensitive' };
+  }
+  if (query.district) {
+    where.district = { equals: query.district, mode: 'insensitive' };
+  }
+  if (query.city) {
+    where.city = { equals: query.city, mode: 'insensitive' };
+  }
+  if (query.workMode) {
+    where.workMode = query.workMode;
   }
 
   if (query.skill) {
@@ -212,12 +217,30 @@ export async function updateWorkerProfile(req: Request, res: Response): Promise<
         headline: input.headline,
         hourlyRate: input.hourlyRate !== undefined ? new Prisma.Decimal(input.hourlyRate) : undefined,
         availability: input.availability,
+        country: input.country,
+        state: input.state,
+        district: input.district,
+        city: input.city,
+        area: input.area,
+        postalCode: input.postalCode,
+        workMode: input.workMode,
+        latitude: input.latitude,
+        longitude: input.longitude,
       },
       create: {
         userId: user.id,
         headline: input.headline,
         hourlyRate: input.hourlyRate !== undefined ? new Prisma.Decimal(input.hourlyRate) : undefined,
         availability: input.availability || 'AVAILABLE',
+        country: input.country,
+        state: input.state,
+        district: input.district,
+        city: input.city,
+        area: input.area,
+        postalCode: input.postalCode,
+        workMode: input.workMode || 'HYBRID',
+        latitude: input.latitude,
+        longitude: input.longitude,
       },
       include: {
         skills: { include: { skill: true } },

@@ -26,8 +26,10 @@ import {
   Layers,
   Scale,
   Stamp,
+  Star,
 } from 'lucide-react';
 import { ContractLifecyclePanel } from './ContractLifecyclePanel';
+import { ContractReviewModal } from './ContractReviewModal';
 
 interface CashfreeSDKInstance {
   checkout: (options: { paymentSessionId: string; redirectTarget: '_modal' | '_self' }) => Promise<{
@@ -238,6 +240,7 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
     hasUserAccepted;
 
   const [showStampModal, setShowStampModal] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
   const [isApplyingStamp, setIsApplyingStamp] = useState(false);
   const [stampPosition, setStampPosition] = useState<'BOTTOM_RIGHT' | 'BOTTOM_LEFT' | 'BOTTOM_CENTER'>('BOTTOM_RIGHT');
 
@@ -497,6 +500,16 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
                 <Stamp className="w-3.5 h-3.5" />
                 <span>Client Stamped</span>
               </span>
+            )}
+
+            {detailedContract.status === ContractStatus.COMPLETED && (
+              <button
+                onClick={() => setShowReviewModal(true)}
+                className="px-3 py-1.5 rounded-lg dark:bg-[#8BFF24]/10 bg-[#EEF2FF] border dark:border-[#8BFF24]/30 border-[#C7D2FE] dark:text-[#8BFF24] text-[#5046E5] text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
+              >
+                <Star className="w-3.5 h-3.5" />
+                <span>Verified Review</span>
+              </button>
             )}
 
             <button
@@ -1242,6 +1255,19 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
             </div>
           </div>
         </div>
+      )}
+
+      {showReviewModal && (
+        <ContractReviewModal
+          contractId={detailedContract.id}
+          contractTitle={detailedContract.title}
+          recipientName={isClient ? [detailedContract.worker?.firstName, detailedContract.worker?.lastName].filter(Boolean).join(' ') || 'Specialist' : [detailedContract.client?.firstName, detailedContract.client?.lastName].filter(Boolean).join(' ') || 'Client'}
+          recipientRole={isClient ? 'SPECIALIST' : 'CLIENT'}
+          onClose={() => setShowReviewModal(false)}
+          onSuccess={() => {
+            // Refresh
+          }}
+        />
       )}
     </div>
   );

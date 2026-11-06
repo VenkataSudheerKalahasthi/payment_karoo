@@ -7,6 +7,7 @@ import {
   withdrawHiringRequest,
   convertToContract,
   counterofferHiringRequest,
+  deleteHiringRequest,
 } from './hiring-requests.controller.js';
 import { authenticateUser, requireRole } from '../../middleware/auth.js';
 import { validateRequest } from '../../middleware/validate.js';
@@ -66,6 +67,13 @@ hiringRequestsRoutes.post(
   authenticateUser(),
   requireRole(UserRole.CLIENT),
   convertToContract,
+);
+
+// Delete / Remove hiring request (Client or Worker)
+hiringRequestsRoutes.delete(
+  '/:id',
+  authenticateUser(),
+  deleteHiringRequest,
 );
 
 export { hiringRequestsRoutes };

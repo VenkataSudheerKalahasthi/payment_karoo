@@ -20,6 +20,9 @@ export const createContractSchema = z.object({
   revisionTerms: z.string().max(2000).optional(),
   startDate: z.string().datetime().optional(),
   endDate: z.string().datetime().optional(),
+  jobProposalId: z.string().uuid().optional(),
+  hiringRequestId: z.string().uuid().optional(),
+  teamId: z.string().uuid().optional(),
   milestones: z
     .array(createMilestoneInputSchema)
     .min(1, 'Contract must contain at least one milestone deliverable'),

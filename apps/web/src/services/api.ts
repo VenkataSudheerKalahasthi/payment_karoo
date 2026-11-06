@@ -57,6 +57,20 @@ import {
   ClientStampDto,
   ClientStampPreviewDto,
   ApplyClientStampRequest,
+  JobPostDto,
+  CreateJobPostRequest,
+  UpdateJobPostRequest,
+  JobProposalDto,
+  CreateJobProposalRequest,
+  CounterofferProposalRequest,
+  SpecialistTeamDto,
+  CreateSpecialistTeamRequest,
+  InviteTeamMemberRequest,
+  TeamInvitationDto,
+  SavedJobDto,
+  SavedSpecialistDto,
+  VerifiedReviewDto,
+  CreateVerifiedReviewRequest,
 } from '@trustpay/shared';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
@@ -296,6 +310,11 @@ export const apiService = {
     return res.data;
   },
 
+  deleteHiringRequest: async (id: string): Promise<ApiResponse<{ deletedId: string }>> => {
+    const res = await apiClient.delete<ApiResponse<{ deletedId: string }>>(`/hiring-requests/${id}`);
+    return res.data;
+  },
+
   counterofferHiringRequest: async (
     id: string,
     data: CounterofferHiringRequestRequest,
@@ -451,8 +470,11 @@ export const apiService = {
     return res.data;
   },
 
-  sendMessage: async (conversationId: string, content: string): Promise<ApiResponse<any>> => {
-    const res = await apiClient.post<ApiResponse<any>>(`/conversations/${conversationId}/messages`, { content });
+  sendMessage: async (conversationId: string, content: string, attachmentUrls?: string[]): Promise<ApiResponse<any>> => {
+    const res = await apiClient.post<ApiResponse<any>>(`/conversations/${conversationId}/messages`, {
+      content,
+      attachmentUrls: attachmentUrls || [],
+    });
     return res.data;
   },
 
@@ -702,6 +724,158 @@ export const apiService = {
 
   listClientStampHistory: async (): Promise<ApiResponse<{ items: ClientStampDto[]; total: number }>> => {
     const res = await apiClient.get<ApiResponse<{ items: ClientStampDto[]; total: number }>>('/contracts/stamps/history');
+    return res.data;
+  },
+
+  // ============================================================================
+  // JOB POSTINGS & DISCOVERY
+  // ============================================================================
+  createJob: async (data: CreateJobPostRequest): Promise<ApiResponse<JobPostDto>> => {
+    const res = await apiClient.post<ApiResponse<JobPostDto>>('/jobs', data);
+    return res.data;
+  },
+
+  updateJob: async (id: string, data: UpdateJobPostRequest): Promise<ApiResponse<JobPostDto>> => {
+    const res = await apiClient.patch<ApiResponse<JobPostDto>>(`/jobs/${id}`, data);
+    return res.data;
+  },
+
+  getJobById: async (id: string): Promise<ApiResponse<JobPostDto>> => {
+    const res = await apiClient.get<ApiResponse<JobPostDto>>(`/jobs/${id}`);
+    return res.data;
+  },
+
+  deleteJob: async (id: string): Promise<ApiResponse<{ message: string }>> => {
+    const res = await apiClient.delete<ApiResponse<{ message: string }>>(`/jobs/${id}`);
+    return res.data;
+  },
+
+  listJobs: async (params?: Record<string, any>): Promise<ApiResponse<JobPostDto[]>> => {
+    const res = await apiClient.get<ApiResponse<JobPostDto[]>>('/jobs', { params });
+    return res.data;
+  },
+
+  listMyJobs: async (params?: Record<string, any>): Promise<ApiResponse<JobPostDto[]>> => {
+    const res = await apiClient.get<ApiResponse<JobPostDto[]>>('/jobs/my-jobs', { params });
+    return res.data;
+  },
+
+  getSmartMatches: async (params?: Record<string, any>): Promise<ApiResponse<any[]>> => {
+    const res = await apiClient.get<ApiResponse<any[]>>('/jobs/smart-matches', { params });
+    return res.data;
+  },
+
+  // ============================================================================
+  // PROPOSALS & VERSIONED NEGOTIATION
+  // ============================================================================
+  submitProposal: async (data: CreateJobProposalRequest): Promise<ApiResponse<JobProposalDto>> => {
+    const res = await apiClient.post<ApiResponse<JobProposalDto>>('/proposals', data);
+    return res.data;
+  },
+
+  submitCounteroffer: async (proposalId: string, data: CounterofferProposalRequest): Promise<ApiResponse<JobProposalDto>> => {
+    const res = await apiClient.post<ApiResponse<JobProposalDto>>(`/proposals/${proposalId}/counteroffer`, data);
+    return res.data;
+  },
+
+  acceptProposal: async (proposalId: string): Promise<ApiResponse<JobProposalDto>> => {
+    const res = await apiClient.post<ApiResponse<JobProposalDto>>(`/proposals/${proposalId}/accept`);
+    return res.data;
+  },
+
+  declineProposal: async (proposalId: string, reason?: string): Promise<ApiResponse<JobProposalDto>> => {
+    const res = await apiClient.post<ApiResponse<JobProposalDto>>(`/proposals/${proposalId}/decline`, { reason });
+    return res.data;
+  },
+
+  toggleShortlistProposal: async (proposalId: string): Promise<ApiResponse<JobProposalDto>> => {
+    const res = await apiClient.post<ApiResponse<JobProposalDto>>(`/proposals/${proposalId}/shortlist`);
+    return res.data;
+  },
+
+  listJobProposals: async (jobId: string, includeDeclined = false): Promise<ApiResponse<JobProposalDto[]>> => {
+    const res = await apiClient.get<ApiResponse<JobProposalDto[]>>(`/proposals/job/${jobId}`, {
+      params: { includeDeclined },
+    });
+    return res.data;
+  },
+
+  listMyProposals: async (): Promise<ApiResponse<JobProposalDto[]>> => {
+    const res = await apiClient.get<ApiResponse<JobProposalDto[]>>('/proposals/my-proposals');
+    return res.data;
+  },
+
+  withdrawProposal: async (proposalId: string): Promise<ApiResponse<any>> => {
+    const res = await apiClient.delete<ApiResponse<any>>(`/proposals/${proposalId}`);
+    return res.data;
+  },
+
+  // ============================================================================
+  // SPECIALIST TEAMS
+  // ============================================================================
+  createTeam: async (data: CreateSpecialistTeamRequest): Promise<ApiResponse<SpecialistTeamDto>> => {
+    const res = await apiClient.post<ApiResponse<SpecialistTeamDto>>('/teams', data);
+    return res.data;
+  },
+
+  inviteTeamMember: async (teamId: string, data: InviteTeamMemberRequest): Promise<ApiResponse<any>> => {
+    const res = await apiClient.post<ApiResponse<any>>(`/teams/${teamId}/invitations`, data);
+    return res.data;
+  },
+
+  respondTeamInvitation: async (invitationId: string, status: 'ACCEPTED' | 'DECLINED'): Promise<ApiResponse<any>> => {
+    const res = await apiClient.post<ApiResponse<any>>(`/teams/invitations/${invitationId}/respond`, { status });
+    return res.data;
+  },
+
+  getTeam: async (id: string): Promise<ApiResponse<SpecialistTeamDto>> => {
+    const res = await apiClient.get<ApiResponse<SpecialistTeamDto>>(`/teams/${id}`);
+    return res.data;
+  },
+
+  listMyTeams: async (): Promise<ApiResponse<SpecialistTeamDto[]>> => {
+    const res = await apiClient.get<ApiResponse<SpecialistTeamDto[]>>('/teams/my-teams');
+    return res.data;
+  },
+
+  listTeamInvitations: async (): Promise<ApiResponse<TeamInvitationDto[]>> => {
+    const res = await apiClient.get<ApiResponse<TeamInvitationDto[]>>('/teams/invitations');
+    return res.data;
+  },
+
+  // ============================================================================
+  // SAVED JOBS & SAVED SPECIALISTS (BOOKMARKS)
+  // ============================================================================
+  toggleSaveJob: async (jobId: string): Promise<ApiResponse<{ saved: boolean }>> => {
+    const res = await apiClient.post<ApiResponse<{ saved: boolean }>>(`/bookmarks/jobs/${jobId}/toggle`);
+    return res.data;
+  },
+
+  listSavedJobs: async (): Promise<ApiResponse<SavedJobDto[]>> => {
+    const res = await apiClient.get<ApiResponse<SavedJobDto[]>>('/bookmarks/jobs');
+    return res.data;
+  },
+
+  toggleSaveSpecialist: async (specialistId: string, notes?: string): Promise<ApiResponse<{ saved: boolean }>> => {
+    const res = await apiClient.post<ApiResponse<{ saved: boolean }>>(`/bookmarks/specialists/${specialistId}/toggle`, { notes });
+    return res.data;
+  },
+
+  listSavedSpecialists: async (): Promise<ApiResponse<SavedSpecialistDto[]>> => {
+    const res = await apiClient.get<ApiResponse<SavedSpecialistDto[]>>('/bookmarks/specialists');
+    return res.data;
+  },
+
+  // ============================================================================
+  // VERIFIED REVIEWS & REPUTATION
+  // ============================================================================
+  submitVerifiedReview: async (data: CreateVerifiedReviewRequest): Promise<ApiResponse<VerifiedReviewDto>> => {
+    const res = await apiClient.post<ApiResponse<VerifiedReviewDto>>('/reviews', data);
+    return res.data;
+  },
+
+  listUserReviews: async (userId: string): Promise<ApiResponse<VerifiedReviewDto[]>> => {
+    const res = await apiClient.get<ApiResponse<VerifiedReviewDto[]>>(`/reviews/user/${userId}`);
     return res.data;
   },
 };

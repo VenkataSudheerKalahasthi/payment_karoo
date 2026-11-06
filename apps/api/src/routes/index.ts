@@ -20,6 +20,11 @@ import { webhooksRoutes } from '../modules/webhooks/webhooks.routes.js';
 import { storageRoutes } from '../modules/storage/storage.routes.js';
 import disputesRoutes from '../modules/disputes/disputes.routes.js';
 import { projectsRoutes } from '../modules/projects/projects.routes.js';
+import { jobsRouter } from '../modules/jobs/jobs.routes.js';
+import { proposalsRouter } from '../modules/proposals/proposals.routes.js';
+import { teamsRouter } from '../modules/teams/teams.routes.js';
+import { bookmarksRouter } from '../modules/bookmarks/bookmarks.routes.js';
+import { reviewsRouter } from '../modules/reviews/reviews.routes.js';
 
 const apiRouter = Router();
 
@@ -85,5 +90,20 @@ apiRouter.use('/disputes', disputesRoutes);
 
 // 21. Projects & Milestone Management Module (Phase 9)
 apiRouter.use('/projects', projectsRoutes);
+
+// 22. Client Job Posting & Discovery
+apiRouter.use('/jobs', jobsRouter);
+
+// 23. Specialist Proposals & Versioned Negotiation
+apiRouter.use('/proposals', proposalsRouter);
+
+// 24. Specialist Teams & Multi-Specialist Hiring
+apiRouter.use('/teams', teamsRouter);
+
+// 25. Saved Jobs & Saved Specialists Bookmarks
+apiRouter.use('/bookmarks', bookmarksRouter);
+
+// 26. Verified Reviews & Counterparty Ratings
+apiRouter.use('/reviews', reviewsRouter);
 
 export { apiRouter };

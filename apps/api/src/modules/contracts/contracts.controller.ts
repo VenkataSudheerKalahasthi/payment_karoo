@@ -65,6 +65,170 @@ export async function createContract(req: Request, res: Response): Promise<void>
       return;
     }
 
+    // PART 15: CONTRACT CREATION ELIGIBILITY ENFORCEMENT
+    let resolvedJobProposalId = (input as any).jobProposalId || null;
+    let resolvedHiringRequestId = (input as any).hiringRequestId || null;
+    let resolvedTeamId = (input as any).teamId || null;
+    let teamSnapshotJson: any = null;
+
+    if (resolvedJobProposalId) {
+      const proposal = await prisma.jobProposal.findUnique({
+        where: { id: resolvedJobProposalId },
+        include: {
+          jobPost: true,
+          team: { include: { members: true } },
+          contracts: true,
+        },
+      });
+
+      if (!proposal) {
+        sendError(res, 404, 'PROPOSAL_NOT_FOUND', 'Linked job proposal not found');
+        return;
+      }
+      if (proposal.jobPost.clientId !== client.id) {
+        sendError(res, 403, 'FORBIDDEN', 'Only the client who posted the job can create a contract from this proposal');
+        return;
+      }
+      if (proposal.status !== 'ACCEPTED') {
+        sendError(
+          res,
+          400,
+          'UNACCEPTED_PROPOSAL',
+          `Contracts can only be created from an ACCEPTED proposal (current status: ${proposal.status})`
+        );
+        return;
+      }
+      if (proposal.contracts.length > 0) {
+        sendError(
+          res,
+          409,
+          'PROPOSAL_ALREADY_CONTRACTED',
+          'A contract has already been generated from this accepted proposal'
+        );
+        return;
+      }
+      if (proposal.jobPost.status === 'CLOSED' || proposal.jobPost.status === 'EXPIRED') {
+        sendError(res, 400, 'JOB_CLOSED_OR_EXPIRED', `Job is ${proposal.jobPost.status}`);
+        return;
+      }
+      if (proposal.proposalType === 'TEAM' && proposal.team) {
+        resolvedTeamId = proposal.team.id;
+        const activeMembers = proposal.team.members.filter((m) => m.status === 'ACTIVE' && m.consentGiven);
+        if (activeMembers.length === 0) {
+          sendError(res, 400, 'TEAM_CONSENT_MISSING', 'Team contract requires active consenting members');
+          return;
+        }
+        teamSnapshotJson = activeMembers.map((m) => ({
+          workerId: m.workerId,
+          role: m.role,
+          workloadAllocation: m.workloadAllocation,
+          responsibility: m.responsibility,
+        }));
+      }
+    } else if (resolvedHiringRequestId) {
+      const hr = await prisma.hiringRequest.findUnique({
+        where: { id: resolvedHiringRequestId },
+      });
+      if (!hr) {
+        sendError(res, 404, 'HIRING_REQUEST_NOT_FOUND', 'Linked hiring request not found');
+        return;
+      }
+      if (hr.clientId !== client.id) {
+        sendError(res, 403, 'FORBIDDEN', 'Only the requesting client can create a contract from this request');
+        return;
+      }
+      if (hr.status !== 'ACCEPTED') {
+        sendError(
+          res,
+          400,
+          'UNACCEPTED_HIRING_REQUEST',
+          `Contracts can only be created from an ACCEPTED hiring request (current status: ${hr.status})`
+        );
+        return;
+      }
+      if (hr.contractId) {
+        sendError(
+          res,
+          409,
+          'REQUEST_ALREADY_CONTRACTED',
+          'A contract has already been generated from this accepted hiring request'
+        );
+        return;
+      }
+    } else {
+      // Check if an accepted source exists between client and worker to automatically bind
+      const autoProposal = await prisma.jobProposal.findFirst({
+        where: {
+          workerId: worker.id,
+          jobPost: { clientId: client.id },
+          status: 'ACCEPTED',
+          contracts: { none: {} },
+        },
+        include: { team: { include: { members: true } } },
+      });
+      if (autoProposal) {
+        resolvedJobProposalId = autoProposal.id;
+        if (autoProposal.proposalType === 'TEAM' && autoProposal.team) {
+          resolvedTeamId = autoProposal.team.id;
+          teamSnapshotJson = autoProposal.team.members
+            .filter((m) => m.status === 'ACTIVE' && m.consentGiven)
+            .map((m) => ({
+              workerId: m.workerId,
+              role: m.role,
+              workloadAllocation: m.workloadAllocation,
+              responsibility: m.responsibility,
+            }));
+        }
+      } else {
+        const autoHr = await prisma.hiringRequest.findFirst({
+          where: {
+            clientId: client.id,
+            workerId: worker.id,
+            status: 'ACCEPTED',
+            contractId: null,
+          },
+        });
+        if (autoHr) {
+          resolvedHiringRequestId = autoHr.id;
+        } else {
+          // Reject if there is an unaccepted/declined pending proposal or request between them
+          const pendingProp = await prisma.jobProposal.findFirst({
+            where: {
+              workerId: worker.id,
+              jobPost: { clientId: client.id },
+              status: { in: ['PENDING', 'UNDER_REVISION', 'DECLINED', 'WITHDRAWN'] },
+            },
+          });
+          if (pendingProp) {
+            sendError(
+              res,
+              400,
+              'UNACCEPTED_PROPOSAL',
+              `Cannot initialize contract while proposal is in ${pendingProp.status} status. Mutual acceptance is strictly required.`
+            );
+            return;
+          }
+
+          const pendingHr = await prisma.hiringRequest.findFirst({
+            where: {
+              clientId: client.id,
+              workerId: worker.id,
+              status: { in: ['PENDING', 'DECLINED'] },
+            },
+          });
+          if (pendingHr) {
+            sendError(
+              res,
+              400,
+              'UNACCEPTED_HIRING_REQUEST',
+              `Cannot initialize contract while hiring request is in ${pendingHr.status} status. Mutual acceptance is strictly required.`
+            );
+            return;
+          }
+        }
+      }
+    }
+
     // 2. Calculate total contract amount strictly from milestone amounts
     const totalAmount = input.milestones.reduce((acc, m) => acc + m.amount, 0);
     const contractNumber = `TPE-${Date.now().toString(36).toUpperCase()}-${Math.floor(
@@ -111,6 +275,9 @@ export async function createContract(req: Request, res: Response): Promise<void>
           revisionTerms: input.revisionTerms || 'Up to 2 standard revision cycles per milestone deliverable.',
           startDate: input.startDate ? new Date(input.startDate) : null,
           endDate: input.endDate ? new Date(input.endDate) : null,
+          jobProposalId: resolvedJobProposalId,
+          teamId: resolvedTeamId,
+          teamSnapshot: teamSnapshotJson,
           milestones: {
             create: input.milestones.map((m, idx) => ({
               title: m.title,
@@ -159,6 +326,13 @@ export async function createContract(req: Request, res: Response): Promise<void>
         isAccepted: false,
         tx,
       });
+
+      if (resolvedHiringRequestId) {
+        await tx.hiringRequest.update({
+          where: { id: resolvedHiringRequestId },
+          data: { contractId: createdContract.id },
+        });
+      }
 
       // Initialize dedicated contract conversation
       const conversation = await tx.conversation.create({

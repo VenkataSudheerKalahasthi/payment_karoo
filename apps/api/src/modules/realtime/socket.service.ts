@@ -241,6 +241,49 @@ export function initSocketServer(httpServer: HttpServer): SocketIOServer {
       }
     });
 
+    // Authorize & Join Conversation Room
+    socket.on('join:conversation', async (conversationId: string, callback?: (res: { success: boolean; error?: string }) => void) => {
+      try {
+        if (!conversationId || typeof conversationId !== 'string') {
+          callback?.({ success: false, error: 'INVALID_CONVERSATION_ID' });
+          return;
+        }
+
+        if (!user) {
+          callback?.({ success: false, error: 'UNAUTHENTICATED' });
+          return;
+        }
+
+        const isPrivileged = user.role === UserRole.ADMIN || user.role === UserRole.SUPERADMIN;
+        if (!isPrivileged) {
+          const participant = await prisma.conversationParticipant.findFirst({
+            where: { conversationId, userId: user.id },
+          });
+
+          if (!participant) {
+            logger.warn(`[Socket.IO Authorization] Access denied for user ${user.id} to conversation ${conversationId}`);
+            callback?.({ success: false, error: 'FORBIDDEN' });
+            return;
+          }
+        }
+
+        const roomName = `conversation:${conversationId}`;
+        socket.join(roomName);
+        logger.info(`[Socket.IO] User ${user.email} joined ${roomName}`);
+        callback?.({ success: true });
+      } catch (err) {
+        logger.error('[Socket.IO join:conversation] Error:', err);
+        callback?.({ success: false, error: 'INTERNAL_ERROR' });
+      }
+    });
+
+    // Leave Conversation Room
+    socket.on('leave:conversation', (conversationId: string) => {
+      if (conversationId && typeof conversationId === 'string') {
+        socket.leave(`conversation:${conversationId}`);
+      }
+    });
+
     // Handle Disconnect
     socket.on('disconnect', (reason) => {
       logger.info(`[Socket.IO] Client disconnected: ${socket.id} (${reason})`);

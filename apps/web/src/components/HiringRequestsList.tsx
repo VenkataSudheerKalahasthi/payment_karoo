@@ -12,6 +12,7 @@ import {
   AlertCircle,
   DollarSign,
   Calendar,
+  Trash2,
 } from 'lucide-react';
 
 interface HiringRequestsListProps {
@@ -64,6 +65,23 @@ export const HiringRequestsList: React.FC<HiringRequestsListProps> = ({
       } else {
         alert(res.error?.message || 'Failed to withdraw request');
       }
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to permanently delete this proposal?')) return;
+    setIsActionLoading(true);
+    try {
+      const res = await apiService.deleteHiringRequest(id);
+      if (res.success) {
+        setRequests((prev) => prev.filter((r) => r.id !== id));
+      } else {
+        alert(res.error?.message || 'Failed to delete proposal');
+      }
+    } catch (err: any) {
+      alert(err.message || 'Error deleting proposal');
     } finally {
       setIsActionLoading(false);
     }
@@ -199,13 +217,15 @@ export const HiringRequestsList: React.FC<HiringRequestsListProps> = ({
         <div className="p-16 text-center dark:text-[#A5AAA2] text-[#64748B] text-sm dark:bg-[#151715] bg-white border dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] rounded-xl animate-pulse font-mono">
           Querying proposal pipeline...
         </div>
-      ) : requests.length === 0 ? (
+      ) : requests.filter((r) => !isWorker || r.status !== 'DECLINED').length === 0 ? (
         <div className="dark:bg-[#151715] bg-white border dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] rounded-xl p-16 text-center dark:text-[#A5AAA2] text-[#64748B] text-sm shadow-sm">
           No hiring proposals recorded yet.
         </div>
       ) : (
         <div className="space-y-4">
-          {requests.map((req) => {
+          {requests
+            .filter((r) => !isWorker || r.status !== 'DECLINED')
+            .map((req) => {
             const party = isClient ? req.worker : req.client;
             const partyName = party?.firstName
               ? `${party.firstName} ${party.lastName || ''}`.trim()
@@ -351,6 +371,19 @@ export const HiringRequestsList: React.FC<HiringRequestsListProps> = ({
                       >
                         <Send className="w-3.5 h-3.5" />
                         <span>Respond to Proposal</span>
+                      </button>
+                    )}
+
+                    {/* Delete / Remove Proposal Button for both Client and Specialist */}
+                    {!req.contractId && (
+                      <button
+                        onClick={() => handleDelete(req.id)}
+                        disabled={isActionLoading}
+                        className="px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 border border-rose-500/20 text-xs font-semibold flex items-center space-x-1 transition cursor-pointer active:scale-95"
+                        title="Delete / Remove Proposal"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Delete</span>
                       </button>
                     )}
                   </div>

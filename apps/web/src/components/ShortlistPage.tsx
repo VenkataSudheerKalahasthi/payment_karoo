@@ -8,16 +8,19 @@ import {
   Star,
   Briefcase,
   BookmarkCheck,
+  MessageSquare,
 } from 'lucide-react';
 
 interface ShortlistPageProps {
   onOpenHiringModal: (worker: WorkerProfileDto) => void;
   onSelectWorkerForContract: (workerId: string) => void;
+  onStartChat?: (specialistUserId: string) => void;
 }
 
 export const ShortlistPage: React.FC<ShortlistPageProps> = ({
   onOpenHiringModal,
   onSelectWorkerForContract,
+  onStartChat,
 }) => {
   const [items, setItems] = useState<WorkerShortlistDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -160,6 +163,17 @@ export const ShortlistPage: React.FC<ShortlistPageProps> = ({
                 </div>
 
                 <div className="pt-3 border-t dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] flex items-center space-x-2">
+                  {onStartChat && (
+                    <button
+                      onClick={() => onStartChat(worker.userId)}
+                      className="py-1.5 px-3 rounded-xl dark:bg-[#8BFF24]/10 bg-[#EEF2FF] border dark:border-[#8BFF24]/30 border-[#C7D2FE] text-xs font-bold dark:text-[#8BFF24] text-[#5046E5] hover:opacity-80 transition flex items-center gap-1 cursor-pointer"
+                      title="Direct WhatsApp-style chat"
+                    >
+                      <MessageSquare className="w-3.5 h-3.5" />
+                      <span>Chat</span>
+                    </button>
+                  )}
+
                   <button
                     onClick={() => onOpenHiringModal(worker)}
                     className="flex-1 py-1.5 px-3 rounded-xl dark:bg-[#8BFF24] bg-[#5046E5] hover:dark:bg-[#A3FF50] hover:bg-[#4338CA] text-xs font-bold dark:text-[#050605] text-white transition flex items-center justify-center space-x-1 dark:shadow-[0_0_15px_rgba(139,255,36,0.2)] shadow-md shadow-[#5046E5]/25 active:scale-95 cursor-pointer"

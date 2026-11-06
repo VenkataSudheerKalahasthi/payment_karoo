@@ -372,6 +372,53 @@ export async function withdrawHiringRequest(req: Request, res: Response): Promis
 }
 
 /**
+ * Delete / Remove a hiring request (Client or Worker can delete their hiring request).
+ */
+export async function deleteHiringRequest(req: Request, res: Response): Promise<void> {
+  const { id } = req.params;
+  const user = req.user!;
+
+  try {
+    const request = await prisma.hiringRequest.findUnique({
+      where: { id },
+    });
+
+    if (!request) {
+      sendError(res, 404, 'NOT_FOUND', 'Hiring request not found');
+      return;
+    }
+
+    const isParty = request.clientId === user.id || request.workerId === user.id || user.role.name === UserRole.SUPERADMIN;
+    if (!isParty) {
+      sendError(res, 403, 'FORBIDDEN', 'Unauthorized to delete this hiring request');
+      return;
+    }
+
+    if (request.contractId) {
+      sendError(res, 400, 'CANNOT_DELETE_ACTIVE_CONTRACT', 'Cannot delete a hiring request that has been converted into an active contract');
+      return;
+    }
+
+    await prisma.hiringRequest.delete({
+      where: { id },
+    });
+
+    await recordAuditLog({
+      actorId: user.id,
+      action: 'HIRING_REQUEST_DELETED',
+      resource: 'HiringRequest',
+      resourceId: id,
+      req,
+    });
+
+    sendSuccess(res, 200, { deletedId: id });
+  } catch (error) {
+    logger.error('Error deleting hiring request:', error);
+    sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Failed to delete hiring request');
+  }
+}
+
+/**
  * Client submits a counteroffer / revised terms during negotiation.
  */
 export async function counterofferHiringRequest(req: Request, res: Response): Promise<void> {

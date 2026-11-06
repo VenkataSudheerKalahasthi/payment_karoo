@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { io, Socket } from 'socket.io-client';
 import {
   MessageSquare,
   Send,
@@ -11,9 +12,19 @@ import {
   AlertCircle,
   Plus,
   ShieldCheck,
+  Paperclip,
+  Image as ImageIcon,
+  X,
+  Phone,
+  Video,
+  MoreVertical,
+  Check,
+  Smile,
+  ExternalLink,
+  ChevronLeft,
 } from 'lucide-react';
 import { apiService } from '../services/api';
-import { ContractDto } from '@trustpay/shared';
+import { ContractDto, WorkerProfileDto } from '@trustpay/shared';
 
 interface Participant {
   id: string;
@@ -30,6 +41,7 @@ interface Participant {
 interface MessageItem {
   id: string;
   content: string;
+  attachments?: string[];
   senderId: string;
   createdAt: string;
   sender?: {
@@ -55,7 +67,17 @@ interface ConversationItem {
   } | null;
 }
 
-export const ClientMessages: React.FC = () => {
+interface ClientMessagesProps {
+  currentUserId?: string;
+  targetRecipientId?: string | null;
+  onClearTargetRecipient?: () => void;
+}
+
+export const ClientMessages: React.FC<ClientMessagesProps> = ({
+  currentUserId,
+  targetRecipientId,
+  onClearTargetRecipient,
+}) => {
   const [conversations, setConversations] = useState<ConversationItem[]>([]);
   const [activeConversation, setActiveConversation] = useState<ConversationItem | null>(null);
   const [messages, setMessages] = useState<MessageItem[]>([]);
@@ -63,43 +85,142 @@ export const ClientMessages: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [contracts, setContracts] = useState<ContractDto[]>([]);
+
+  // Image attachment state
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // New Chat Modal state
   const [showNewChatModal, setShowNewChatModal] = useState(false);
+  const [specialistsList, setSpecialistsList] = useState<any[]>([]);
+  const [loadingSpecialists, setLoadingSpecialists] = useState(false);
+  const [newChatSearch, setNewChatSearch] = useState('');
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const socketRef = useRef<Socket | null>(null);
 
-  const fetchConversations = async () => {
+  // Initialize Socket.IO connection
+  useEffect(() => {
+    const socketUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const socket = io(socketUrl, {
+      withCredentials: true,
+      transports: ['websocket', 'polling'],
+    });
+
+    socketRef.current = socket;
+
+    socket.on('connect', () => {
+      if (currentUserId) {
+        socket.emit('join:user', currentUserId);
+      }
+    });
+
+    socket.on('message:new', (newMsg: MessageItem) => {
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === newMsg.id)) return prev;
+        return [...prev, newMsg];
+      });
+      // Update conversation last message snippet in list
+      setConversations((prev) =>
+        prev.map((c) =>
+          c.id === (newMsg as any).conversationId
+            ? { ...c, messages: [newMsg], updatedAt: new Date().toISOString() }
+            : c
+        )
+      );
+    });
+
+    socket.on('message:received', (data: { conversationId: string; message: MessageItem }) => {
+      if (activeConversation?.id === data.conversationId) {
+        setMessages((prev) => {
+          if (prev.some((m) => m.id === data.message.id)) return prev;
+          return [...prev, data.message];
+        });
+      }
+      fetchConversations(false);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [currentUserId, activeConversation?.id]);
+
+  // Join active conversation room on socket
+  useEffect(() => {
+    if (activeConversation && socketRef.current) {
+      socketRef.current.emit('join:conversation', activeConversation.id);
+    }
+    return () => {
+      if (activeConversation && socketRef.current) {
+        socketRef.current.emit('leave:conversation', activeConversation.id);
+      }
+    };
+  }, [activeConversation?.id]);
+
+  const fetchConversations = async (showLoading = true) => {
     try {
-      setLoading(true);
+      if (showLoading) setLoading(true);
       const res = await apiService.listConversations();
       if (res.success && res.data) {
-        setConversations(res.data as ConversationItem[]);
-        if (!activeConversation && res.data.length > 0) {
-          setActiveConversation(res.data[0] as ConversationItem);
+        const convList = res.data as ConversationItem[];
+        setConversations(convList);
+
+        // If targetRecipientId was passed from another page (Marketplace, Proposals, etc.)
+        if (targetRecipientId) {
+          const match = convList.find((c) =>
+            c.participants.some((p) => p.userId === targetRecipientId)
+          );
+          if (match) {
+            setActiveConversation(match);
+            onClearTargetRecipient?.();
+          } else {
+            // Automatically initialize direct conversation with target
+            initConversationWithUser(targetRecipientId);
+          }
+        } else if (!activeConversation && convList.length > 0) {
+          setActiveConversation(convList[0]);
         }
       }
     } catch (err) {
       console.error('Error fetching conversations:', err);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
-  const fetchContracts = async () => {
+  const initConversationWithUser = async (recipientId: string) => {
     try {
-      const res = await apiService.listContracts();
+      const res = await apiService.getOrCreateConversation({ recipientId });
       if (res.success && res.data) {
-        setContracts(res.data);
+        setShowNewChatModal(false);
+        await fetchConversations(false);
+        setActiveConversation(res.data as ConversationItem);
+        onClearTargetRecipient?.();
+      }
+    } catch (err: any) {
+      alert(err?.message || 'Failed to start conversation');
+    }
+  };
+
+  const fetchSpecialistsForNewChat = async () => {
+    try {
+      setLoadingSpecialists(true);
+      const res = await apiService.listWorkers({ limit: 50 });
+      if (res.success && res.data) {
+        setSpecialistsList(res.data.items || []);
       }
     } catch (err) {
-      console.error('Error fetching contracts for chat:', err);
+      console.error('Failed to load specialists for new chat:', err);
+    } finally {
+      setLoadingSpecialists(false);
     }
   };
 
   useEffect(() => {
     fetchConversations();
-    fetchContracts();
-  }, []);
+  }, [targetRecipientId]);
 
   // Fetch messages when active conversation changes
   const fetchMessages = async (convId: string) => {
@@ -116,29 +237,63 @@ export const ClientMessages: React.FC = () => {
   useEffect(() => {
     if (activeConversation) {
       fetchMessages(activeConversation.id);
-      const timer = setInterval(() => {
-        fetchMessages(activeConversation.id);
-      }, 5000); // Polling for live chat updates
-      return () => clearInterval(timer);
     }
-  }, [activeConversation]);
+  }, [activeConversation?.id]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!activeConversation || !inputText.trim() || sending) return;
+  // Handle Image Selection
+  const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please select a valid image file (PNG, JPG, WebP, etc.)');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image size exceeds 5MB limit.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result as string;
+      setSelectedImage(base64);
+      setPreviewImageUrl(base64);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleClearImage = () => {
+    setSelectedImage(null);
+    setPreviewImageUrl(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  // Handle Send Message
+  const handleSendMessage = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!activeConversation || (!inputText.trim() && !selectedImage) || sending) return;
 
     const content = inputText.trim();
+    const attachments = selectedImage ? [selectedImage] : [];
+
     setInputText('');
+    handleClearImage();
     setSending(true);
 
     try {
-      const res = await apiService.sendMessage(activeConversation.id, content);
-      if (res.success) {
-        await fetchMessages(activeConversation.id);
+      const res = await apiService.sendMessage(activeConversation.id, content, attachments);
+      if (res.success && res.data) {
+        // Optimistically add to message thread if socket hasn't arrived yet
+        setMessages((prev) => {
+          if (prev.some((m) => m.id === res.data.id)) return prev;
+          return [...prev, res.data];
+        });
       }
     } catch (err) {
       console.error('Error sending message:', err);
@@ -147,140 +302,199 @@ export const ClientMessages: React.FC = () => {
     }
   };
 
-  const handleStartConversationForContract = async (contract: ContractDto) => {
-    try {
-      const res = await apiService.getOrCreateConversation({
-        contractId: contract.id,
-        recipientId: contract.workerId,
-      });
-
-      if (res.success && res.data) {
-        setShowNewChatModal(false);
-        await fetchConversations();
-        setActiveConversation(res.data as ConversationItem);
-      }
-    } catch (err: any) {
-      alert(err?.message || 'Error starting chat');
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
     }
   };
 
-  // Find other participant
-  const getOtherParticipant = (conv: ConversationItem) => {
-    // Return first participant that has user details
-    const other = conv.participants?.find((p) => p.user?.role?.name === 'WORKER') || conv.participants?.[0];
+  // Get recipient (the counterparty)
+  const getRecipient = (conv: ConversationItem) => {
+    if (!conv.participants || conv.participants.length === 0) return null;
+    const other = conv.participants.find((p) => p.userId !== currentUserId) || conv.participants[0];
     return other?.user;
   };
 
   // Filtered conversations
   const filteredConversations = conversations.filter((c) => {
-    const other = getOtherParticipant(c);
-    const name = `${other?.firstName || ''} ${other?.lastName || ''}`.toLowerCase();
+    const recipient = getRecipient(c);
+    const name = `${recipient?.firstName || ''} ${recipient?.lastName || ''}`.toLowerCase();
     const contract = (c.contract?.title || '').toLowerCase();
     const q = searchQuery.toLowerCase();
     return name.includes(q) || contract.includes(q);
   });
 
+  const formatMessageTime = (dateStr: string) => {
+    try {
+      const d = new Date(dateStr);
+      return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } catch {
+      return '';
+    }
+  };
+
+  const formatConversationDate = (dateStr: string) => {
+    try {
+      const d = new Date(dateStr);
+      const now = new Date();
+      if (d.toDateString() === now.toDateString()) {
+        return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      }
+      return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    } catch {
+      return '';
+    }
+  };
+
   return (
-    <div className="space-y-6">
-      {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm p-6 rounded-2xl">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl dark:bg-[#8BFF24]/10 bg-[#EEF2FF] border dark:border-[#8BFF24]/30 border-[#C7D2FE] flex items-center justify-center">
-            <MessageSquare className="w-5 h-5 dark:text-[#8BFF24] text-[#5046E5]" />
-          </div>
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold dark:text-white text-slate-900 tracking-tight">Direct Project Messages</h1>
-            <p className="text-sm dark:text-zinc-400 text-slate-500">
-              End-to-end encrypted messaging with verified contract specialists.
-            </p>
-          </div>
-        </div>
+    <div className="space-y-4">
+      {/* WhatsApp Container Box */}
+      <div className="h-[750px] flex rounded-2xl overflow-hidden border dark:border-[#262926] border-slate-200 dark:bg-[#0c0d0c] bg-white shadow-xl">
+        
+        {/* ========================================================================= */}
+        {/* LEFT PANEL: WhatsApp Chat List & Search */}
+        {/* ========================================================================= */}
+        <div className="w-full sm:w-80 md:w-96 flex flex-col border-r dark:border-[#262926] border-slate-200 dark:bg-[#111311] bg-[#F8FAFC]">
+          {/* Header */}
+          <div className="p-4 border-b dark:border-[#262926] border-slate-200 flex items-center justify-between dark:bg-[#151715] bg-white">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-full dark:bg-[#8BFF24]/10 bg-[#EEF2FF] border dark:border-[#8BFF24]/30 border-[#C7D2FE] flex items-center justify-center font-bold text-xs dark:text-[#8BFF24] text-[#5046E5]">
+                <MessageSquare className="w-4 h-4" />
+              </div>
+              <div>
+                <h2 className="text-sm font-bold dark:text-white text-slate-900">Chats</h2>
+                <p className="text-[10px] dark:text-zinc-400 text-slate-500 font-mono">
+                  {conversations.length} Active Conversations
+                </p>
+              </div>
+            </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowNewChatModal(true)}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl dark:bg-[#8BFF24] bg-[#5046E5] hover:dark:bg-[#78e018] hover:bg-[#4338CA] dark:text-black text-white shadow-md shadow-[#5046E5]/25 text-xs font-bold transition shadow-[0_0_12px_rgba(139,255,36,0.2)]"
-          >
-            <Plus className="w-4 h-4" />
-            New Chat
-          </button>
-          <button
-            onClick={fetchConversations}
-            disabled={loading}
-            className="p-2 rounded-xl dark:bg-[#1e201e] bg-slate-100 border dark:border-[#2e322e] border-slate-300 dark:text-zinc-300 text-slate-700 hover:dark:text-white hover:text-slate-900 hover:dark:bg-[#282c28] hover:bg-slate-200 transition"
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-          </button>
-        </div>
-      </div>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => {
+                  fetchSpecialistsForNewChat();
+                  setShowNewChatModal(true);
+                }}
+                className="p-2 rounded-xl dark:bg-[#202220] bg-slate-100 hover:dark:bg-[#282a28] hover:bg-slate-200 dark:text-[#8BFF24] text-[#5046E5] transition"
+                title="Start New Chat with Specialist"
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => fetchConversations()}
+                disabled={loading}
+                className="p-2 rounded-xl dark:bg-[#202220] bg-slate-100 hover:dark:bg-[#282a28] hover:bg-slate-200 text-slate-500 dark:text-zinc-400 transition"
+                title="Refresh Chats"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+              </button>
+            </div>
+          </div>
 
-      {/* Main Chat Layout: 2 Columns */}
-      <div className="interactive-card grid grid-cols-1 md:grid-cols-12 gap-0 h-[650px] dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm rounded-2xl overflow-hidden">
-        {/* Left Column: Conversation List */}
-        <div className="md:col-span-4 border-r dark:border-[#262926] border-slate-200 flex flex-col h-full dark:bg-[#101210] bg-[#F8FAFC]">
           {/* Search Bar */}
-          <div className="p-3.5 border-b dark:border-[#262926] border-slate-200">
+          <div className="p-3 border-b dark:border-[#262926] border-slate-200">
             <div className="relative">
-              <Search className="w-4 h-4 dark:text-zinc-400 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                placeholder="Search conversations..."
+                placeholder="Search or start new chat..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full dark:bg-[#181a18] bg-white border dark:border-[#2e322e] border-slate-300 rounded-lg pl-9 pr-3 py-1.5 text-xs dark:text-white text-slate-900 placeholder-zinc-400 focus:outline-none focus:dark:border-[#8BFF24]/60 focus:border-[#5046E5]"
+                className="w-full pl-8 pr-3 py-1.5 rounded-xl text-xs dark:bg-[#1a1c1a] bg-white border dark:border-[#262926] border-slate-300 dark:text-white text-slate-900 placeholder:text-slate-400 focus:outline-none dark:focus:border-[#8BFF24]/60 focus:border-[#5046E5]"
               />
             </div>
           </div>
 
-          {/* Conversations Scrollable List */}
-          <div className="flex-1 overflow-y-auto divide-y dark:divide-[#202220] divide-slate-200">
+          {/* Conversation List */}
+          <div className="flex-1 overflow-y-auto divide-y dark:divide-[#1c1f1c] divide-slate-100">
             {loading ? (
-              <div className="p-8 text-center text-zinc-500 text-xs flex flex-col items-center">
-                <RefreshCw className="w-5 h-5 dark:text-[#8BFF24] text-[#5046E5] animate-spin mb-2" />
-                Loading conversations...
+              <div className="p-8 text-center flex flex-col items-center justify-center space-y-2">
+                <RefreshCw className="w-6 h-6 dark:text-[#8BFF24] text-[#5046E5] animate-spin" />
+                <p className="text-xs dark:text-zinc-400 text-slate-500">Loading chats...</p>
               </div>
             ) : filteredConversations.length === 0 ? (
-              <div className="p-8 text-center text-zinc-500 text-xs">
-                No active conversations found.
+              <div className="p-8 text-center space-y-2">
+                <MessageSquare className="w-8 h-8 text-slate-300 dark:text-zinc-600 mx-auto" />
+                <p className="text-xs font-semibold dark:text-zinc-300 text-slate-700">No conversations yet</p>
+                <p className="text-[11px] dark:text-zinc-500 text-slate-400">
+                  Select a specialist in the Marketplace or click (+) to start a chat.
+                </p>
+                <button
+                  onClick={() => {
+                    fetchSpecialistsForNewChat();
+                    setShowNewChatModal(true);
+                  }}
+                  className="mt-2 px-3 py-1.5 rounded-lg text-xs font-bold dark:bg-[#8BFF24] bg-[#5046E5] dark:text-black text-white"
+                >
+                  Start New Chat
+                </button>
               </div>
             ) : (
               filteredConversations.map((conv) => {
-                const other = getOtherParticipant(conv);
-                const isActive = activeConversation?.id === conv.id;
-                const lastMsg = conv.messages && conv.messages.length > 0 ? conv.messages[0] : null;
+                const recipient = getRecipient(conv);
+                const recipientName = recipient
+                  ? [recipient.firstName, recipient.lastName].filter(Boolean).join(' ') || 'Specialist'
+                  : 'Specialist Counterparty';
+                const isSelected = activeConversation?.id === conv.id;
+                const lastMsg = conv.messages?.[0];
+                const hasAttachment = lastMsg?.attachments && lastMsg.attachments.length > 0;
 
                 return (
                   <button
                     key={conv.id}
                     onClick={() => setActiveConversation(conv)}
-                    className={`w-full text-left p-3.5 transition flex items-start gap-3 ${
-                      isActive ? 'dark:bg-[#181a18] bg-slate-100 border-l-2 dark:border-[#8BFF24] border-[#5046E5]' : 'dark:hover:bg-[#141614] hover:bg-[#EEF2FF]'
+                    className={`w-full p-3.5 flex items-start gap-3 transition text-left cursor-pointer ${
+                      isSelected
+                        ? 'dark:bg-[#1a2e1a] bg-[#EEF2FF] border-l-4 dark:border-[#8BFF24] border-[#5046E5]'
+                        : 'dark:hover:bg-[#161816] hover:bg-slate-100'
                     }`}
                   >
-                    <div className="w-9 h-9 rounded-full dark:bg-zinc-800 bg-[#EEF2FF] border dark:border-zinc-700 border-[#C7D2FE] flex items-center justify-center dark:text-zinc-300 text-[#5046E5] font-bold text-xs flex-shrink-0">
-                      {other?.firstName ? other.firstName[0] : 'S'}
+                    {/* Avatar with Online Dot */}
+                    <div className="relative shrink-0">
+                      <div className="w-10 h-10 rounded-full dark:bg-[#202220] bg-slate-200 flex items-center justify-center font-bold text-xs dark:text-[#8BFF24] text-[#5046E5] overflow-hidden border dark:border-[#2e322e] border-slate-300">
+                        {recipient?.avatarUrl ? (
+                          <img src={recipient.avatarUrl} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          recipientName[0]?.toUpperCase() || 'U'
+                        )}
+                      </div>
+                      <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 dark:ring-[#111311] ring-white" />
                     </div>
 
+                    {/* Chat Info */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-center">
-                        <span className="font-semibold text-xs dark:text-white text-slate-900 truncate">
-                          {other?.firstName ? `${other.firstName} ${other.lastName || ''}` : 'Specialist'}
+                      <div className="flex items-center justify-between mb-0.5">
+                        <span className="text-xs font-bold dark:text-white text-slate-900 truncate">
+                          {recipientName}
                         </span>
-                        <span className="text-[10px] text-zinc-500">
-                          {new Date(conv.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        <span className="text-[10px] font-mono dark:text-zinc-500 text-slate-400 shrink-0">
+                          {formatConversationDate(conv.updatedAt)}
                         </span>
                       </div>
 
-                      {conv.contract && (
-                        <p className="text-[11px] dark:text-[#8BFF24] text-[#5046E5] truncate flex items-center gap-1 mt-0.5">
-                          <FileText className="w-3 h-3 flex-shrink-0" />
-                          {conv.contract.title}
+                      <div className="flex items-center justify-between text-[11px]">
+                        <p className="dark:text-zinc-400 text-slate-500 truncate flex items-center gap-1">
+                          {lastMsg ? (
+                            <>
+                              {lastMsg.senderId === currentUserId && (
+                                <CheckCheck className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                              )}
+                              {hasAttachment && <ImageIcon className="w-3 h-3 text-emerald-400 shrink-0" />}
+                              <span>{lastMsg.content || 'Photo'}</span>
+                            </>
+                          ) : (
+                            <span className="italic text-[10px]">No messages yet</span>
+                          )}
                         </p>
-                      )}
+                      </div>
 
-                      <p className="text-xs dark:text-zinc-400 text-slate-500 truncate mt-1">
-                        {lastMsg ? lastMsg.content : 'No messages yet. Say hello!'}
-                      </p>
+                      {conv.contract && (
+                        <div className="mt-1 flex items-center gap-1 text-[10px] font-mono px-1.5 py-0.5 rounded dark:bg-[#202220] bg-slate-200/60 dark:text-zinc-300 text-slate-700 w-fit">
+                          <FileText className="w-2.5 h-2.5" />
+                          <span className="truncate max-w-[150px]">{conv.contract.title}</span>
+                        </div>
+                      )}
                     </div>
                   </button>
                 );
@@ -289,65 +503,130 @@ export const ClientMessages: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Column: Chat Window */}
-        <div className="md:col-span-8 flex flex-col h-full dark:bg-[#121412] bg-white">
+        {/* ========================================================================= */}
+        {/* RIGHT PANEL: WhatsApp Active Conversation Viewport */}
+        {/* ========================================================================= */}
+        <div className="flex-1 flex flex-col dark:bg-[#0a0b0a] bg-[#ECE5DD]/20 relative">
           {activeConversation ? (
             <>
-              {/* Chat Header */}
-              <div className="p-4 border-b dark:border-[#262926] border-slate-200 dark:bg-[#101210] bg-[#F8FAFC] flex justify-between items-center">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full dark:bg-[#8BFF24]/10 bg-[#EEF2FF] border dark:border-[#8BFF24]/30 border-[#C7D2FE] flex items-center justify-center dark:text-[#8BFF24] text-[#5046E5] font-bold text-sm">
-                    {getOtherParticipant(activeConversation)?.firstName ? getOtherParticipant(activeConversation)!.firstName![0] : 'S'}
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold dark:text-white text-slate-900 flex items-center gap-2">
-                      {getOtherParticipant(activeConversation)?.firstName
-                        ? `${getOtherParticipant(activeConversation)!.firstName} ${getOtherParticipant(activeConversation)!.lastName || ''}`
-                        : 'Specialist'}
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-                        Online
-                      </span>
-                    </h3>
+              {/* WhatsApp Active Header */}
+              {(() => {
+                const recipient = getRecipient(activeConversation);
+                const recipientName = recipient
+                  ? [recipient.firstName, recipient.lastName].filter(Boolean).join(' ') || 'Specialist'
+                  : 'Specialist Counterparty';
+
+                return (
+                  <div className="p-3.5 px-5 border-b dark:border-[#262926] border-slate-200 dark:bg-[#151715] bg-white flex items-center justify-between z-10 shadow-sm">
+                    <div className="flex items-center gap-3">
+                      <div className="relative">
+                        <div className="w-10 h-10 rounded-full dark:bg-[#202220] bg-slate-200 flex items-center justify-center font-bold text-xs dark:text-[#8BFF24] text-[#5046E5] overflow-hidden border dark:border-[#2e322e] border-slate-300">
+                          {recipient?.avatarUrl ? (
+                            <img src={recipient.avatarUrl} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            recipientName[0]?.toUpperCase() || 'U'
+                          )}
+                        </div>
+                        <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 dark:ring-[#151715] ring-white" />
+                      </div>
+
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-sm font-bold dark:text-white text-slate-900">{recipientName}</h3>
+                          <span className="text-[10px] font-mono px-2 py-0.2 rounded-full dark:bg-[#8BFF24]/10 bg-[#EEF2FF] dark:text-[#8BFF24] text-[#5046E5]">
+                            {recipient?.role?.name === 'WORKER' ? 'Specialist' : 'Client'}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-emerald-500 font-medium flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                          Online • Direct encrypted link
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Linked Contract pill if any */}
                     {activeConversation.contract && (
-                      <p className="text-xs dark:text-zinc-400 text-slate-500">
-                        Contract: {activeConversation.contract.title} ({activeConversation.contract.contractNumber})
-                      </p>
+                      <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl dark:bg-[#181a18] bg-slate-100 border dark:border-[#262926] border-slate-200 text-xs">
+                        <FileText className="w-3.5 h-3.5 dark:text-[#8BFF24] text-[#5046E5]" />
+                        <span className="font-semibold dark:text-white text-slate-900 truncate max-w-[200px]">
+                          {activeConversation.contract.title}
+                        </span>
+                        <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-blue-500/10 text-blue-400">
+                          {activeConversation.contract.status}
+                        </span>
+                      </div>
                     )}
                   </div>
+                );
+              })()}
+
+              {/* Chat Messages Body (WhatsApp Bubbles) */}
+              <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3 dark:bg-[#080908] bg-[#E5DDD5]/30">
+                {/* Security encryption banner */}
+                <div className="flex justify-center my-2">
+                  <div className="px-3 py-1 rounded-lg dark:bg-[#181a18]/80 bg-white/80 border dark:border-[#262926] border-slate-200 text-[10px] dark:text-zinc-400 text-slate-500 flex items-center gap-1.5 shadow-sm">
+                    <ShieldCheck className="w-3.5 h-3.5 dark:text-[#8BFF24] text-[#5046E5]" />
+                    <span>Messages and shared files are protected with cryptographic ledger identity.</span>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-2 text-xs dark:text-zinc-400 text-slate-500">
-                  <ShieldCheck className="w-4 h-4 dark:text-[#8BFF24] text-[#5046E5]" />
-                  <span>Escrow Safe Chat</span>
-                </div>
-              </div>
-
-              {/* Messages Body */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {messages.length === 0 ? (
-                  <div className="h-full flex flex-col items-center justify-center text-center text-zinc-500 text-xs">
-                    <MessageSquare className="w-8 h-8 text-zinc-600 mb-2" />
-                    <p>No messages in this conversation yet.</p>
-                    <p className="text-zinc-600">Send a message below to start communicating.</p>
+                  <div className="py-16 text-center text-xs dark:text-zinc-500 text-slate-400">
+                    No messages in this chat yet. Type a message or send an image below to start chatting!
                   </div>
                 ) : (
-                  messages.map((m) => {
-                    const otherUser = getOtherParticipant(activeConversation);
-                    const isMe = m.senderId !== otherUser?.id;
+                  messages.map((msg) => {
+                    const isMe = msg.senderId === currentUserId;
+                    const hasImages = msg.attachments && msg.attachments.length > 0;
+
                     return (
-                      <div key={m.id} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
+                      <div
+                        key={msg.id}
+                        className={`flex flex-col ${isMe ? 'items-end' : 'items-start'} space-y-1`}
+                      >
                         <div
-                          className={`max-w-[75%] rounded-2xl px-4 py-2.5 text-xs ${
+                          className={`max-w-[85%] sm:max-w-[70%] rounded-2xl p-3 shadow-sm ${
                             isMe
-                              ? 'dark:bg-[#8BFF24] bg-[#5046E5] dark:text-black text-white shadow-sm font-medium shadow-[0_0_12px_rgba(139,255,36,0.15)] rounded-br-none'
-                              : 'dark:bg-[#181a18] bg-slate-100 dark:text-zinc-200 text-slate-800 border dark:border-[#2e322e] border-slate-200 rounded-bl-none shadow-sm'
+                              ? 'dark:bg-[#005c4b] bg-[#5046E5] text-white rounded-tr-none'
+                              : 'dark:bg-[#1a1c1a] bg-white dark:text-white text-slate-900 border dark:border-[#262926] border-slate-200 rounded-tl-none'
                           }`}
                         >
-                          <p className="whitespace-pre-wrap">{m.content}</p>
+                          {/* Attached Image if present */}
+                          {hasImages && (
+                            <div className="mb-2 space-y-1.5">
+                              {msg.attachments!.map((imgUrl, idx) => (
+                                <div
+                                  key={idx}
+                                  onClick={() => setLightboxImage(imgUrl)}
+                                  className="rounded-xl overflow-hidden cursor-pointer hover:opacity-95 transition border border-black/10 max-h-72"
+                                >
+                                  <img
+                                    src={imgUrl}
+                                    alt="Shared attachment"
+                                    className="w-full h-auto object-cover rounded-xl"
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Message Text */}
+                          {msg.content && (
+                            <p className="text-xs whitespace-pre-wrap leading-relaxed break-words font-sans">
+                              {msg.content}
+                            </p>
+                          )}
+
+                          {/* Time & Double Checkmark */}
+                          <div
+                            className={`flex items-center justify-end gap-1 mt-1 text-[10px] ${
+                              isMe ? 'text-white/80' : 'text-slate-400 dark:text-zinc-400'
+                            }`}
+                          >
+                            <span>{formatMessageTime(msg.createdAt)}</span>
+                            {isMe && <CheckCheck className="w-3.5 h-3.5 text-sky-300" />}
+                          </div>
                         </div>
-                        <span className="text-[10px] text-zinc-500 mt-1 px-1">
-                          {new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
                       </div>
                     );
                   })
@@ -355,68 +634,211 @@ export const ClientMessages: React.FC = () => {
                 <div ref={messagesEndRef} />
               </div>
 
-              {/* Chat Input Bar */}
-              <form onSubmit={handleSendMessage} className="p-3 border-t dark:border-[#262926] border-slate-200 dark:bg-[#101210] bg-[#F8FAFC] flex gap-2">
+              {/* Image Preview Floating Bar (Before Sending) */}
+              {previewImageUrl && (
+                <div className="p-3 border-t dark:border-[#262926] border-slate-200 dark:bg-[#151715] bg-white flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={previewImageUrl}
+                      alt="Selected attachment"
+                      className="w-14 h-14 object-cover rounded-xl border dark:border-[#8BFF24]/40 border-[#5046E5]"
+                    />
+                    <div>
+                      <p className="text-xs font-bold dark:text-white text-slate-900">Image Attached</p>
+                      <p className="text-[10px] dark:text-zinc-400 text-slate-500">
+                        Ready to send in this conversation
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleClearImage}
+                    className="p-1.5 rounded-full hover:dark:bg-zinc-800 hover:bg-slate-200 text-slate-500"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+
+              {/* WhatsApp Message Input Bar */}
+              <form
+                onSubmit={handleSendMessage}
+                className="p-3 sm:p-4 border-t dark:border-[#262926] border-slate-200 dark:bg-[#121412] bg-white flex items-end gap-2"
+              >
+                {/* Hidden File Input */}
                 <input
-                  type="text"
-                  placeholder="Type your message... (Press Enter to send)"
-                  value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
-                  className="flex-1 dark:bg-[#181a18] bg-white border dark:border-[#2e322e] border-slate-300 rounded-xl px-4 py-2.5 text-xs dark:text-white text-slate-900 placeholder-zinc-400 focus:outline-none focus:dark:border-[#8BFF24]/60 focus:border-[#5046E5]"
+                  type="file"
+                  ref={fileInputRef}
+                  accept="image/*"
+                  onChange={handleImageFileChange}
+                  className="hidden"
                 />
+
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="p-2.5 rounded-full hover:dark:bg-[#202220] hover:bg-slate-100 text-slate-500 dark:text-zinc-400 transition"
+                  title="Attach Photo / Image"
+                >
+                  <Paperclip className="w-5 h-5" />
+                </button>
+
+                {/* Textarea Input */}
+                <div className="flex-1 rounded-2xl dark:bg-[#1a1c1a] bg-slate-100 border dark:border-[#262926] border-slate-300 focus-within:dark:border-[#8BFF24]/60 focus-within:border-[#5046E5] p-2 px-3 transition">
+                  <textarea
+                    rows={1}
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Type a message (Press Enter to send)..."
+                    className="w-full bg-transparent text-xs dark:text-white text-slate-900 placeholder:text-slate-400 focus:outline-none resize-none max-h-28 overflow-y-auto"
+                  />
+                </div>
+
                 <button
                   type="submit"
-                  disabled={!inputText.trim() || sending}
-                  className="px-4 py-2.5 rounded-xl dark:bg-[#8BFF24] bg-[#5046E5] hover:dark:bg-[#78e018] hover:bg-[#4338CA] dark:text-black text-white shadow-md shadow-[#5046E5]/25 text-xs font-bold transition disabled:opacity-40 flex items-center gap-1.5"
+                  disabled={(!inputText.trim() && !selectedImage) || sending}
+                  className="p-2.5 rounded-full dark:bg-[#8BFF24] bg-[#5046E5] hover:opacity-90 dark:text-black text-white font-bold transition disabled:opacity-40 disabled:cursor-not-allowed shadow-md shadow-[#5046E5]/25"
+                  title="Send Message"
                 >
-                  <Send className="w-3.5 h-3.5" />
-                  {sending ? 'Sending...' : 'Send'}
+                  <Send className="w-4 h-4" />
                 </button>
               </form>
             </>
           ) : (
-            <div className="h-full flex flex-col items-center justify-center text-center text-zinc-500 text-xs">
-              <MessageSquare className="w-10 h-10 text-zinc-600 mb-3" />
-              <p>Select a conversation from the left to start chatting.</p>
+            /* Empty State (WhatsApp Web style) */
+            <div className="flex-1 flex flex-col items-center justify-center p-8 text-center space-y-4">
+              <div className="w-16 h-16 rounded-full dark:bg-[#8BFF24]/10 bg-[#EEF2FF] border dark:border-[#8BFF24]/30 border-[#C7D2FE] flex items-center justify-center">
+                <MessageSquare className="w-8 h-8 dark:text-[#8BFF24] text-[#5046E5]" />
+              </div>
+              <div className="max-w-md">
+                <h3 className="text-lg font-bold dark:text-white text-slate-900">
+                  TrustPay Secure Direct Messaging
+                </h3>
+                <p className="text-xs dark:text-zinc-400 text-slate-500 mt-1">
+                  Send real-time messages and share deliverable images with specialists and clients. Select a conversation on the left or click (+) to start a new chat.
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  fetchSpecialistsForNewChat();
+                  setShowNewChatModal(true);
+                }}
+                className="px-4 py-2 rounded-xl dark:bg-[#8BFF24] bg-[#5046E5] dark:text-black text-white text-xs font-bold transition"
+              >
+                Start New Conversation
+              </button>
             </div>
           )}
         </div>
       </div>
 
-      {/* New Chat Modal: Choose Contract / Specialist */}
+      {/* ========================================================================= */}
+      {/* Lightbox Modal (Click Image to Enlarge) */}
+      {/* ========================================================================= */}
+      {lightboxImage && (
+        <div
+          className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4 backdrop-blur-sm"
+          onClick={() => setLightboxImage(null)}
+        >
+          <div className="relative max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl">
+            <button
+              onClick={() => setLightboxImage(null)}
+              className="absolute top-3 right-3 p-2 rounded-full bg-black/60 text-white hover:bg-black/90 transition"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <img
+              src={lightboxImage}
+              alt="Enlarged shared image"
+              className="w-full h-auto max-h-[85vh] object-contain rounded-2xl"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* New Chat Modal (Pick any Specialist / Client) */}
+      {/* ========================================================================= */}
       {showNewChatModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm w-full max-w-md rounded-2xl p-6 space-y-4 shadow-2xl">
-            <h3 className="text-base font-bold dark:text-white text-slate-900">Start New Conversation</h3>
-            <p className="text-xs dark:text-zinc-400 text-slate-500">Select an active contract to message your assigned specialist:</p>
-
-            <div className="space-y-2 max-h-60 overflow-y-auto">
-              {contracts.length === 0 ? (
-                <p className="text-xs text-zinc-500 italic p-3">No active contracts found.</p>
-              ) : (
-                contracts.map((c) => (
-                  <button
-                    key={c.id}
-                    onClick={() => handleStartConversationForContract(c)}
-                    className="w-full text-left p-3 rounded-xl dark:bg-[#181a18] bg-slate-50 hover:dark:bg-[#202220] bg-slate-100 border dark:border-[#262926] border-slate-200 transition flex items-center justify-between"
-                  >
-                    <div>
-                      <p className="text-xs font-semibold dark:text-white text-slate-900">{c.title}</p>
-                      <span className="text-[11px] text-zinc-500 font-mono">{c.contractNumber}</span>
-                    </div>
-                    <span className="text-[11px] dark:text-[#8BFF24] text-[#5046E5] font-semibold">Start Chat →</span>
-                  </button>
-                ))
-              )}
-            </div>
-
-            <div className="flex justify-end pt-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="w-full max-w-md dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 rounded-2xl p-6 shadow-2xl space-y-4 max-h-[80vh] flex flex-col">
+            <div className="flex items-center justify-between border-b dark:border-[#262926] border-slate-200 pb-3">
+              <div className="flex items-center gap-2">
+                <MessageSquare className="w-4 h-4 dark:text-[#8BFF24] text-[#5046E5]" />
+                <h3 className="text-sm font-bold dark:text-white text-slate-900">Start New Chat</h3>
+              </div>
               <button
                 onClick={() => setShowNewChatModal(false)}
-                className="px-4 py-2 rounded-xl dark:bg-zinc-800 bg-slate-100 hover:dark:bg-zinc-700 hover:bg-slate-200 dark:text-zinc-200 text-slate-700 hover:dark:text-white hover:text-slate-900 text-xs font-semibold transition"
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white"
               >
-                Close
+                <X className="w-4 h-4" />
               </button>
+            </div>
+
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Search specialist by name or headline..."
+                value={newChatSearch}
+                onChange={(e) => setNewChatSearch(e.target.value)}
+                className="w-full pl-8 pr-3 py-1.5 rounded-xl text-xs dark:bg-[#1a1c1a] bg-slate-50 border dark:border-[#262926] border-slate-300 dark:text-white text-slate-900 focus:outline-none"
+              />
+            </div>
+
+            <div className="flex-1 overflow-y-auto divide-y dark:divide-[#1c1f1c] divide-slate-100 pr-1">
+              {loadingSpecialists ? (
+                <div className="p-8 text-center text-xs dark:text-zinc-400 text-slate-500">
+                  <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 dark:text-[#8BFF24] text-[#5046E5]" />
+                  Loading specialists...
+                </div>
+              ) : specialistsList.length === 0 ? (
+                <div className="p-8 text-center text-xs dark:text-zinc-500 text-slate-400">
+                  No specialists found.
+                </div>
+              ) : (
+                specialistsList
+                  .filter((w) => {
+                    const name = `${w.user?.firstName || ''} ${w.user?.lastName || ''}`.toLowerCase();
+                    const headline = (w.headline || '').toLowerCase();
+                    const q = newChatSearch.toLowerCase();
+                    return name.includes(q) || headline.includes(q);
+                  })
+                  .map((worker) => {
+                    const name =
+                      [worker.user?.firstName, worker.user?.lastName].filter(Boolean).join(' ') ||
+                      worker.user?.email ||
+                      'Specialist';
+
+                    return (
+                      <button
+                        key={worker.userId}
+                        onClick={() => initConversationWithUser(worker.userId)}
+                        className="w-full p-2.5 flex items-center justify-between hover:dark:bg-[#181a18] hover:bg-slate-50 rounded-xl transition text-left cursor-pointer"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-full dark:bg-[#202220] bg-slate-200 flex items-center justify-center font-bold text-xs dark:text-[#8BFF24] text-[#5046E5] overflow-hidden">
+                            {worker.user?.avatarUrl ? (
+                              <img src={worker.user.avatarUrl} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              name[0]?.toUpperCase()
+                            )}
+                          </div>
+                          <div>
+                            <p className="text-xs font-bold dark:text-white text-slate-900">{name}</p>
+                            <p className="text-[10px] dark:text-zinc-400 text-slate-500 truncate max-w-[220px]">
+                              {worker.headline || 'Verified Specialist'}
+                            </p>
+                          </div>
+                        </div>
+
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg dark:bg-[#8BFF24]/10 bg-[#EEF2FF] dark:text-[#8BFF24] text-[#5046E5]">
+                          Chat
+                        </span>
+                      </button>
+                    );
+                  })
+              )}
             </div>
           </div>
         </div>

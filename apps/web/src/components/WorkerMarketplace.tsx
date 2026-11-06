@@ -16,17 +16,20 @@ import {
   ChevronLeft,
   ChevronRight,
   Sparkles,
+  MessageSquare,
 } from 'lucide-react';
 
 interface WorkerMarketplaceProps {
   onSelectWorkerForContract?: (workerId: string) => void;
   onOpenHiringModal?: (worker: WorkerProfileDto) => void;
+  onStartChat?: (specialistUserId: string) => void;
   isClient?: boolean;
 }
 
 export const WorkerMarketplace: React.FC<WorkerMarketplaceProps> = ({
   onSelectWorkerForContract,
   onOpenHiringModal,
+  onStartChat,
   isClient = true,
 }) => {
   const [workers, setWorkers] = useState<WorkerProfileDto[]>([]);
@@ -364,6 +367,17 @@ export const WorkerMarketplace: React.FC<WorkerMarketplaceProps> = ({
                   >
                     View Portfolio
                   </button>
+
+                  {onStartChat && (
+                    <button
+                      onClick={() => onStartChat(worker.userId)}
+                      className="py-1.5 px-3 rounded-xl dark:bg-[#8BFF24]/10 bg-[#EEF2FF] border dark:border-[#8BFF24]/30 border-[#C7D2FE] text-xs font-bold dark:text-[#8BFF24] text-[#5046E5] hover:opacity-80 transition flex items-center gap-1 cursor-pointer"
+                      title="Chat / Message Specialist"
+                    >
+                      <MessageSquare className="w-3.5 h-3.5" />
+                      <span>Chat</span>
+                    </button>
+                  )}
 
                   {isClient && onOpenHiringModal && (
                     <button

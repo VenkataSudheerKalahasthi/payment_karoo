@@ -1526,5 +1526,401 @@ export interface ApplyClientStampRequest {
   stampPosition?: 'BOTTOM_RIGHT' | 'BOTTOM_LEFT' | 'BOTTOM_CENTER';
 }
 
+// ==============================================================================
+// 16. CLIENT JOB POSTING, PROPOSALS, TEAMS & REPUTATION
+// ==============================================================================
+
+export const JobPostStatus = {
+  DRAFT: 'DRAFT',
+  PUBLISHED: 'PUBLISHED',
+  PAUSED: 'PAUSED',
+  CLOSED: 'CLOSED',
+  EXPIRED: 'EXPIRED',
+} as const;
+export type JobPostStatus = (typeof JobPostStatus)[keyof typeof JobPostStatus];
+
+export const JobWorkMode = {
+  ON_SITE: 'ON_SITE',
+  REMOTE: 'REMOTE',
+  HYBRID: 'HYBRID',
+} as const;
+export type JobWorkMode = (typeof JobWorkMode)[keyof typeof JobWorkMode];
+
+export const JobPaymentType = {
+  FIXED: 'FIXED',
+  HOURLY: 'HOURLY',
+  MILESTONE_BASED: 'MILESTONE_BASED',
+} as const;
+export type JobPaymentType = (typeof JobPaymentType)[keyof typeof JobPaymentType];
+
+export const JobHiringType = {
+  INDIVIDUAL: 'INDIVIDUAL',
+  TEAM: 'TEAM',
+} as const;
+export type JobHiringType = (typeof JobHiringType)[keyof typeof JobHiringType];
+
+export const JobProposalStatus = {
+  PENDING: 'PENDING',
+  ACCEPTED: 'ACCEPTED',
+  DECLINED: 'DECLINED',
+  WITHDRAWN: 'WITHDRAWN',
+  UNDER_REVISION: 'UNDER_REVISION',
+} as const;
+export type JobProposalStatus = (typeof JobProposalStatus)[keyof typeof JobProposalStatus];
+
+export interface JobPostSkillDto {
+  id: string;
+  jobPostId: string;
+  skillId?: string | null;
+  customSkillName?: string | null;
+  isPrimary: boolean;
+  skill?: {
+    id: string;
+    name: string;
+    category?: string | null;
+  };
+}
+
+export interface JobPostDto {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  objectives?: string | null;
+  deliverables?: string | null;
+  minBudget?: number | null;
+  maxBudget?: number | null;
+  currency: string;
+  paymentType: string;
+  isNegotiable: boolean;
+  status: string;
+  workMode: string;
+  country?: string | null;
+  state?: string | null;
+  district?: string | null;
+  city?: string | null;
+  area?: string | null;
+  postalCode?: string | null;
+  address?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  requiredSpecialists: number;
+  hiringType: string;
+  requiredExperience?: string | null;
+  teamLeadRequired: boolean;
+  startDate?: string | null;
+  completionDate?: string | null;
+  applicationDeadline?: string | null;
+  estimatedDuration?: string | null;
+  clientId: string;
+  client?: {
+    id: string;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    avatarUrl?: string | null;
+    profile?: {
+      companyName?: string | null;
+      country?: string | null;
+    };
+  };
+  skills?: JobPostSkillDto[];
+  proposalsCount?: number;
+  acceptedProposalsCount?: number;
+  declinedProposalsCount?: number;
+  isSaved?: boolean;
+  matchScore?: number;
+  matchFactors?: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateJobPostRequest {
+  title: string;
+  description: string;
+  category: string;
+  objectives?: string;
+  deliverables?: string;
+  minBudget?: number;
+  maxBudget?: number;
+  currency?: string;
+  paymentType?: 'FIXED' | 'HOURLY' | 'MILESTONE_BASED';
+  isNegotiable?: boolean;
+  status?: 'DRAFT' | 'PUBLISHED';
+  workMode?: 'ON_SITE' | 'REMOTE' | 'HYBRID';
+  country?: string;
+  state?: string;
+  district?: string;
+  city?: string;
+  area?: string;
+  postalCode?: string;
+  address?: string;
+  requiredSpecialists?: number;
+  hiringType?: 'INDIVIDUAL' | 'TEAM';
+  requiredExperience?: string;
+  teamLeadRequired?: boolean;
+  startDate?: string;
+  completionDate?: string;
+  applicationDeadline?: string;
+  estimatedDuration?: string;
+  skills?: {
+    skillId?: string;
+    name?: string;
+    isPrimary?: boolean;
+  }[];
+}
+
+export interface UpdateJobPostRequest extends Omit<Partial<CreateJobPostRequest>, 'status'> {
+  status?: 'DRAFT' | 'PUBLISHED' | 'PAUSED' | 'CLOSED';
+}
+
+export interface ProposalNegotiationVersionDto {
+  id: string;
+  proposalId: string;
+  versionNumber: number;
+  proposedAmount: number;
+  timeline?: string | null;
+  scope?: string | null;
+  deliverables?: string | null;
+  message?: string | null;
+  counterOfferBy: string;
+  status: string;
+  createdAt: string;
+}
+
+export interface JobProposalDto {
+  id: string;
+  jobPostId: string;
+  workerId: string;
+  teamId?: string | null;
+  proposalType: string;
+  coverLetter: string;
+  proposedAmount: number;
+  currency: string;
+  estimatedTimeline?: string | null;
+  workApproach?: string | null;
+  deliverables?: string | null;
+  attachmentUrl?: string | null;
+  status: string;
+  isShortlisted: boolean;
+  worker?: {
+    id: string;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    avatarUrl?: string | null;
+    workerProfile?: {
+      headline?: string | null;
+      rating?: number;
+      totalCompletedContracts?: number;
+      city?: string | null;
+      state?: string | null;
+      skills?: {
+        skillName?: string;
+        yearsOfExperience?: number;
+      }[];
+    };
+  };
+  team?: SpecialistTeamDto;
+  jobPost?: {
+    id: string;
+    title: string;
+    status: string;
+    currency: string;
+    minBudget?: number | null;
+    maxBudget?: number | null;
+    client?: {
+      firstName?: string | null;
+      lastName?: string | null;
+    };
+  };
+  negotiations?: ProposalNegotiationVersionDto[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateJobProposalRequest {
+  jobPostId: string;
+  coverLetter: string;
+  proposedAmount: number;
+  currency?: string;
+  estimatedTimeline?: string;
+  workApproach?: string;
+  deliverables?: string;
+  attachmentUrl?: string;
+  proposalType?: 'INDIVIDUAL' | 'TEAM';
+  teamId?: string;
+}
+
+export interface CounterofferProposalRequest {
+  proposedAmount: number;
+  timeline?: string;
+  scope?: string;
+  deliverables?: string;
+  message?: string;
+}
+
+export interface SpecialistTeamMemberDto {
+  id: string;
+  teamId: string;
+  workerId: string;
+  role: string;
+  status: string;
+  consentGiven: boolean;
+  consentDate?: string | null;
+  workloadAllocation: number;
+  responsibility?: string | null;
+  worker?: {
+    id: string;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    avatarUrl?: string | null;
+    workerProfile?: {
+      headline?: string | null;
+      rating?: number;
+      skills?: {
+        skillName?: string;
+      }[];
+    };
+  };
+}
+
+export interface SpecialistTeamDto {
+  id: string;
+  name: string;
+  description?: string | null;
+  category?: string | null;
+  logoUrl?: string | null;
+  leadId: string;
+  maxMembers: number;
+  status: string;
+  skills: string[];
+  lead?: {
+    id: string;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    avatarUrl?: string | null;
+  };
+  members?: SpecialistTeamMemberDto[];
+  memberCount?: number;
+  activeProjectsCount?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateSpecialistTeamRequest {
+  name: string;
+  description?: string;
+  category?: string;
+  logoUrl?: string;
+  maxMembers?: number;
+  skills?: string[];
+}
+
+export interface TeamInvitationDto {
+  id: string;
+  teamId: string;
+  workerId: string;
+  invitedById: string;
+  role: string;
+  message?: string | null;
+  status: string;
+  team?: {
+    name: string;
+    category?: string | null;
+  };
+  invitedBy?: {
+    firstName?: string | null;
+    lastName?: string | null;
+  };
+  createdAt: string;
+}
+
+export interface InviteTeamMemberRequest {
+  workerId: string;
+  role?: 'LEAD' | 'MEMBER';
+  message?: string;
+}
+
+export interface SavedJobDto {
+  id: string;
+  workerId: string;
+  jobPostId: string;
+  jobPost?: JobPostDto;
+  createdAt: string;
+}
+
+export interface SavedSpecialistDto {
+  id: string;
+  clientId: string;
+  specialistId: string;
+  notes?: string | null;
+  specialist?: {
+    id: string;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    avatarUrl?: string | null;
+    workerProfile?: {
+      headline?: string | null;
+      rating?: number;
+      city?: string | null;
+      state?: string | null;
+      country?: string | null;
+      skills?: {
+        skillName?: string;
+        yearsOfExperience?: number;
+      }[];
+    };
+  };
+  createdAt: string;
+}
+
+export interface VerifiedReviewDto {
+  id: string;
+  contractId: string;
+  projectId?: string | null;
+  reviewerId: string;
+  revieweeId: string;
+  workQuality: number;
+  communication: number;
+  timeliness: number;
+  professionalism: number;
+  overallRating: number;
+  feedback: string;
+  isVerified: boolean;
+  reviewer?: {
+    id: string;
+    firstName?: string | null;
+    lastName?: string | null;
+    avatarUrl?: string | null;
+  };
+  createdAt: string;
+}
+
+export interface CreateVerifiedReviewRequest {
+  contractId: string;
+  workQuality: number;
+  communication: number;
+  timeliness: number;
+  professionalism: number;
+  feedback: string;
+}
+
+export interface SmartMatchResultDto {
+  score: number; // 0-100
+  breakdown: {
+    skillsMatch: number;
+    locationMatch: number;
+    workModeMatch: number;
+    budgetMatch: number;
+    experienceMatch: number;
+  };
+  explanations: string[];
+}
+
+
 
 

@@ -315,6 +315,17 @@ model User {
   workerProjects           Project[]                    @relation("WorkerProjects")
   milestoneActivities      MilestoneActivity[]
   clientStamps             ClientStamp[]
+  clientJobPosts           JobPost[]                    @relation("ClientJobPosts")
+  workerJobProposals       JobProposal[]                @relation("WorkerJobProposals")
+  leadSpecialistTeams      SpecialistTeam[]             @relation("LeadSpecialistTeams")
+  teamMemberships          SpecialistTeamMember[]       @relation("TeamMemberSpecialist")
+  sentTeamInvitations      TeamInvitation[]             @relation("SentTeamInvitations")
+  receivedTeamInvitations  TeamInvitation[]             @relation("ReceivedTeamInvitations")
+  workerSavedJobs          SavedJob[]                   @relation("WorkerSavedJobs")
+  clientSavedSpecialists   SavedSpecialist[]            @relation("ClientSavedSpecialists")
+  specialistSavedByClients SavedSpecialist[]            @relation("SpecialistSavedByClients")
+  submittedReviews         VerifiedReview[]             @relation("SubmittedReviews")
+  receivedReviews          VerifiedReview[]             @relation("ReceivedReviews")
 
   @@index([clerkId])
   @@index([email])
@@ -353,6 +364,15 @@ model WorkerProfile {
   availability            WorkerAvailability @default(AVAILABLE)
   totalCompletedContracts Int                @default(0)
   rating                  Decimal            @default(0.0) @db.Decimal(3, 2)
+  country                 String?
+  state                   String?
+  district                String?
+  city                    String?
+  area                    String?
+  postalCode              String?
+  workMode                String             @default("HYBRID")
+  latitude                Float?
+  longitude               Float?
   user                    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   skills                  WorkerSkill[]
   portfolioItems          PortfolioItem[]
@@ -362,16 +382,20 @@ model WorkerProfile {
 
   @@index([userId])
   @@index([availability])
+  @@index([city])
+  @@index([district])
+  @@index([state])
   @@map("worker_profiles")
 }
 
 model Skill {
-  id           String        @id @default(uuid())
-  name         String        @unique
-  category     String?
-  workerSkills WorkerSkill[]
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  id            String         @id @default(uuid())
+  name          String         @unique
+  category      String?
+  workerSkills  WorkerSkill[]
+  jobPostSkills JobPostSkill[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 
   @@index([name])
   @@map("skills")
@@ -382,6 +406,8 @@ model WorkerSkill {
   workerProfileId   String
   skillId           String
   yearsOfExperience Int           @default(0)
+  isPrimary         Boolean       @default(false)
+  proficiency       String        @default("INTERMEDIATE")
   workerProfile     WorkerProfile @relation(fields: [workerProfileId], references: [id], onDelete: Cascade)
   skill             Skill         @relation(fields: [skillId], references: [id], onDelete: Cascade)
   createdAt         DateTime      @default(now())
@@ -444,6 +470,14 @@ model Contract {
   project            Project?
   milestoneActivities MilestoneActivity[]
   clientStamps       ClientStamp[]
+  jobPostId          String?
+  jobProposalId      String?
+  teamId             String?
+  teamSnapshot       Json?
+  jobPost            JobPost?             @relation(fields: [jobPostId], references: [id], onDelete: SetNull)
+  jobProposal        JobProposal?         @relation(fields: [jobProposalId], references: [id], onDelete: SetNull)
+  team               SpecialistTeam?      @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  reviews            VerifiedReview[]
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
 
@@ -451,6 +485,9 @@ model Contract {
   @@index([clientId])
   @@index([workerId])
   @@index([status])
+  @@index([jobPostId])
+  @@index([jobProposalId])
+  @@index([teamId])
   @@map("contracts")
 }
 
@@ -499,6 +536,7 @@ model Project {
   worker                 User                @relation("WorkerProjects", fields: [workerId], references: [id])
   milestones             ContractMilestone[]
   activities             MilestoneActivity[]
+  reviews                VerifiedReview[]
 
   @@index([contractId])
   @@index([clientId])
@@ -591,10 +629,12 @@ model HiringRequest {
   clientMessage          String?
   workerResponse         String?
   contractId             String?
+  jobPostId              String?
   respondedAt            DateTime?
   client                 User                @relation("ClientHiringRequests", fields: [clientId], references: [id], onDelete: Cascade)
   worker                 User                @relation("WorkerHiringRequests", fields: [workerId], references: [id], onDelete: Cascade)
   contract               Contract?           @relation(fields: [contractId], references: [id], onDelete: SetNull)
+  jobPost                JobPost?            @relation(fields: [jobPostId], references: [id], onDelete: SetNull)
   createdAt              DateTime            @default(now())
   updatedAt              DateTime            @updatedAt
 
@@ -602,6 +642,7 @@ model HiringRequest {
   @@index([workerId])
   @@index([status])
   @@index([contractId])
+  @@index([jobPostId])
   @@map("hiring_requests")
 }
 
@@ -1192,4 +1233,240 @@ model EscrowActivity {
   @@index([actorId])
   @@index([operationalState])
   @@map("escrow_activities")
+}
+
+// ==============================================================================
+// 12. CLIENT JOB POSTING, PROPOSALS, TEAMS & REPUTATION
+// ==============================================================================
+
+model JobPost {
+  id                   String         @id @default(uuid())
+  title                String
+  description          String
+  category             String
+  objectives           String?
+  deliverables         String?
+  minBudget            Decimal?       @db.Decimal(12, 2)
+  maxBudget            Decimal?       @db.Decimal(12, 2)
+  currency             String         @default("USD")
+  paymentType          String         @default("MILESTONE_BASED") // FIXED, HOURLY, MILESTONE_BASED
+  isNegotiable         Boolean        @default(true)
+  status               String         @default("PUBLISHED") // DRAFT, PUBLISHED, PAUSED, CLOSED, EXPIRED
+  workMode             String         @default("REMOTE") // ON_SITE, REMOTE, HYBRID
+  country              String?
+  state                String?
+  district             String?
+  city                 String?
+  area                 String?
+  postalCode           String?
+  address              String?
+  latitude             Float?
+  longitude            Float?
+  requiredSpecialists  Int            @default(1)
+  hiringType           String         @default("INDIVIDUAL") // INDIVIDUAL, TEAM
+  requiredExperience   String?
+  teamLeadRequired     Boolean        @default(false)
+  startDate            DateTime?
+  completionDate       DateTime?
+  applicationDeadline  DateTime?
+  estimatedDuration    String?
+  clientId             String
+  client               User           @relation("ClientJobPosts", fields: [clientId], references: [id], onDelete: Cascade)
+  skills               JobPostSkill[]
+  proposals            JobProposal[]
+  savedBy              SavedJob[]
+  hiringRequests       HiringRequest[]
+  contracts            Contract[]
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+
+  @@index([clientId])
+  @@index([status])
+  @@index([category])
+  @@index([city])
+  @@index([district])
+  @@index([state])
+  @@map("job_posts")
+}
+
+model JobPostSkill {
+  id              String   @id @default(uuid())
+  jobPostId       String
+  jobPost         JobPost  @relation(fields: [jobPostId], references: [id], onDelete: Cascade)
+  skillId         String?
+  skill           Skill?   @relation(fields: [skillId], references: [id], onDelete: SetNull)
+  customSkillName String?
+  isPrimary       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+
+  @@index([jobPostId])
+  @@index([skillId])
+  @@map("job_post_skills")
+}
+
+model JobProposal {
+  id                String                        @id @default(uuid())
+  jobPostId         String
+  jobPost           JobPost                       @relation(fields: [jobPostId], references: [id], onDelete: Cascade)
+  workerId          String
+  worker            User                          @relation("WorkerJobProposals", fields: [workerId], references: [id], onDelete: Cascade)
+  teamId            String?
+  team              SpecialistTeam?               @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  proposalType      String                        @default("INDIVIDUAL") // INDIVIDUAL, TEAM
+  coverLetter       String
+  proposedAmount    Decimal                       @db.Decimal(12, 2)
+  currency          String                        @default("USD")
+  estimatedTimeline String?
+  workApproach      String?
+  deliverables      String?
+  attachmentUrl     String?
+  status            String                        @default("PENDING") // PENDING, ACCEPTED, DECLINED, WITHDRAWN, UNDER_REVISION
+  isShortlisted     Boolean                       @default(false)
+  createdAt         DateTime                      @default(now())
+  updatedAt         DateTime                      @updatedAt
+  negotiations      ProposalNegotiationVersion[]
+  contracts         Contract[]
+
+  @@index([jobPostId])
+  @@index([workerId])
+  @@index([teamId])
+  @@index([status])
+  @@map("job_proposals")
+}
+
+model ProposalNegotiationVersion {
+  id             String      @id @default(uuid())
+  proposalId     String
+  proposal       JobProposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  versionNumber  Int         @default(1)
+  proposedAmount Decimal     @db.Decimal(12, 2)
+  timeline       String?
+  scope          String?
+  deliverables   String?
+  message        String?
+  counterOfferBy String // CLIENT, SPECIALIST
+  status         String      @default("PENDING") // PENDING, ACCEPTED, DECLINED, WITHDRAWN
+  createdAt      DateTime    @default(now())
+
+  @@index([proposalId])
+  @@map("proposal_negotiation_versions")
+}
+
+model SpecialistTeam {
+  id          String                 @id @default(uuid())
+  name        String
+  description String?
+  category    String?
+  logoUrl     String?
+  leadId      String
+  lead        User                   @relation("LeadSpecialistTeams", fields: [leadId], references: [id], onDelete: Cascade)
+  maxMembers  Int                    @default(10)
+  status      String                 @default("ACTIVE") // ACTIVE, INACTIVE
+  skills      String[]               @default([])
+  members     SpecialistTeamMember[]
+  invitations TeamInvitation[]
+  proposals   JobProposal[]
+  contracts   Contract[]
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+
+  @@index([leadId])
+  @@map("specialist_teams")
+}
+
+model SpecialistTeamMember {
+  id                 String         @id @default(uuid())
+  teamId             String
+  team               SpecialistTeam @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  workerId           String
+  worker             User           @relation("TeamMemberSpecialist", fields: [workerId], references: [id], onDelete: Cascade)
+  role               String         @default("MEMBER") // LEAD, MEMBER
+  status             String         @default("ACTIVE") // INVITED, ACTIVE, DECLINED, REMOVED
+  consentGiven       Boolean        @default(true)
+  consentDate        DateTime?
+  workloadAllocation Int            @default(100)
+  responsibility     String?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  @@unique([teamId, workerId])
+  @@index([teamId])
+  @@index([workerId])
+  @@map("specialist_team_members")
+}
+
+model TeamInvitation {
+  id          String         @id @default(uuid())
+  teamId      String
+  team        SpecialistTeam @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  workerId    String
+  worker      User           @relation("ReceivedTeamInvitations", fields: [workerId], references: [id], onDelete: Cascade)
+  invitedById String
+  invitedBy   User           @relation("SentTeamInvitations", fields: [invitedById], references: [id], onDelete: Cascade)
+  role        String         @default("MEMBER")
+  message     String?
+  status      String         @default("PENDING") // PENDING, ACCEPTED, DECLINED, CANCELLED
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([teamId])
+  @@index([workerId])
+  @@index([invitedById])
+  @@map("team_invitations")
+}
+
+model SavedJob {
+  id        String   @id @default(uuid())
+  workerId  String
+  worker    User     @relation("WorkerSavedJobs", fields: [workerId], references: [id], onDelete: Cascade)
+  jobPostId String
+  jobPost   JobPost  @relation(fields: [jobPostId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([workerId, jobPostId])
+  @@index([workerId])
+  @@index([jobPostId])
+  @@map("saved_jobs")
+}
+
+model SavedSpecialist {
+  id           String   @id @default(uuid())
+  clientId     String
+  client       User     @relation("ClientSavedSpecialists", fields: [clientId], references: [id], onDelete: Cascade)
+  specialistId String
+  specialist   User     @relation("SpecialistSavedByClients", fields: [specialistId], references: [id], onDelete: Cascade)
+  notes        String?
+  createdAt    DateTime @default(now())
+
+  @@unique([clientId, specialistId])
+  @@index([clientId])
+  @@index([specialistId])
+  @@map("saved_specialists")
+}
+
+model VerifiedReview {
+  id              String    @id @default(uuid())
+  contractId      String
+  contract        Contract  @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  projectId       String?
+  project         Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  reviewerId      String
+  reviewer        User      @relation("SubmittedReviews", fields: [reviewerId], references: [id], onDelete: Cascade)
+  revieweeId      String
+  reviewee        User      @relation("ReceivedReviews", fields: [revieweeId], references: [id], onDelete: Cascade)
+  workQuality     Int       @default(5)
+  communication   Int       @default(5)
+  timeliness      Int       @default(5)
+  professionalism Int       @default(5)
+  overallRating   Float     @default(5.0)
+  feedback        String
+  isVerified      Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([contractId, reviewerId])
+  @@index([contractId])
+  @@index([reviewerId])
+  @@index([revieweeId])
+  @@map("verified_reviews")
 }

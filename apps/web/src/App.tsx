@@ -82,6 +82,8 @@ import { ClientMessages } from './components/ClientMessages';
 import { ClientDisputes } from './components/ClientDisputes';
 import { SpecialistOpportunities } from './components/SpecialistOpportunities';
 import { ClientStampConsole } from './components/ClientStampConsole';
+import { ClientJobsManagement } from './components/ClientJobsManagement';
+import { SpecialistTeamConsole } from './components/SpecialistTeamConsole';
 import { RoleSelectionModal } from './components/RoleSelectionModal';
 import { UserRole, ContractDto, WorkerProfileDto } from '@trustpay/shared';
 import { useLocation } from 'react-router-dom';
@@ -90,6 +92,8 @@ import { PaymentCallbackPage } from './pages/PaymentCallbackPage';
 type AppTab =
   | 'dashboard'
   | 'stamp'
+  | 'job-postings'
+  | 'teams'
   | 'opportunities'
   | 'marketplace'
   | 'contracts'
@@ -131,6 +135,12 @@ export const App: React.FC = () => {
   const [selectedRoleInProgress, setSelectedRoleInProgress] = useState<'CLIENT' | 'WORKER' | null>(null);
   const [syncError, setSyncError] = useState<string | null>(null);
   const [hasCheckedExistingProfile, setHasCheckedExistingProfile] = useState(false);
+  const [chatTargetUserId, setChatTargetUserId] = useState<string | null>(null);
+
+  const handleStartChat = (userId: string) => {
+    setChatTargetUserId(userId);
+    setActiveTab('messages');
+  };
 
   // Configure token getter for Axios
   useEffect(() => {
@@ -423,6 +433,21 @@ export const App: React.FC = () => {
               </button>
             )}
 
+            {/* Client Job Postings Feature (Client only) */}
+            {isClient && (
+              <button
+                onClick={() => setActiveTab('job-postings')}
+                className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer mb-1 ${
+                  activeTab === 'job-postings'
+                    ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#5046E5] text-white shadow-md shadow-[#5046E5]/25 font-bold'
+                    : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#EEF2FF] hover:text-[#5046E5]'
+                }`}
+              >
+                <Briefcase className="w-4 h-4 dark:text-[#8BFF24] text-[#5046E5]" />
+                <span>Job Postings</span>
+              </button>
+            )}
+
             {isWorker && (
               <button
                 onClick={() => setActiveTab('opportunities')}
@@ -434,6 +459,20 @@ export const App: React.FC = () => {
               >
                 <Compass className="w-4 h-4" />
                 <span>Browse Opportunities</span>
+              </button>
+            )}
+
+            {isWorker && (
+              <button
+                onClick={() => setActiveTab('teams')}
+                className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer mb-1 ${
+                  activeTab === 'teams'
+                    ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#5046E5] text-white shadow-md shadow-[#5046E5]/25 font-bold'
+                    : 'dark:text-[#CDCBCA] text-[#475569] hover:dark:bg-[#151715] hover:bg-[#EEF2FF] hover:text-[#5046E5]'
+                }`}
+              >
+                <Users className="w-4 h-4" />
+                <span>My Teams</span>
               </button>
             )}
 
@@ -702,6 +741,15 @@ export const App: React.FC = () => {
                     <span>Browse Opportunities</span>
                   </button>
                 )}
+                {isWorker && (
+                  <button
+                    onClick={() => { setActiveTab('teams'); setMobileSidebarOpen(false); }}
+                    className="w-full flex items-center space-x-3 px-3 py-2 rounded-xl text-xs font-semibold dark:text-[#CDCBCA] text-[#475569]"
+                  >
+                    <Users className="w-4 h-4" />
+                    <span>My Teams</span>
+                  </button>
+                )}
                 {isClient && (
                   <button
                     onClick={() => { setActiveTab('stamp'); setMobileSidebarOpen(false); }}
@@ -709,6 +757,15 @@ export const App: React.FC = () => {
                   >
                     <Stamp className="w-4 h-4 dark:text-[#8BFF24] text-[#5046E5]" />
                     <span>My Stamp</span>
+                  </button>
+                )}
+                {isClient && (
+                  <button
+                    onClick={() => { setActiveTab('job-postings'); setMobileSidebarOpen(false); }}
+                    className="w-full flex items-center space-x-3 px-3 py-2 rounded-xl text-xs font-semibold dark:text-[#CDCBCA] text-[#475569]"
+                  >
+                    <Briefcase className="w-4 h-4 dark:text-[#8BFF24] text-[#5046E5]" />
+                    <span>Job Postings</span>
                   </button>
                 )}
                 {isClient && (
@@ -851,6 +908,16 @@ export const App: React.FC = () => {
             />
           )}
 
+          {/* Tab: Client Job Postings & Applications Management */}
+          {activeTab === 'job-postings' && isClient && (
+            <ClientJobsManagement onStartChat={handleStartChat} />
+          )}
+
+          {/* Tab: Specialist Teams & Consortiums */}
+          {activeTab === 'teams' && isWorker && (
+            <SpecialistTeamConsole />
+          )}
+
           {/* Tab 2: Specialist Marketplace View (Client only) */}
           {activeTab === 'marketplace' && isClient && (
             <WorkerMarketplace
@@ -859,6 +926,7 @@ export const App: React.FC = () => {
                 setIsCreateModalOpen(true);
               }}
               onOpenHiringModal={(worker) => setHiringTargetWorker(worker)}
+              onStartChat={handleStartChat}
               isClient={isClient}
             />
           )}
@@ -878,6 +946,7 @@ export const App: React.FC = () => {
                 setIsCreateModalOpen(true);
               }}
               onOpenHiringModal={(worker) => setHiringTargetWorker(worker)}
+              onStartChat={handleStartChat}
             />
           )}
 
@@ -956,7 +1025,11 @@ export const App: React.FC = () => {
 
           {/* Tab: Direct Messages (Feature 6) */}
           {activeTab === 'messages' && (
-            <ClientMessages />
+            <ClientMessages
+              currentUserId={auth.user?.id}
+              targetRecipientId={chatTargetUserId}
+              onClearTargetRecipient={() => setChatTargetUserId(null)}
+            />
           )}
 
           {/* Tab: Dispute Resolution Center (Feature 7) */}

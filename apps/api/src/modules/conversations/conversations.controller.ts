@@ -4,6 +4,7 @@ import { sendSuccess, sendError } from '../../utils/response.js';
 import { logger } from '../../utils/logger.js';
 import { UserRole, NotificationType } from '@prisma/client';
 import { SendMessageInput } from './conversations.schema.js';
+import { getSocketServer } from '../realtime/socket.service.js';
 
 /**
  * List all conversations where the authenticated user is an active participant.
@@ -125,6 +126,42 @@ export async function getOrCreateConversation(req: Request, res: Response): Prom
     if (!targetRecipientId) {
       sendError(res, 400, 'BAD_REQUEST', 'Recipient ID or Contract ID is required');
       return;
+    }
+
+    // Check if a direct conversation already exists between these two users
+    if (!contractId && targetRecipientId) {
+      const existingDirect = await prisma.conversation.findFirst({
+        where: {
+          contractId: null,
+          AND: [
+            { participants: { some: { userId: user.id } } },
+            { participants: { some: { userId: targetRecipientId } } },
+          ],
+        },
+        include: {
+          participants: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  avatarUrl: true,
+                  role: { select: { name: true } },
+                },
+              },
+            },
+          },
+          contract: {
+            select: { id: true, contractNumber: true, title: true, status: true },
+          },
+        },
+      });
+
+      if (existingDirect) {
+        sendSuccess(res, 200, existingDirect);
+        return;
+      }
     }
 
     // Create new conversation with both participants
@@ -362,6 +399,19 @@ export async function sendMessage(req: Request, res: Response): Promise<void> {
 
       return createdMessage;
     });
+
+    // Real-time Socket.IO Broadcast to active conversation room & user notification channels
+    const socketServer = getSocketServer();
+    if (socketServer) {
+      socketServer.to(`conversation:${id}`).emit('message:new', message);
+      const otherParticipants = conversation.participants.filter((p) => p.userId !== user.id);
+      for (const participant of otherParticipants) {
+        socketServer.to(`user:${participant.userId}`).emit('message:received', {
+          conversationId: id,
+          message,
+        });
+      }
+    }
 
     sendSuccess(res, 201, message);
   } catch (error) {
