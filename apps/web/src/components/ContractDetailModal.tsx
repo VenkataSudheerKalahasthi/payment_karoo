@@ -452,42 +452,42 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
       case ContractStatus.COMPLETED:
         return <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-[#2563EB]/10 text-[#2563EB] border border-[#2563EB]/20">COMPLETED</span>;
       case ContractStatus.CANCELLED:
-        return <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 dark:bg-[#202020] text-[#64748B] dark:text-[#777777] border border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)]">CANCELLED</span>;
+        return <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 dark:bg-[#191D2A] text-[#64748B] dark:text-[#9AA4B8] border border-[#E2E8F0] dark:border-[#272B38]">CANCELLED</span>;
       case ContractStatus.DISPUTED:
         return <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">DISPUTED</span>;
       default:
-        return <span className="px-2.5 py-1 rounded-full text-xs font-semibold text-[#64748B] dark:text-[#A5A5A5]">{status}</span>;
+        return <span className="px-2.5 py-1 rounded-full text-xs font-semibold text-[#64748B] dark:text-[#9AA4B8]">{status}</span>;
     }
   };
 
   return (
     <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-[#FFFFFF] dark:bg-[#171717] border border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)] rounded-2xl max-w-4xl w-full p-6 space-y-5 max-h-[92vh] overflow-y-auto text-[#242424] dark:text-[#CDCBCA] shadow-2xl transition-colors">
+      <div className="bg-[#FFFFFF] dark:bg-[#191B25] border border-[#E2E8F0] dark:border-[#272B38] rounded-2xl max-w-4xl w-full p-6 space-y-5 max-h-[92vh] overflow-y-auto text-[#242424] dark:text-[#E8ECF5] shadow-2xl transition-colors">
         {/* Header Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)] pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-[#E2E8F0] dark:border-[#272B38] pb-4">
           <div>
             <div className="flex items-center space-x-3">
-              <span className="text-xs font-mono px-2.5 py-0.5 rounded-md bg-[#F1F5F9] dark:bg-[#202020] border border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)] text-[#242424] dark:text-[#CDCBCA] font-semibold">
+              <span className="text-xs font-mono px-2.5 py-0.5 rounded-md bg-[#F1F5F9] dark:bg-[#191D2A] border border-[#E2E8F0] dark:border-[#272B38] text-[#242424] dark:text-[#E8ECF5] font-semibold">
                 {detailedContract.contractNumber}
               </span>
-              <span className="text-xs text-[#64748B] dark:text-[#A5A5A5] font-mono">v{detailedContract.version}</span>
+              <span className="text-xs text-[#64748B] dark:text-[#9AA4B8] font-mono">v{detailedContract.version}</span>
               {getStatusBadge(detailedContract.status)}
             </div>
-            <h3 className="text-xl font-bold text-[#242424] dark:text-[#CDCBCA] mt-1.5">{detailedContract.title}</h3>
-            <p className="text-xs text-[#64748B] dark:text-[#A5A5A5] mt-0.5">{detailedContract.description}</p>
+            <h3 className="text-xl font-bold text-[#242424] dark:text-[#E8ECF5] mt-1.5">{detailedContract.title}</h3>
+            <p className="text-xs text-[#64748B] dark:text-[#9AA4B8] mt-0.5">{detailedContract.description}</p>
           </div>
 
           <div className="flex items-center space-x-2 shrink-0">
             {isClient && isApproved && (
               hasClientStamp ? (
-                <span className="px-3 py-1.5 rounded-lg dark:bg-[#8BFF24]/10 bg-[#EEF2FF] dark:text-[#8BFF24] text-[#5046E5] border dark:border-[#8BFF24]/30 border-[#C7D2FE] text-xs font-bold flex items-center gap-1.5">
+                <span className="px-3 py-1.5 rounded-lg dark:bg-[#1C2740] bg-[#EEF2FF] dark:text-[#8FB5FF] text-[#5046E5] border dark:border-[#1F61EF]/30 border-[#C7D2FE] text-xs font-bold flex items-center gap-1.5">
                   <Stamp className="w-3.5 h-3.5" />
                   <span>Stamp Applied</span>
                 </span>
               ) : (
                 <button
                   onClick={() => setShowStampModal(true)}
-                  className="px-3 py-1.5 rounded-lg dark:bg-[#8BFF24] bg-[#5046E5] hover:dark:bg-[#78e018] hover:bg-[#4338CA] dark:text-black text-white shadow-md shadow-[#5046E5]/25 text-xs font-bold flex items-center gap-1.5 transition shadow-[0_0_12px_rgba(139,255,36,0.25)] cursor-pointer"
+                  className="px-3 py-1.5 rounded-lg dark:bg-[#1F61EF] bg-[#5046E5] hover:dark:bg-[#78e018] hover:bg-[#4338CA] dark:text-black text-white shadow-md shadow-[#5046E5]/25 text-xs font-bold flex items-center gap-1.5 transition shadow-[0_0_12px_rgba(31,97,239,0.2)] cursor-pointer"
                 >
                   <Stamp className="w-3.5 h-3.5" />
                   <span>Add Stamp</span>
@@ -505,7 +505,7 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
             {detailedContract.status === ContractStatus.COMPLETED && (
               <button
                 onClick={() => setShowReviewModal(true)}
-                className="px-3 py-1.5 rounded-lg dark:bg-[#8BFF24]/10 bg-[#EEF2FF] border dark:border-[#8BFF24]/30 border-[#C7D2FE] dark:text-[#8BFF24] text-[#5046E5] text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
+                className="px-3 py-1.5 rounded-lg dark:bg-[#1C2740] bg-[#EEF2FF] border dark:border-[#1F61EF]/30 border-[#C7D2FE] dark:text-[#8FB5FF] text-[#5046E5] text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
               >
                 <Star className="w-3.5 h-3.5" />
                 <span>Verified Review</span>
@@ -515,7 +515,7 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
             <button
               onClick={handleDownloadPdf}
               disabled={isDownloadingPdf}
-              className="px-3 py-1.5 rounded-lg bg-[#F8FAFC] dark:bg-[#202020] hover:bg-[#F1F5F9] dark:hover:bg-[#303030] disabled:opacity-50 text-xs font-semibold text-[#242424] dark:text-[#CDCBCA] border border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)] flex items-center space-x-1.5 transition cursor-pointer"
+              className="px-3 py-1.5 rounded-lg bg-[#F8FAFC] dark:bg-[#191D2A] hover:bg-[#F1F5F9] dark:hover:bg-[#1C2740] disabled:opacity-50 text-xs font-semibold text-[#242424] dark:text-[#E8ECF5] border border-[#E2E8F0] dark:border-[#272B38] flex items-center space-x-1.5 transition cursor-pointer"
             >
               <Download className="w-3.5 h-3.5 text-[#2563EB]" />
               <span>{isDownloadingPdf ? 'Generating PDF...' : 'Download PDF'}</span>
@@ -523,7 +523,7 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
 
             <button
               onClick={onClose}
-              className="text-[#64748B] dark:text-[#777777] hover:text-[#242424] dark:hover:text-[#CDCBCA] p-1.5 rounded-lg bg-[#F1F5F9] dark:bg-[#202020] border border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)] transition cursor-pointer"
+              className="text-[#64748B] dark:text-[#9AA4B8] hover:text-[#242424] dark:hover:text-[#CDCBCA] p-1.5 rounded-lg bg-[#F1F5F9] dark:bg-[#191D2A] border border-[#E2E8F0] dark:border-[#272B38] transition cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -538,13 +538,13 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
         )}
 
         {/* Console Navigation Tabs */}
-        <div className="flex items-center space-x-2 border-b border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)] pb-2 overflow-x-auto text-xs font-semibold">
+        <div className="flex items-center space-x-2 border-b border-[#E2E8F0] dark:border-[#272B38] pb-2 overflow-x-auto text-xs font-semibold">
           <button
             onClick={() => setModalTab('milestones')}
             className={`px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition cursor-pointer ${
               modalTab === 'milestones'
-                ? 'bg-[#2563EB] text-white shadow-sm dark:bg-[#202020] dark:text-[#CDCBCA] dark:border dark:border-[rgba(205,203,202,0.18)]'
-                : 'text-[#64748B] dark:text-[#A5A5A5] hover:text-[#242424] dark:hover:text-[#CDCBCA]'
+                ? 'bg-[#2563EB] text-white shadow-sm dark:bg-[#191D2A] dark:text-[#E8ECF5] dark:border dark:border-[#272B38]'
+                : 'text-[#64748B] dark:text-[#9AA4B8] hover:text-[#242424] dark:hover:text-[#CDCBCA]'
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
@@ -555,8 +555,8 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
             onClick={() => setModalTab('scope')}
             className={`px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition cursor-pointer ${
               modalTab === 'scope'
-                ? 'bg-[#2563EB] text-white shadow-sm dark:bg-[#202020] dark:text-[#CDCBCA] dark:border dark:border-[rgba(205,203,202,0.18)]'
-                : 'text-[#64748B] dark:text-[#A5A5A5] hover:text-[#242424] dark:hover:text-[#CDCBCA]'
+                ? 'bg-[#2563EB] text-white shadow-sm dark:bg-[#191D2A] dark:text-[#E8ECF5] dark:border dark:border-[#272B38]'
+                : 'text-[#64748B] dark:text-[#9AA4B8] hover:text-[#242424] dark:hover:text-[#CDCBCA]'
             }`}
           >
             <FileText className="w-3.5 h-3.5" />
@@ -567,8 +567,8 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
             onClick={() => setModalTab('escrow')}
             className={`px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition cursor-pointer ${
               modalTab === 'escrow'
-                ? 'bg-[#2563EB] text-white shadow-sm dark:bg-[#202020] dark:text-[#CDCBCA] dark:border dark:border-[rgba(205,203,202,0.18)]'
-                : 'text-[#64748B] dark:text-[#A5A5A5] hover:text-[#242424] dark:hover:text-[#CDCBCA]'
+                ? 'bg-[#2563EB] text-white shadow-sm dark:bg-[#191D2A] dark:text-[#E8ECF5] dark:border dark:border-[#272B38]'
+                : 'text-[#64748B] dark:text-[#9AA4B8] hover:text-[#242424] dark:hover:text-[#CDCBCA]'
             }`}
           >
             <Lock className="w-3.5 h-3.5" />
@@ -579,8 +579,8 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
             onClick={() => setModalTab('governance')}
             className={`px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition cursor-pointer ${
               modalTab === 'governance'
-                ? 'bg-[#2563EB] text-white shadow-sm dark:bg-[#202020] dark:text-[#CDCBCA] dark:border dark:border-[rgba(205,203,202,0.18)]'
-                : 'text-[#64748B] dark:text-[#A5A5A5] hover:text-[#242424] dark:hover:text-[#CDCBCA]'
+                ? 'bg-[#2563EB] text-white shadow-sm dark:bg-[#191D2A] dark:text-[#E8ECF5] dark:border dark:border-[#272B38]'
+                : 'text-[#64748B] dark:text-[#9AA4B8] hover:text-[#242424] dark:hover:text-[#CDCBCA]'
             }`}
           >
             <Scale className="w-3.5 h-3.5" />
@@ -595,15 +595,15 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
               {detailedContract.milestones?.map((m) => (
                 <div
                   key={m.id}
-                  className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#202020] border border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)] space-y-3 text-xs"
+                  className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#191D2A] border border-[#E2E8F0] dark:border-[#272B38] space-y-3 text-xs"
                 >
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
                     <div className="space-y-1 max-w-lg">
                       <div className="flex items-center space-x-2">
-                        <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-[#FFFFFF] dark:bg-[#171717] border border-[#CBD5E1] dark:border-[rgba(205,203,202,0.18)] text-[#242424] dark:text-[#CDCBCA] font-semibold">
+                        <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-[#FFFFFF] dark:bg-[#191B25] border border-[#CBD5E1] dark:border-[#272B38] text-[#242424] dark:text-[#E8ECF5] font-semibold">
                           #{m.order}
                         </span>
-                        <span className="font-semibold text-[#242424] dark:text-[#CDCBCA]">{m.title}</span>
+                        <span className="font-semibold text-[#242424] dark:text-[#E8ECF5]">{m.title}</span>
                         <span
                           className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
                             m.status === MilestoneStatus.APPROVED
@@ -614,13 +614,13 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
                                   ? 'bg-amber-500/10 text-amber-500 dark:text-amber-400 border border-amber-500/20'
                                   : m.status === MilestoneStatus.IN_REVISION
                                     ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'
-                                    : 'bg-[#FFFFFF] dark:bg-[#171717] text-[#64748B] dark:text-[#A5A5A5] border border-[#CBD5E1] dark:border-[rgba(205,203,202,0.18)]'
+                                    : 'bg-[#FFFFFF] dark:bg-[#191B25] text-[#64748B] dark:text-[#9AA4B8] border border-[#CBD5E1] dark:border-[#272B38]'
                           }`}
                         >
                           {m.status}
                         </span>
                       </div>
-                      <p className="text-[#64748B] dark:text-[#A5A5A5] text-[11px] leading-relaxed">{m.description}</p>
+                      <p className="text-[#64748B] dark:text-[#9AA4B8] text-[11px] leading-relaxed">{m.description}</p>
                     </div>
 
                     <div className="flex items-center space-x-4 shrink-0">
@@ -629,7 +629,7 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
                           ${Number(m.amount).toLocaleString()}
                         </span>
                         {m.dueDate && (
-                          <p className="text-[10px] text-[#64748B] dark:text-[#777777] font-mono">
+                          <p className="text-[10px] text-[#64748B] dark:text-[#9AA4B8] font-mono">
                             Due {new Date(m.dueDate).toLocaleDateString()}
                           </p>
                         )}
@@ -679,7 +679,7 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
                                 setActionType('REVISE');
                                 setRevisionReason('');
                               }}
-                              className="px-3 py-1.5 rounded-lg bg-[#FFFFFF] dark:bg-[#171717] hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-500/10 dark:hover:text-rose-400 border border-[#CBD5E1] dark:border-[rgba(205,203,202,0.18)] text-xs font-medium text-[#475569] dark:text-[#CDCBCA] transition cursor-pointer"
+                              className="px-3 py-1.5 rounded-lg bg-[#FFFFFF] dark:bg-[#191B25] hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-500/10 dark:hover:text-rose-400 border border-[#CBD5E1] dark:border-[#272B38] text-xs font-medium text-[#475569] dark:text-[#E8ECF5] transition cursor-pointer"
                             >
                               Request Revision
                             </button>
@@ -691,8 +691,8 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
 
                   {/* Submissions & Deliverables Review */}
                   {m.submissions && m.submissions.length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)] space-y-2">
-                      <span className="text-[10px] font-bold text-[#64748B] dark:text-[#777777] uppercase tracking-wider">
+                    <div className="mt-3 pt-3 border-t border-[#E2E8F0] dark:border-[#272B38] space-y-2">
+                      <span className="text-[10px] font-bold text-[#64748B] dark:text-[#9AA4B8] uppercase tracking-wider">
                         Submitted Deliverables &amp; Evidence ({m.submissions.length})
                       </span>
                       <div className="space-y-2">
@@ -700,9 +700,9 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
                           const subNumber = m.submissions ? m.submissions.length - sIdx : 1;
                           const workerName = sub.worker ? `${sub.worker.firstName || ''} ${sub.worker.lastName || ''}`.trim() : 'Specialist';
                           return (
-                            <div key={sub.id || sIdx} className="p-3 rounded-lg bg-[#FFFFFF] dark:bg-[#171717] border border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)] space-y-2">
+                            <div key={sub.id || sIdx} className="p-3 rounded-lg bg-[#FFFFFF] dark:bg-[#191B25] border border-[#E2E8F0] dark:border-[#272B38] space-y-2">
                               <div className="flex items-center justify-between text-[11px]">
-                                <span className="font-semibold text-[#242424] dark:text-[#CDCBCA]">
+                                <span className="font-semibold text-[#242424] dark:text-[#E8ECF5]">
                                   Submission #{subNumber} by <span className="text-[#2563EB]">{workerName}</span>
                                 </span>
                                 <div className="flex items-center space-x-2">
@@ -713,19 +713,19 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
                                   }`}>
                                     {sub.status}
                                   </span>
-                                  <span className="text-[10px] text-[#64748B] dark:text-[#777777] font-mono">
+                                  <span className="text-[10px] text-[#64748B] dark:text-[#9AA4B8] font-mono">
                                     {new Date(sub.submittedAt || sub.createdAt || Date.now()).toLocaleString()}
                                   </span>
                                 </div>
                               </div>
 
-                              <p className="text-[#334155] dark:text-[#CDCBCA] text-xs bg-[#F8FAFC] dark:bg-[#202020] p-2.5 rounded-lg border border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)] leading-relaxed">
+                              <p className="text-[#334155] dark:text-[#E8ECF5] text-xs bg-[#F8FAFC] dark:bg-[#191D2A] p-2.5 rounded-lg border border-[#E2E8F0] dark:border-[#272B38] leading-relaxed">
                                 {sub.notes}
                               </p>
 
                               {sub.attachmentUrls && sub.attachmentUrls.length > 0 && (
                                 <div className="space-y-1">
-                                  <span className="text-[10px] text-[#64748B] dark:text-[#777777] font-medium">Deliverable Evidence / Repository Links:</span>
+                                  <span className="text-[10px] text-[#64748B] dark:text-[#9AA4B8] font-medium">Deliverable Evidence / Repository Links:</span>
                                   <div className="flex flex-wrap gap-2">
                                     {sub.attachmentUrls.map((url, uIdx) => (
                                       <a
@@ -733,7 +733,7 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
                                         href={url}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-[#EFF6FF] dark:bg-[#202020] hover:bg-[#DBEAFE] dark:hover:bg-[#303030] text-[#2563EB] text-[11px] border border-[#DBEAFE] dark:border-[rgba(205,203,202,0.18)] transition font-mono"
+                                        className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-[#EFF6FF] dark:bg-[#191D2A] hover:bg-[#DBEAFE] dark:hover:bg-[#1C2740] text-[#2563EB] text-[11px] border border-[#DBEAFE] dark:border-[#272B38] transition font-mono"
                                       >
                                         <ExternalLink className="w-3 h-3 shrink-0" />
                                         <span className="truncate max-w-[240px]">{url}</span>
@@ -754,15 +754,15 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
 
             {/* Deliverable Submission / Revision Drawer Form */}
             {activeMilestoneId && actionType && (
-              <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#202020] border border-[#CBD5E1] dark:border-[rgba(205,203,202,0.18)] space-y-3">
-                <h4 className="text-xs font-bold text-[#242424] dark:text-[#CDCBCA]">
+              <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#191D2A] border border-[#CBD5E1] dark:border-[#272B38] space-y-3">
+                <h4 className="text-xs font-bold text-[#242424] dark:text-[#E8ECF5]">
                   {actionType === 'SUBMIT' ? 'Submit Milestone Deliverable' : 'Request Milestone Revision'}
                 </h4>
 
                 {actionType === 'SUBMIT' ? (
                   <form onSubmit={handleSubmitDeliverable} className="space-y-3 text-xs">
                     <div>
-                      <label className="block text-[#242424] dark:text-[#CDCBCA] font-medium mb-1">
+                      <label className="block text-[#242424] dark:text-[#E8ECF5] font-medium mb-1">
                         Deliverable Notes &amp; Evidence *
                       </label>
                       <textarea
@@ -770,14 +770,14 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
                         onChange={(e) => setSubmissionNotes(e.target.value)}
                         rows={3}
                         placeholder="Describe completed deliverables, commit hashes, pull requests, test verification..."
-                        className="w-full px-3 py-2 rounded-lg bg-[#FFFFFF] dark:bg-[#171717] border border-[#CBD5E1] dark:border-[rgba(205,203,202,0.18)] text-[#242424] dark:text-[#CDCBCA] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] transition leading-relaxed"
+                        className="w-full px-3 py-2 rounded-lg bg-[#FFFFFF] dark:bg-[#191B25] border border-[#CBD5E1] dark:border-[#272B38] text-[#242424] dark:text-[#E8ECF5] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] transition leading-relaxed"
                         required
                       />
                     </div>
 
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <label className="block text-[#242424] dark:text-[#CDCBCA] font-medium">Deliverable Evidence Files / Links</label>
+                        <label className="block text-[#242424] dark:text-[#E8ECF5] font-medium">Deliverable Evidence Files / Links</label>
                         {isAuthorizingUpload && (
                           <span className="text-[10px] text-[#2563EB] animate-pulse">Authorizing upload...</span>
                         )}
@@ -785,8 +785,8 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <div>
-                          <label className="text-[10px] text-[#64748B] dark:text-[#777777] block mb-1">Upload File (PDF, ZIP, Images, Docs)</label>
-                          <label className="flex items-center justify-center space-x-2 px-3 py-2 rounded-lg bg-[#FFFFFF] dark:bg-[#171717] border border-[#CBD5E1] dark:border-[rgba(205,203,202,0.18)] hover:border-[#2563EB] cursor-pointer text-[#242424] dark:text-[#CDCBCA] transition">
+                          <label className="text-[10px] text-[#64748B] dark:text-[#9AA4B8] block mb-1">Upload File (PDF, ZIP, Images, Docs)</label>
+                          <label className="flex items-center justify-center space-x-2 px-3 py-2 rounded-lg bg-[#FFFFFF] dark:bg-[#191B25] border border-[#CBD5E1] dark:border-[#272B38] hover:border-[#2563EB] cursor-pointer text-[#242424] dark:text-[#E8ECF5] transition">
                             <Paperclip className="w-3.5 h-3.5 text-[#2563EB]" />
                             <span className="truncate max-w-[150px] text-[11px] font-mono">
                               {uploadFileName || 'Choose Local File'}
@@ -801,13 +801,13 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
                         </div>
 
                         <div>
-                          <label className="text-[10px] text-[#64748B] dark:text-[#777777] block mb-1">Or Direct Attachment / Repo URL</label>
+                          <label className="text-[10px] text-[#64748B] dark:text-[#9AA4B8] block mb-1">Or Direct Attachment / Repo URL</label>
                           <input
                             type="url"
                             value={attachmentUrl}
                             onChange={(e) => setAttachmentUrl(e.target.value)}
                             placeholder="https://github.com/... or https://..."
-                            className="w-full px-3 py-2 rounded-lg bg-[#FFFFFF] dark:bg-[#171717] border border-[#CBD5E1] dark:border-[rgba(205,203,202,0.18)] text-[#242424] dark:text-[#CDCBCA] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] font-mono transition"
+                            className="w-full px-3 py-2 rounded-lg bg-[#FFFFFF] dark:bg-[#191B25] border border-[#CBD5E1] dark:border-[#272B38] text-[#242424] dark:text-[#E8ECF5] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] font-mono transition"
                           />
                         </div>
                       </div>
@@ -821,7 +821,7 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
                           setActionType(null);
                           setUploadFileName(null);
                         }}
-                        className="px-3 py-1.5 rounded-lg bg-[#F1F5F9] dark:bg-[#171717] text-[#242424] dark:text-[#CDCBCA] border border-[#CBD5E1] dark:border-[rgba(205,203,202,0.18)] transition cursor-pointer"
+                        className="px-3 py-1.5 rounded-lg bg-[#F1F5F9] dark:bg-[#191B25] text-[#242424] dark:text-[#E8ECF5] border border-[#CBD5E1] dark:border-[#272B38] transition cursor-pointer"
                       >
                         Cancel
                       </button>
@@ -838,13 +838,13 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
                 ) : (
                   <form onSubmit={handleRequestRevision} className="space-y-3 text-xs">
                     <div>
-                      <label className="block text-[#242424] dark:text-[#CDCBCA] font-medium mb-1">Reason for Revision *</label>
+                      <label className="block text-[#242424] dark:text-[#E8ECF5] font-medium mb-1">Reason for Revision *</label>
                       <textarea
                         value={revisionReason}
                         onChange={(e) => setRevisionReason(e.target.value)}
                         rows={3}
                         placeholder="Detail specific criteria that require correction or additional deliverables..."
-                        className="w-full px-3 py-2 rounded-lg bg-[#FFFFFF] dark:bg-[#171717] border border-[#CBD5E1] dark:border-[rgba(205,203,202,0.18)] text-[#242424] dark:text-[#CDCBCA] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] transition leading-relaxed"
+                        className="w-full px-3 py-2 rounded-lg bg-[#FFFFFF] dark:bg-[#191B25] border border-[#CBD5E1] dark:border-[#272B38] text-[#242424] dark:text-[#E8ECF5] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] transition leading-relaxed"
                         required
                       />
                     </div>
@@ -856,7 +856,7 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
                           setActiveMilestoneId(null);
                           setActionType(null);
                         }}
-                        className="px-3 py-1.5 rounded-lg bg-[#F1F5F9] dark:bg-[#171717] text-[#242424] dark:text-[#CDCBCA] border border-[#CBD5E1] dark:border-[rgba(205,203,202,0.18)] transition cursor-pointer"
+                        className="px-3 py-1.5 rounded-lg bg-[#F1F5F9] dark:bg-[#191B25] text-[#242424] dark:text-[#E8ECF5] border border-[#CBD5E1] dark:border-[#272B38] transition cursor-pointer"
                       >
                         Cancel
                       </button>
@@ -879,37 +879,37 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
         {modalTab === 'scope' && (
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#202020] border border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)] space-y-1">
-                <span className="text-[10px] font-semibold text-[#64748B] dark:text-[#777777] uppercase tracking-wider">Client (Buyer)</span>
-                <p className="text-xs font-bold text-[#242424] dark:text-[#CDCBCA]">
+              <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#191D2A] border border-[#E2E8F0] dark:border-[#272B38] space-y-1">
+                <span className="text-[10px] font-semibold text-[#64748B] dark:text-[#9AA4B8] uppercase tracking-wider">Client (Buyer)</span>
+                <p className="text-xs font-bold text-[#242424] dark:text-[#E8ECF5]">
                   {contract.client?.firstName
                     ? `${contract.client.firstName} ${contract.client.lastName || ''}`.trim()
                     : 'Verified Client'}
                 </p>
-                <p className="text-[11px] text-[#64748B] dark:text-[#A5A5A5] font-mono">{contract.client?.email}</p>
+                <p className="text-[11px] text-[#64748B] dark:text-[#9AA4B8] font-mono">{contract.client?.email}</p>
               </div>
 
-              <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#202020] border border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)] space-y-1">
-                <span className="text-[10px] font-semibold text-[#64748B] dark:text-[#777777] uppercase tracking-wider">Specialist (Provider)</span>
-                <p className="text-xs font-bold text-[#242424] dark:text-[#CDCBCA]">
+              <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#191D2A] border border-[#E2E8F0] dark:border-[#272B38] space-y-1">
+                <span className="text-[10px] font-semibold text-[#64748B] dark:text-[#9AA4B8] uppercase tracking-wider">Specialist (Provider)</span>
+                <p className="text-xs font-bold text-[#242424] dark:text-[#E8ECF5]">
                   {contract.worker?.firstName
                     ? `${contract.worker.firstName} ${contract.worker.lastName || ''}`.trim()
                     : 'Verified Specialist'}
                 </p>
-                <p className="text-[11px] text-[#64748B] dark:text-[#A5A5A5] font-mono">{contract.worker?.email}</p>
+                <p className="text-[11px] text-[#64748B] dark:text-[#9AA4B8] font-mono">{contract.worker?.email}</p>
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#202020] border border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)] space-y-2">
-              <h4 className="text-xs font-bold text-[#242424] dark:text-[#CDCBCA] uppercase tracking-wider">Statement of Work</h4>
-              <p className="text-xs text-[#475569] dark:text-[#A5A5A5] leading-relaxed max-w-[68ch]">
+            <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#191D2A] border border-[#E2E8F0] dark:border-[#272B38] space-y-2">
+              <h4 className="text-xs font-bold text-[#242424] dark:text-[#E8ECF5] uppercase tracking-wider">Statement of Work</h4>
+              <p className="text-xs text-[#475569] dark:text-[#9AA4B8] leading-relaxed max-w-[68ch]">
                 {detailedContract.scopeOfWork || detailedContract.description}
               </p>
             </div>
 
-            <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#202020] border border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)] space-y-2">
-              <h4 className="text-xs font-bold text-[#242424] dark:text-[#CDCBCA] uppercase tracking-wider">Commercial Terms &amp; Cancellation</h4>
-              <p className="text-xs text-[#475569] dark:text-[#A5A5A5] leading-relaxed max-w-[68ch]">
+            <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#191D2A] border border-[#E2E8F0] dark:border-[#272B38] space-y-2">
+              <h4 className="text-xs font-bold text-[#242424] dark:text-[#E8ECF5] uppercase tracking-wider">Commercial Terms &amp; Cancellation</h4>
+              <p className="text-xs text-[#475569] dark:text-[#9AA4B8] leading-relaxed max-w-[68ch]">
                 {detailedContract.termsAndConditions || 'Standard TrustPay Enterprise digital contract terms apply.'}
               </p>
             </div>
@@ -922,7 +922,7 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
                     <ShieldCheck className="w-4 h-4 text-amber-500" />
                     <span>Digital Sign-Off Required</span>
                   </span>
-                  <p className="text-[#334155] dark:text-[#CDCBCA]">
+                  <p className="text-[#334155] dark:text-[#E8ECF5]">
                     {hasUserAccepted
                       ? '✓ You have digitally accepted this agreement version. Awaiting counterparty sign-off to activate.'
                       : hasOtherAccepted
@@ -946,16 +946,16 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
 
             {/* Client Office Stamp Status Banner */}
             {isApproved && (
-              <div className="p-4 rounded-xl bg-[#141614] border dark:border-[#262926] border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+              <div className="p-4 rounded-xl bg-[#141614] border dark:border-[#272B38] border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg dark:bg-[#8BFF24]/10 bg-[#EEF2FF] border dark:border-[#8BFF24]/30 border-[#C7D2FE] flex items-center justify-center dark:text-[#8BFF24] text-[#5046E5]">
+                  <div className="w-9 h-9 rounded-lg dark:bg-[#1C2740] bg-[#EEF2FF] border dark:border-[#1F61EF]/30 border-[#C7D2FE] flex items-center justify-center dark:text-[#8FB5FF] text-[#5046E5]">
                     <Stamp className="w-5 h-5" />
                   </div>
                   <div>
                     <span className="font-bold dark:text-white text-slate-900 flex items-center gap-1.5">
                       Client Digital Office Stamp
                       {hasClientStamp ? (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full dark:bg-[#8BFF24]/10 bg-[#EEF2FF] dark:text-[#8BFF24] text-[#5046E5] border dark:border-[#8BFF24]/30 border-[#C7D2FE] font-semibold">
+                        <span className="text-[10px] px-2 py-0.5 rounded-full dark:bg-[#1C2740] bg-[#EEF2FF] dark:text-[#8FB5FF] text-[#5046E5] border dark:border-[#1F61EF]/30 border-[#C7D2FE] font-semibold">
                           Applied ✓
                         </span>
                       ) : (
@@ -977,7 +977,7 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
                 {isClient && !hasClientStamp && (
                   <button
                     onClick={() => setShowStampModal(true)}
-                    className="px-4 py-2 rounded-xl dark:bg-[#8BFF24] bg-[#5046E5] hover:dark:bg-[#78e018] hover:bg-[#4338CA] dark:text-black text-white shadow-md shadow-[#5046E5]/25 text-xs font-bold transition shrink-0 flex items-center gap-1.5 shadow-[0_0_12px_rgba(139,255,36,0.2)]"
+                    className="px-4 py-2 rounded-xl dark:bg-[#1F61EF] bg-[#5046E5] hover:dark:bg-[#78e018] hover:bg-[#4338CA] dark:text-black text-white shadow-md shadow-[#5046E5]/25 text-xs font-bold transition shrink-0 flex items-center gap-1.5 shadow-[0_0_12px_rgba(31,97,239,0.15)]"
                   >
                     <Stamp className="w-4 h-4" />
                     <span>Apply Office Stamp</span>
@@ -991,11 +991,11 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
         {/* TAB 3: ESCROW & CASHFREE GATEWAY */}
         {modalTab === 'escrow' && (
           <div className="space-y-4">
-            <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#202020] border border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)] space-y-3">
-              <div className="flex items-center justify-between border-b border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)] pb-2.5">
+            <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#191D2A] border border-[#E2E8F0] dark:border-[#272B38] space-y-3">
+              <div className="flex items-center justify-between border-b border-[#E2E8F0] dark:border-[#272B38] pb-2.5">
                 <div className="flex items-center space-x-2">
                   <Lock className="w-4 h-4 text-[#2563EB]" />
-                  <h4 className="text-xs font-bold text-[#242424] dark:text-[#CDCBCA] uppercase tracking-wider">Escrow Custody Status</h4>
+                  <h4 className="text-xs font-bold text-[#242424] dark:text-[#E8ECF5] uppercase tracking-wider">Escrow Custody Status</h4>
                 </div>
                 <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold font-mono ${
                   escrowRecord?.status === 'FUNDED'
@@ -1007,36 +1007,36 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-mono tabular-nums">
-                <div className="p-2.5 rounded-lg bg-[#FFFFFF] dark:bg-[#171717] border border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)]">
-                  <span className="text-[10px] text-[#64748B] dark:text-[#A5A5A5] font-sans">Agreed Total</span>
-                  <div className="text-sm font-bold text-[#242424] dark:text-[#CDCBCA] mt-0.5">
-                    ${Number(contract.totalAmount).toLocaleString()} <span className="text-xs font-normal text-[#64748B] dark:text-[#777777]">{contract.currency}</span>
+                <div className="p-2.5 rounded-lg bg-[#FFFFFF] dark:bg-[#191B25] border border-[#E2E8F0] dark:border-[#272B38]">
+                  <span className="text-[10px] text-[#64748B] dark:text-[#9AA4B8] font-sans">Agreed Total</span>
+                  <div className="text-sm font-bold text-[#242424] dark:text-[#E8ECF5] mt-0.5">
+                    ${Number(contract.totalAmount).toLocaleString()} <span className="text-xs font-normal text-[#64748B] dark:text-[#9AA4B8]">{contract.currency}</span>
                   </div>
                 </div>
 
-                <div className="p-2.5 rounded-lg bg-[#FFFFFF] dark:bg-[#171717] border border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)]">
-                  <span className="text-[10px] text-[#64748B] dark:text-[#A5A5A5] font-sans">Verified Escrow</span>
+                <div className="p-2.5 rounded-lg bg-[#FFFFFF] dark:bg-[#191B25] border border-[#E2E8F0] dark:border-[#272B38]">
+                  <span className="text-[10px] text-[#64748B] dark:text-[#9AA4B8] font-sans">Verified Escrow</span>
                   <div className="text-sm font-bold text-amber-500 dark:text-amber-400 mt-0.5">
                     {escrowRecord?.status === 'FUNDED' ? `$${Number(contract.totalAmount).toLocaleString()}` : '$0.00'}{' '}
-                    <span className="text-xs font-normal text-[#64748B] dark:text-[#777777]">USD</span>
+                    <span className="text-xs font-normal text-[#64748B] dark:text-[#9AA4B8]">USD</span>
                   </div>
                 </div>
 
-                <div className="p-2.5 rounded-lg bg-[#FFFFFF] dark:bg-[#171717] border border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)]">
-                  <span className="text-[10px] text-[#64748B] dark:text-[#A5A5A5] font-sans">Released Funds</span>
+                <div className="p-2.5 rounded-lg bg-[#FFFFFF] dark:bg-[#191B25] border border-[#E2E8F0] dark:border-[#272B38]">
+                  <span className="text-[10px] text-[#64748B] dark:text-[#9AA4B8] font-sans">Released Funds</span>
                   <div className="text-sm font-bold text-[#2563EB] mt-0.5">
-                    $0.00 <span className="text-xs font-normal text-[#64748B] dark:text-[#777777]">USD</span>
+                    $0.00 <span className="text-xs font-normal text-[#64748B] dark:text-[#9AA4B8]">USD</span>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Cashfree Sandbox Terminal Card */}
-            <div className="p-4 rounded-xl bg-[#FFFFFF] dark:bg-[#171717] border border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)] space-y-3 shadow-sm">
+            <div className="p-4 rounded-xl bg-[#FFFFFF] dark:bg-[#191B25] border border-[#E2E8F0] dark:border-[#272B38] space-y-3 shadow-sm">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <CreditCard className="w-4 h-4 text-[#2563EB]" />
-                  <span className="text-xs font-bold text-[#242424] dark:text-[#CDCBCA]">Cashfree Hosted Checkout</span>
+                  <span className="text-xs font-bold text-[#242424] dark:text-[#E8ECF5]">Cashfree Hosted Checkout</span>
                   <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/30">
                     SANDBOX / ZERO REAL MONEY
                   </span>
@@ -1058,14 +1058,14 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
               )}
 
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
-                <div className="text-xs text-[#334155] dark:text-[#CDCBCA]">
+                <div className="text-xs text-[#334155] dark:text-[#E8ECF5]">
                   <p className="font-semibold">
                     Test Escrow Funding:{' '}
                     <span className="text-[#2563EB] font-mono tabular-nums">
                       ₹{(Number(contract.totalAmount)).toLocaleString()} INR
                     </span>
                   </p>
-                  <p className="text-[11px] text-[#64748B] dark:text-[#A5A5A5]">
+                  <p className="text-[11px] text-[#64748B] dark:text-[#9AA4B8]">
                     Simulate card or UPI payments in Cashfree hosted checkout modal.
                   </p>
                 </div>
@@ -1086,31 +1086,31 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
                     </span>
                   </button>
                 ) : (
-                  <div className="text-[11px] text-[#64748B] dark:text-[#777777] italic">
+                  <div className="text-[11px] text-[#64748B] dark:text-[#9AA4B8] italic">
                     Specialist view: Client funds escrow via Cashfree sandbox.
                   </div>
                 )}
               </div>
 
               {paymentTransactions.length > 0 && (
-                <div className="mt-3 pt-3 border-t border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)] space-y-1.5">
-                  <span className="text-[10px] font-semibold text-[#64748B] dark:text-[#777777] uppercase tracking-wider">
+                <div className="mt-3 pt-3 border-t border-[#E2E8F0] dark:border-[#272B38] space-y-1.5">
+                  <span className="text-[10px] font-semibold text-[#64748B] dark:text-[#9AA4B8] uppercase tracking-wider">
                     Sandbox Transactions ({paymentTransactions.length})
                   </span>
                   <div className="space-y-1">
                     {paymentTransactions.map((tx) => (
                       <div
                         key={tx.id}
-                        className="p-2 rounded-lg bg-[#F8FAFC] dark:bg-[#202020] border border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)] flex items-center justify-between text-[11px] font-mono tabular-nums"
+                        className="p-2 rounded-lg bg-[#F8FAFC] dark:bg-[#191D2A] border border-[#E2E8F0] dark:border-[#272B38] flex items-center justify-between text-[11px] font-mono tabular-nums"
                       >
                         <div className="flex items-center space-x-2">
-                          <span className="text-[#242424] dark:text-[#CDCBCA] font-medium">{tx.transactionReference}</span>
+                          <span className="text-[#242424] dark:text-[#E8ECF5] font-medium">{tx.transactionReference}</span>
                           {tx.providerOrderId && (
-                            <span className="text-[10px] text-[#64748B] dark:text-[#777777]">({tx.providerOrderId})</span>
+                            <span className="text-[10px] text-[#64748B] dark:text-[#9AA4B8]">({tx.providerOrderId})</span>
                           )}
                         </div>
                         <div className="flex items-center space-x-2">
-                          <span className="text-[#64748B] dark:text-[#A5A5A5]">
+                          <span className="text-[#64748B] dark:text-[#9AA4B8]">
                             {(Number(tx.amountMinor) / 100).toFixed(2)} {tx.currency}
                           </span>
                           <span
@@ -1150,20 +1150,20 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
 
             {/* Digital Acceptance Audit Trail */}
             {detailedContract.acceptances && detailedContract.acceptances.length > 0 && (
-              <div className="space-y-2 pt-2 border-t border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)] text-xs">
-                <span className="font-semibold text-[#64748B] dark:text-[#777777] uppercase tracking-wider text-[10px]">
+              <div className="space-y-2 pt-2 border-t border-[#E2E8F0] dark:border-[#272B38] text-xs">
+                <span className="font-semibold text-[#64748B] dark:text-[#9AA4B8] uppercase tracking-wider text-[10px]">
                   Digital Acceptance Audit Trail
                 </span>
                 <div className="space-y-1">
                   {detailedContract.acceptances.map((acc) => (
                     <div
                       key={acc.id}
-                      className="p-2.5 rounded-lg bg-[#F8FAFC] dark:bg-[#202020] border border-[#E2E8F0] dark:border-[rgba(205,203,202,0.18)] flex items-center justify-between font-mono"
+                      className="p-2.5 rounded-lg bg-[#F8FAFC] dark:bg-[#191D2A] border border-[#E2E8F0] dark:border-[#272B38] flex items-center justify-between font-mono"
                     >
                       <span className="text-emerald-600 dark:text-emerald-400 font-medium">
                         ✓ {acc.role}: {acc.user?.firstName || ''} {acc.user?.lastName || ''} ({acc.user?.email})
                       </span>
-                      <span className="text-[#64748B] dark:text-[#777777] text-[10px]">
+                      <span className="text-[#64748B] dark:text-[#9AA4B8] text-[10px]">
                         Method: {acc.acceptanceMethod} • {new Date(acc.acceptedAt).toLocaleString()}
                       </span>
                     </div>
@@ -1178,7 +1178,7 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
       {/* CLIENT STAMP APPLICATION MODAL */}
       {showStampModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm w-full max-w-lg rounded-2xl p-6 space-y-4 shadow-2xl relative">
+          <div className="dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-slate-200 shadow-sm w-full max-w-lg rounded-2xl p-6 space-y-4 shadow-2xl relative">
             <button
               onClick={() => setShowStampModal(false)}
               className="absolute top-4 right-4 dark:text-zinc-400 text-slate-500 hover:dark:text-white hover:text-slate-900 p-1 rounded-lg hover:dark:bg-zinc-800 hover:bg-slate-100"
@@ -1187,7 +1187,7 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
             </button>
 
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl dark:bg-[#8BFF24]/10 bg-[#EEF2FF] border dark:border-[#8BFF24]/30 border-[#C7D2FE] flex items-center justify-center dark:text-[#8BFF24] text-[#5046E5]">
+              <div className="w-10 h-10 rounded-xl dark:bg-[#1C2740] bg-[#EEF2FF] border dark:border-[#1F61EF]/30 border-[#C7D2FE] flex items-center justify-center dark:text-[#8FB5FF] text-[#5046E5]">
                 <Stamp className="w-5 h-5" />
               </div>
               <div>
@@ -1211,8 +1211,8 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
                     onClick={() => setStampPosition(pos.id as any)}
                     className={`p-2.5 rounded-xl border text-center font-medium transition ${
                       stampPosition === pos.id
-                        ? 'dark:bg-[#8BFF24]/10 bg-[#EEF2FF] dark:border-[#8BFF24] border-[#5046E5] dark:text-white text-[#5046E5] shadow-sm'
-                        : 'dark:bg-[#181a18] bg-slate-50 dark:border-[#262926] border-slate-200 dark:text-zinc-400 text-slate-600 hover:dark:text-white hover:text-slate-900'
+                        ? 'dark:bg-[#1C2740] bg-[#EEF2FF] dark:border-[#1F61EF] border-[#5046E5] dark:text-white text-[#5046E5] shadow-sm'
+                        : 'dark:bg-[#191B25] bg-slate-50 dark:border-[#272B38] border-slate-200 dark:text-zinc-400 text-slate-600 hover:dark:text-white hover:text-slate-900'
                     }`}
                   >
                     {pos.label}
@@ -1221,7 +1221,7 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
               </div>
             </div>
 
-            <div className="p-3.5 dark:bg-[#181a18] bg-slate-50 rounded-xl border dark:border-[#262926] border-slate-200 text-xs dark:text-zinc-400 text-slate-500 space-y-1.5">
+            <div className="p-3.5 dark:bg-[#191B25] bg-slate-50 rounded-xl border dark:border-[#272B38] border-slate-200 text-xs dark:text-zinc-400 text-slate-500 space-y-1.5">
               <div className="flex justify-between dark:text-zinc-300 text-slate-700">
                 <span>Signer:</span>
                 <span className="font-semibold dark:text-white text-slate-900">Authenticated Client</span>
@@ -1230,12 +1230,12 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
                 <span>Timestamp:</span>
                 <span className="font-mono text-emerald-400">Server Live UTC</span>
               </div>
-              <p className="text-[11px] text-zinc-500 pt-1 border-t dark:border-[#262926] border-slate-200">
+              <p className="text-[11px] text-zinc-500 pt-1 border-t dark:border-[#272B38] border-slate-200">
                 The stamp contains TRUSTPAY watermark, Client name, verified mobile, and server date. Embedded directly into the final PDF.
               </p>
             </div>
 
-            <div className="flex justify-end gap-2.5 pt-2 border-t dark:border-[#262926] border-slate-200">
+            <div className="flex justify-end gap-2.5 pt-2 border-t dark:border-[#272B38] border-slate-200">
               <button
                 type="button"
                 onClick={() => setShowStampModal(false)}
@@ -1247,7 +1247,7 @@ export const ContractDetailModal: React.FC<ContractDetailModalProps> = ({
                 type="button"
                 onClick={handleApplyStampFromModal}
                 disabled={isApplyingStamp}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl dark:bg-[#8BFF24] bg-[#5046E5] hover:dark:bg-[#78e018] hover:bg-[#4338CA] dark:text-black text-white shadow-md shadow-[#5046E5]/25 text-xs font-bold transition disabled:opacity-50"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl dark:bg-[#1F61EF] bg-[#5046E5] hover:dark:bg-[#78e018] hover:bg-[#4338CA] dark:text-black text-white shadow-md shadow-[#5046E5]/25 text-xs font-bold transition disabled:opacity-50"
               >
                 <Stamp className="w-3.5 h-3.5" />
                 <span>{isApplyingStamp ? 'Applying Stamp...' : 'Confirm & Apply Stamp'}</span>

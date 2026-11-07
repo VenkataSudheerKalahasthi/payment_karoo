@@ -60,17 +60,17 @@ export const PaymentCallbackPage: React.FC = () => {
   }, [orderId]);
 
   return (
-    <div className="min-h-screen dark:bg-[#080808] bg-[#F5F7FA] dark:text-[#CDCBCA] text-[#242424] flex flex-col justify-center items-center p-4 transition-colors">
-      <div className="w-full max-w-md dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl shadow-xl overflow-hidden">
+    <div className="min-h-screen dark:bg-[#0B0D14] bg-[#F5F7FA] dark:text-[#E8ECF5] text-[#242424] flex flex-col justify-center items-center p-4 transition-colors">
+      <div className="w-full max-w-md dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-2xl shadow-xl overflow-hidden">
         {/* Header */}
-        <div className="p-6 border-b dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] dark:bg-[#202020]/40 bg-[#F8FAFC] flex items-center justify-between">
+        <div className="p-6 border-b dark:border-[#272B38] border-[#E2E8F0] dark:bg-[#191D2A]/40 bg-[#F8FAFC] flex items-center justify-between">
           <div className="flex items-center space-x-2.5">
             <div className="w-9 h-9 rounded-xl bg-[#2563EB]/10 border border-[#2563EB]/20 flex items-center justify-center text-[#2563EB]">
               <CreditCard className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-sm font-bold dark:text-[#CDCBCA] text-[#242424]">Cashfree Payment Checkout</h2>
-              <span className="text-[10px] dark:text-[#777777] text-[#64748B] font-mono">SANDBOX VERIFICATION GATEWAY</span>
+              <h2 className="text-sm font-bold dark:text-[#E8ECF5] text-[#242424]">Cashfree Payment Checkout</h2>
+              <span className="text-[10px] dark:text-[#9AA4B8] text-[#64748B] font-mono">SANDBOX VERIFICATION GATEWAY</span>
             </div>
           </div>
           <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/10 text-amber-500 border border-amber-500/20">
@@ -84,8 +84,8 @@ export const PaymentCallbackPage: React.FC = () => {
             <div className="py-8 text-center space-y-3">
               <RefreshCw className="w-8 h-8 text-[#2563EB] animate-spin mx-auto" />
               <div className="space-y-1">
-                <p className="text-sm font-semibold dark:text-[#CDCBCA] text-[#242424]">Verifying Payment in Sandbox</p>
-                <p className="text-xs dark:text-[#A5A5A5] text-[#475569]">
+                <p className="text-sm font-semibold dark:text-[#E8ECF5] text-[#242424]">Verifying Payment in Sandbox</p>
+                <p className="text-xs dark:text-[#9AA4B8] text-[#475569]">
                   Querying authoritative Cashfree order status for Order #{orderId}...
                 </p>
               </div>
@@ -98,13 +98,13 @@ export const PaymentCallbackPage: React.FC = () => {
                 <AlertCircle className="w-6 h-6" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-base font-bold dark:text-[#CDCBCA] text-[#242424]">Verification Error</h3>
+                <h3 className="text-base font-bold dark:text-[#E8ECF5] text-[#242424]">Verification Error</h3>
                 <p className="text-xs text-red-500">{errorMessage}</p>
               </div>
               {orderId && (
                 <button
                   onClick={() => verifyOrder(orderId)}
-                  className="px-4 py-2 rounded-lg dark:bg-[#202020] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] text-xs font-semibold dark:text-[#CDCBCA] text-[#242424] transition border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]"
+                  className="px-4 py-2 rounded-lg dark:bg-[#191D2A] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] text-xs font-semibold dark:text-[#E8ECF5] text-[#242424] transition border dark:border-[#272B38] border-[#E2E8F0]"
                 >
                   Retry Verification
                 </button>
@@ -120,7 +120,7 @@ export const PaymentCallbackPage: React.FC = () => {
                     <CheckCircle className="w-8 h-8" />
                   </div>
                   <div className="space-y-1">
-                    <h3 className="text-base font-bold dark:text-[#CDCBCA] text-[#242424]">Payment Verified in Sandbox</h3>
+                    <h3 className="text-base font-bold dark:text-[#E8ECF5] text-[#242424]">Payment Verified in Sandbox</h3>
                     <p className="text-xs text-emerald-600 dark:text-emerald-400">
                       Cashfree test order was completed successfully.
                     </p>
@@ -134,7 +134,7 @@ export const PaymentCallbackPage: React.FC = () => {
                     <Clock className="w-8 h-8" />
                   </div>
                   <div className="space-y-1">
-                    <h3 className="text-base font-bold dark:text-[#CDCBCA] text-[#242424]">Payment Still Processing</h3>
+                    <h3 className="text-base font-bold dark:text-[#E8ECF5] text-[#242424]">Payment Still Processing</h3>
                     <p className="text-xs text-amber-600 dark:text-amber-400">
                       Cashfree Sandbox reports order is active and awaiting test completion.
                     </p>
@@ -148,7 +148,7 @@ export const PaymentCallbackPage: React.FC = () => {
                     <AlertCircle className="w-8 h-8" />
                   </div>
                   <div className="space-y-1">
-                    <h3 className="text-base font-bold dark:text-[#CDCBCA] text-[#242424]">Payment Incomplete or Expired</h3>
+                    <h3 className="text-base font-bold dark:text-[#E8ECF5] text-[#242424]">Payment Incomplete or Expired</h3>
                     <p className="text-xs text-red-500">
                       {result.failureReason || 'The payment was not completed on Cashfree Sandbox.'}
                     </p>
@@ -157,24 +157,24 @@ export const PaymentCallbackPage: React.FC = () => {
               )}
 
               {/* Order Metadata Details */}
-              <div className="p-4 rounded-xl dark:bg-[#080808] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] space-y-2 text-xs font-mono">
-                <div className="flex justify-between items-center dark:text-[#777777] text-[#64748B]">
+              <div className="p-4 rounded-xl dark:bg-[#0B0D14] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] space-y-2 text-xs font-mono">
+                <div className="flex justify-between items-center dark:text-[#9AA4B8] text-[#64748B]">
                   <span>Order Reference:</span>
-                  <span className="dark:text-[#CDCBCA] text-[#242424] font-semibold">{result.orderId}</span>
+                  <span className="dark:text-[#E8ECF5] text-[#242424] font-semibold">{result.orderId}</span>
                 </div>
                 {result.cfOrderId && (
-                  <div className="flex justify-between items-center dark:text-[#777777] text-[#64748B]">
+                  <div className="flex justify-between items-center dark:text-[#9AA4B8] text-[#64748B]">
                     <span>Cashfree CF ID:</span>
                     <span className="text-[#2563EB]">{result.cfOrderId}</span>
                   </div>
                 )}
-                <div className="flex justify-between items-center dark:text-[#777777] text-[#64748B]">
+                <div className="flex justify-between items-center dark:text-[#9AA4B8] text-[#64748B]">
                   <span>Simulated Amount:</span>
                   <span className="text-emerald-500 font-bold tabular-nums">
                     {result.amount.toFixed(2)} {result.currency}
                   </span>
                 </div>
-                <div className="flex justify-between items-center dark:text-[#777777] text-[#64748B]">
+                <div className="flex justify-between items-center dark:text-[#9AA4B8] text-[#64748B]">
                   <span>TrustPay Status:</span>
                   <span
                     className={`px-2 py-0.5 rounded text-[10px] font-bold ${
@@ -191,7 +191,7 @@ export const PaymentCallbackPage: React.FC = () => {
               </div>
 
               {/* Security Invariant Notice */}
-              <div className="p-3 rounded-lg dark:bg-[#202020] bg-[#EFF6FF] border dark:border-[rgba(205,203,202,0.18)] border-[#2563EB]/20 text-[11px] dark:text-[#A5A5A5] text-[#475569] flex items-start space-x-2">
+              <div className="p-3 rounded-lg dark:bg-[#191D2A] bg-[#EFF6FF] border dark:border-[#272B38] border-[#2563EB]/20 text-[11px] dark:text-[#9AA4B8] text-[#475569] flex items-start space-x-2">
                 <ShieldCheck className="w-4 h-4 text-[#2563EB] shrink-0 mt-0.5" />
                 <span>
                   <strong>Financial Isolation Guarantee:</strong> This transaction executed in sandbox test mode. No live money was debited from cards or bank accounts, and no production ledger movements occurred.

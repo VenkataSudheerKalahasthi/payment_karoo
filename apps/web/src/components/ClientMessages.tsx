@@ -350,16 +350,16 @@ export const ClientMessages: React.FC<ClientMessagesProps> = ({
   return (
     <div className="space-y-4">
       {/* WhatsApp Container Box */}
-      <div className="h-[750px] flex rounded-2xl overflow-hidden border dark:border-[#262926] border-slate-200 dark:bg-[#0c0d0c] bg-white shadow-xl">
+      <div className="h-[750px] flex rounded-2xl overflow-hidden border dark:border-[#272B38] border-slate-200 dark:bg-[#0c0d0c] bg-white shadow-xl">
         
         {/* ========================================================================= */}
         {/* LEFT PANEL: WhatsApp Chat List & Search */}
         {/* ========================================================================= */}
-        <div className="w-full sm:w-80 md:w-96 flex flex-col border-r dark:border-[#262926] border-slate-200 dark:bg-[#111311] bg-[#F8FAFC]">
+        <div className="w-full sm:w-80 md:w-96 flex flex-col border-r dark:border-[#272B38] border-slate-200 dark:bg-[#111311] bg-[#F8FAFC]">
           {/* Header */}
-          <div className="p-4 border-b dark:border-[#262926] border-slate-200 flex items-center justify-between dark:bg-[#151715] bg-white">
+          <div className="p-4 border-b dark:border-[#272B38] border-slate-200 flex items-center justify-between dark:bg-[#191B25] bg-white">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-full dark:bg-[#8BFF24]/10 bg-[#EEF2FF] border dark:border-[#8BFF24]/30 border-[#C7D2FE] flex items-center justify-center font-bold text-xs dark:text-[#8BFF24] text-[#5046E5]">
+              <div className="w-9 h-9 rounded-full dark:bg-[#1C2740] bg-[#EEF2FF] border dark:border-[#1F61EF]/30 border-[#C7D2FE] flex items-center justify-center font-bold text-xs dark:text-[#8FB5FF] text-[#5046E5]">
                 <MessageSquare className="w-4 h-4" />
               </div>
               <div>
@@ -376,7 +376,7 @@ export const ClientMessages: React.FC<ClientMessagesProps> = ({
                   fetchSpecialistsForNewChat();
                   setShowNewChatModal(true);
                 }}
-                className="p-2 rounded-xl dark:bg-[#202220] bg-slate-100 hover:dark:bg-[#282a28] hover:bg-slate-200 dark:text-[#8BFF24] text-[#5046E5] transition"
+                className="p-2 rounded-xl dark:bg-[#191D2A] bg-slate-100 hover:dark:bg-[#282a28] hover:bg-slate-200 dark:text-[#8FB5FF] text-[#5046E5] transition"
                 title="Start New Chat with Specialist"
               >
                 <Plus className="w-4 h-4" />
@@ -384,7 +384,7 @@ export const ClientMessages: React.FC<ClientMessagesProps> = ({
               <button
                 onClick={() => fetchConversations()}
                 disabled={loading}
-                className="p-2 rounded-xl dark:bg-[#202220] bg-slate-100 hover:dark:bg-[#282a28] hover:bg-slate-200 text-slate-500 dark:text-zinc-400 transition"
+                className="p-2 rounded-xl dark:bg-[#191D2A] bg-slate-100 hover:dark:bg-[#282a28] hover:bg-slate-200 text-slate-500 dark:text-zinc-400 transition"
                 title="Refresh Chats"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
@@ -393,7 +393,7 @@ export const ClientMessages: React.FC<ClientMessagesProps> = ({
           </div>
 
           {/* Search Bar */}
-          <div className="p-3 border-b dark:border-[#262926] border-slate-200">
+          <div className="p-3 border-b dark:border-[#272B38] border-slate-200">
             <div className="relative">
               <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
@@ -401,7 +401,7 @@ export const ClientMessages: React.FC<ClientMessagesProps> = ({
                 placeholder="Search or start new chat..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 rounded-xl text-xs dark:bg-[#1a1c1a] bg-white border dark:border-[#262926] border-slate-300 dark:text-white text-slate-900 placeholder:text-slate-400 focus:outline-none dark:focus:border-[#8BFF24]/60 focus:border-[#5046E5]"
+                className="w-full pl-8 pr-3 py-1.5 rounded-xl text-xs dark:bg-[#1a1c1a] bg-white border dark:border-[#272B38] border-slate-300 dark:text-white text-slate-900 placeholder:text-slate-400 focus:outline-none dark:focus:border-[#1F61EF]/60 focus:border-[#5046E5]"
               />
             </div>
           </div>
@@ -410,7 +410,7 @@ export const ClientMessages: React.FC<ClientMessagesProps> = ({
           <div className="flex-1 overflow-y-auto divide-y dark:divide-[#1c1f1c] divide-slate-100">
             {loading ? (
               <div className="p-8 text-center flex flex-col items-center justify-center space-y-2">
-                <RefreshCw className="w-6 h-6 dark:text-[#8BFF24] text-[#5046E5] animate-spin" />
+                <RefreshCw className="w-6 h-6 dark:text-[#8FB5FF] text-[#5046E5] animate-spin" />
                 <p className="text-xs dark:text-zinc-400 text-slate-500">Loading chats...</p>
               </div>
             ) : filteredConversations.length === 0 ? (
@@ -425,7 +425,7 @@ export const ClientMessages: React.FC<ClientMessagesProps> = ({
                     fetchSpecialistsForNewChat();
                     setShowNewChatModal(true);
                   }}
-                  className="mt-2 px-3 py-1.5 rounded-lg text-xs font-bold dark:bg-[#8BFF24] bg-[#5046E5] dark:text-black text-white"
+                  className="mt-2 px-3 py-1.5 rounded-lg text-xs font-bold dark:bg-[#1F61EF] bg-[#5046E5] dark:text-black text-white"
                 >
                   Start New Chat
                 </button>
@@ -446,13 +446,13 @@ export const ClientMessages: React.FC<ClientMessagesProps> = ({
                     onClick={() => setActiveConversation(conv)}
                     className={`w-full p-3.5 flex items-start gap-3 transition text-left cursor-pointer ${
                       isSelected
-                        ? 'dark:bg-[#1a2e1a] bg-[#EEF2FF] border-l-4 dark:border-[#8BFF24] border-[#5046E5]'
+                        ? 'dark:bg-[#1a2e1a] bg-[#EEF2FF] border-l-4 dark:border-[#1F61EF] border-[#5046E5]'
                         : 'dark:hover:bg-[#161816] hover:bg-slate-100'
                     }`}
                   >
                     {/* Avatar with Online Dot */}
                     <div className="relative shrink-0">
-                      <div className="w-10 h-10 rounded-full dark:bg-[#202220] bg-slate-200 flex items-center justify-center font-bold text-xs dark:text-[#8BFF24] text-[#5046E5] overflow-hidden border dark:border-[#2e322e] border-slate-300">
+                      <div className="w-10 h-10 rounded-full dark:bg-[#191D2A] bg-slate-200 flex items-center justify-center font-bold text-xs dark:text-[#8FB5FF] text-[#5046E5] overflow-hidden border dark:border-[#272B38] border-slate-300">
                         {recipient?.avatarUrl ? (
                           <img src={recipient.avatarUrl} alt="" className="w-full h-full object-cover" />
                         ) : (
@@ -490,7 +490,7 @@ export const ClientMessages: React.FC<ClientMessagesProps> = ({
                       </div>
 
                       {conv.contract && (
-                        <div className="mt-1 flex items-center gap-1 text-[10px] font-mono px-1.5 py-0.5 rounded dark:bg-[#202220] bg-slate-200/60 dark:text-zinc-300 text-slate-700 w-fit">
+                        <div className="mt-1 flex items-center gap-1 text-[10px] font-mono px-1.5 py-0.5 rounded dark:bg-[#191D2A] bg-slate-200/60 dark:text-zinc-300 text-slate-700 w-fit">
                           <FileText className="w-2.5 h-2.5" />
                           <span className="truncate max-w-[150px]">{conv.contract.title}</span>
                         </div>
@@ -517,10 +517,10 @@ export const ClientMessages: React.FC<ClientMessagesProps> = ({
                   : 'Specialist Counterparty';
 
                 return (
-                  <div className="p-3.5 px-5 border-b dark:border-[#262926] border-slate-200 dark:bg-[#151715] bg-white flex items-center justify-between z-10 shadow-sm">
+                  <div className="p-3.5 px-5 border-b dark:border-[#272B38] border-slate-200 dark:bg-[#191B25] bg-white flex items-center justify-between z-10 shadow-sm">
                     <div className="flex items-center gap-3">
                       <div className="relative">
-                        <div className="w-10 h-10 rounded-full dark:bg-[#202220] bg-slate-200 flex items-center justify-center font-bold text-xs dark:text-[#8BFF24] text-[#5046E5] overflow-hidden border dark:border-[#2e322e] border-slate-300">
+                        <div className="w-10 h-10 rounded-full dark:bg-[#191D2A] bg-slate-200 flex items-center justify-center font-bold text-xs dark:text-[#8FB5FF] text-[#5046E5] overflow-hidden border dark:border-[#272B38] border-slate-300">
                           {recipient?.avatarUrl ? (
                             <img src={recipient.avatarUrl} alt="" className="w-full h-full object-cover" />
                           ) : (
@@ -533,7 +533,7 @@ export const ClientMessages: React.FC<ClientMessagesProps> = ({
                       <div>
                         <div className="flex items-center gap-2">
                           <h3 className="text-sm font-bold dark:text-white text-slate-900">{recipientName}</h3>
-                          <span className="text-[10px] font-mono px-2 py-0.2 rounded-full dark:bg-[#8BFF24]/10 bg-[#EEF2FF] dark:text-[#8BFF24] text-[#5046E5]">
+                          <span className="text-[10px] font-mono px-2 py-0.2 rounded-full dark:bg-[#1C2740] bg-[#EEF2FF] dark:text-[#8FB5FF] text-[#5046E5]">
                             {recipient?.role?.name === 'WORKER' ? 'Specialist' : 'Client'}
                           </span>
                         </div>
@@ -546,8 +546,8 @@ export const ClientMessages: React.FC<ClientMessagesProps> = ({
 
                     {/* Linked Contract pill if any */}
                     {activeConversation.contract && (
-                      <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl dark:bg-[#181a18] bg-slate-100 border dark:border-[#262926] border-slate-200 text-xs">
-                        <FileText className="w-3.5 h-3.5 dark:text-[#8BFF24] text-[#5046E5]" />
+                      <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl dark:bg-[#191B25] bg-slate-100 border dark:border-[#272B38] border-slate-200 text-xs">
+                        <FileText className="w-3.5 h-3.5 dark:text-[#8FB5FF] text-[#5046E5]" />
                         <span className="font-semibold dark:text-white text-slate-900 truncate max-w-[200px]">
                           {activeConversation.contract.title}
                         </span>
@@ -561,11 +561,11 @@ export const ClientMessages: React.FC<ClientMessagesProps> = ({
               })()}
 
               {/* Chat Messages Body (WhatsApp Bubbles) */}
-              <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3 dark:bg-[#080908] bg-[#E5DDD5]/30">
+              <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3 dark:bg-[#0B0D14] bg-[#E5DDD5]/30">
                 {/* Security encryption banner */}
                 <div className="flex justify-center my-2">
-                  <div className="px-3 py-1 rounded-lg dark:bg-[#181a18]/80 bg-white/80 border dark:border-[#262926] border-slate-200 text-[10px] dark:text-zinc-400 text-slate-500 flex items-center gap-1.5 shadow-sm">
-                    <ShieldCheck className="w-3.5 h-3.5 dark:text-[#8BFF24] text-[#5046E5]" />
+                  <div className="px-3 py-1 rounded-lg dark:bg-[#191B25]/80 bg-white/80 border dark:border-[#272B38] border-slate-200 text-[10px] dark:text-zinc-400 text-slate-500 flex items-center gap-1.5 shadow-sm">
+                    <ShieldCheck className="w-3.5 h-3.5 dark:text-[#8FB5FF] text-[#5046E5]" />
                     <span>Messages and shared files are protected with cryptographic ledger identity.</span>
                   </div>
                 </div>
@@ -588,7 +588,7 @@ export const ClientMessages: React.FC<ClientMessagesProps> = ({
                           className={`max-w-[85%] sm:max-w-[70%] rounded-2xl p-3 shadow-sm ${
                             isMe
                               ? 'dark:bg-[#005c4b] bg-[#5046E5] text-white rounded-tr-none'
-                              : 'dark:bg-[#1a1c1a] bg-white dark:text-white text-slate-900 border dark:border-[#262926] border-slate-200 rounded-tl-none'
+                              : 'dark:bg-[#1a1c1a] bg-white dark:text-white text-slate-900 border dark:border-[#272B38] border-slate-200 rounded-tl-none'
                           }`}
                         >
                           {/* Attached Image if present */}
@@ -636,12 +636,12 @@ export const ClientMessages: React.FC<ClientMessagesProps> = ({
 
               {/* Image Preview Floating Bar (Before Sending) */}
               {previewImageUrl && (
-                <div className="p-3 border-t dark:border-[#262926] border-slate-200 dark:bg-[#151715] bg-white flex items-center justify-between">
+                <div className="p-3 border-t dark:border-[#272B38] border-slate-200 dark:bg-[#191B25] bg-white flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <img
                       src={previewImageUrl}
                       alt="Selected attachment"
-                      className="w-14 h-14 object-cover rounded-xl border dark:border-[#8BFF24]/40 border-[#5046E5]"
+                      className="w-14 h-14 object-cover rounded-xl border dark:border-[#1F61EF]/40 border-[#5046E5]"
                     />
                     <div>
                       <p className="text-xs font-bold dark:text-white text-slate-900">Image Attached</p>
@@ -662,7 +662,7 @@ export const ClientMessages: React.FC<ClientMessagesProps> = ({
               {/* WhatsApp Message Input Bar */}
               <form
                 onSubmit={handleSendMessage}
-                className="p-3 sm:p-4 border-t dark:border-[#262926] border-slate-200 dark:bg-[#121412] bg-white flex items-end gap-2"
+                className="p-3 sm:p-4 border-t dark:border-[#272B38] border-slate-200 dark:bg-[#191B25] bg-white flex items-end gap-2"
               >
                 {/* Hidden File Input */}
                 <input
@@ -676,14 +676,14 @@ export const ClientMessages: React.FC<ClientMessagesProps> = ({
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="p-2.5 rounded-full hover:dark:bg-[#202220] hover:bg-slate-100 text-slate-500 dark:text-zinc-400 transition"
+                  className="p-2.5 rounded-full hover:dark:bg-[#191D2A] hover:bg-slate-100 text-slate-500 dark:text-zinc-400 transition"
                   title="Attach Photo / Image"
                 >
                   <Paperclip className="w-5 h-5" />
                 </button>
 
                 {/* Textarea Input */}
-                <div className="flex-1 rounded-2xl dark:bg-[#1a1c1a] bg-slate-100 border dark:border-[#262926] border-slate-300 focus-within:dark:border-[#8BFF24]/60 focus-within:border-[#5046E5] p-2 px-3 transition">
+                <div className="flex-1 rounded-2xl dark:bg-[#1a1c1a] bg-slate-100 border dark:border-[#272B38] border-slate-300 focus-within:dark:border-[#1F61EF]/60 focus-within:border-[#5046E5] p-2 px-3 transition">
                   <textarea
                     rows={1}
                     value={inputText}
@@ -697,7 +697,7 @@ export const ClientMessages: React.FC<ClientMessagesProps> = ({
                 <button
                   type="submit"
                   disabled={(!inputText.trim() && !selectedImage) || sending}
-                  className="p-2.5 rounded-full dark:bg-[#8BFF24] bg-[#5046E5] hover:opacity-90 dark:text-black text-white font-bold transition disabled:opacity-40 disabled:cursor-not-allowed shadow-md shadow-[#5046E5]/25"
+                  className="p-2.5 rounded-full dark:bg-[#1F61EF] bg-[#5046E5] hover:opacity-90 dark:text-black text-white font-bold transition disabled:opacity-40 disabled:cursor-not-allowed shadow-md shadow-[#5046E5]/25"
                   title="Send Message"
                 >
                   <Send className="w-4 h-4" />
@@ -707,8 +707,8 @@ export const ClientMessages: React.FC<ClientMessagesProps> = ({
           ) : (
             /* Empty State (WhatsApp Web style) */
             <div className="flex-1 flex flex-col items-center justify-center p-8 text-center space-y-4">
-              <div className="w-16 h-16 rounded-full dark:bg-[#8BFF24]/10 bg-[#EEF2FF] border dark:border-[#8BFF24]/30 border-[#C7D2FE] flex items-center justify-center">
-                <MessageSquare className="w-8 h-8 dark:text-[#8BFF24] text-[#5046E5]" />
+              <div className="w-16 h-16 rounded-full dark:bg-[#1C2740] bg-[#EEF2FF] border dark:border-[#1F61EF]/30 border-[#C7D2FE] flex items-center justify-center">
+                <MessageSquare className="w-8 h-8 dark:text-[#8FB5FF] text-[#5046E5]" />
               </div>
               <div className="max-w-md">
                 <h3 className="text-lg font-bold dark:text-white text-slate-900">
@@ -723,7 +723,7 @@ export const ClientMessages: React.FC<ClientMessagesProps> = ({
                   fetchSpecialistsForNewChat();
                   setShowNewChatModal(true);
                 }}
-                className="px-4 py-2 rounded-xl dark:bg-[#8BFF24] bg-[#5046E5] dark:text-black text-white text-xs font-bold transition"
+                className="px-4 py-2 rounded-xl dark:bg-[#1F61EF] bg-[#5046E5] dark:text-black text-white text-xs font-bold transition"
               >
                 Start New Conversation
               </button>
@@ -761,10 +761,10 @@ export const ClientMessages: React.FC<ClientMessagesProps> = ({
       {/* ========================================================================= */}
       {showNewChatModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="w-full max-w-md dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 rounded-2xl p-6 shadow-2xl space-y-4 max-h-[80vh] flex flex-col">
-            <div className="flex items-center justify-between border-b dark:border-[#262926] border-slate-200 pb-3">
+          <div className="w-full max-w-md dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-slate-200 rounded-2xl p-6 shadow-2xl space-y-4 max-h-[80vh] flex flex-col">
+            <div className="flex items-center justify-between border-b dark:border-[#272B38] border-slate-200 pb-3">
               <div className="flex items-center gap-2">
-                <MessageSquare className="w-4 h-4 dark:text-[#8BFF24] text-[#5046E5]" />
+                <MessageSquare className="w-4 h-4 dark:text-[#8FB5FF] text-[#5046E5]" />
                 <h3 className="text-sm font-bold dark:text-white text-slate-900">Start New Chat</h3>
               </div>
               <button
@@ -782,14 +782,14 @@ export const ClientMessages: React.FC<ClientMessagesProps> = ({
                 placeholder="Search specialist by name or headline..."
                 value={newChatSearch}
                 onChange={(e) => setNewChatSearch(e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 rounded-xl text-xs dark:bg-[#1a1c1a] bg-slate-50 border dark:border-[#262926] border-slate-300 dark:text-white text-slate-900 focus:outline-none"
+                className="w-full pl-8 pr-3 py-1.5 rounded-xl text-xs dark:bg-[#1a1c1a] bg-slate-50 border dark:border-[#272B38] border-slate-300 dark:text-white text-slate-900 focus:outline-none"
               />
             </div>
 
             <div className="flex-1 overflow-y-auto divide-y dark:divide-[#1c1f1c] divide-slate-100 pr-1">
               {loadingSpecialists ? (
                 <div className="p-8 text-center text-xs dark:text-zinc-400 text-slate-500">
-                  <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 dark:text-[#8BFF24] text-[#5046E5]" />
+                  <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 dark:text-[#8FB5FF] text-[#5046E5]" />
                   Loading specialists...
                 </div>
               ) : specialistsList.length === 0 ? (
@@ -814,10 +814,10 @@ export const ClientMessages: React.FC<ClientMessagesProps> = ({
                       <button
                         key={worker.userId}
                         onClick={() => initConversationWithUser(worker.userId)}
-                        className="w-full p-2.5 flex items-center justify-between hover:dark:bg-[#181a18] hover:bg-slate-50 rounded-xl transition text-left cursor-pointer"
+                        className="w-full p-2.5 flex items-center justify-between hover:dark:bg-[#191B25] hover:bg-slate-50 rounded-xl transition text-left cursor-pointer"
                       >
                         <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-full dark:bg-[#202220] bg-slate-200 flex items-center justify-center font-bold text-xs dark:text-[#8BFF24] text-[#5046E5] overflow-hidden">
+                          <div className="w-8 h-8 rounded-full dark:bg-[#191D2A] bg-slate-200 flex items-center justify-center font-bold text-xs dark:text-[#8FB5FF] text-[#5046E5] overflow-hidden">
                             {worker.user?.avatarUrl ? (
                               <img src={worker.user.avatarUrl} alt="" className="w-full h-full object-cover" />
                             ) : (
@@ -832,7 +832,7 @@ export const ClientMessages: React.FC<ClientMessagesProps> = ({
                           </div>
                         </div>
 
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg dark:bg-[#8BFF24]/10 bg-[#EEF2FF] dark:text-[#8BFF24] text-[#5046E5]">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg dark:bg-[#1C2740] bg-[#EEF2FF] dark:text-[#8FB5FF] text-[#5046E5]">
                           Chat
                         </span>
                       </button>

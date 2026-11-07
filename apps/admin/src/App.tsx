@@ -307,9 +307,9 @@ export const App: React.FC = () => {
   });
 
   return (
-    <div className="min-h-screen dark:bg-[#080808] bg-[#F5F7FA] font-sans antialiased flex flex-col dark:text-[#CDCBCA] text-[#242424] transition-colors duration-200">
+    <div className="min-h-screen dark:bg-[#0B0D14] bg-[#F5F7FA] font-sans antialiased flex flex-col dark:text-[#E8ECF5] text-[#242424] transition-colors duration-200">
       {/* Top Administrative Header */}
-      <header className="sticky top-0 z-40 dark:bg-[#080808]/90 bg-white/90 backdrop-blur-md border-b dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm">
+      <header className="sticky top-0 z-40 dark:bg-[#0B0D14]/90 bg-white/90 backdrop-blur-md border-b dark:border-[#272B38] border-[#E2E8F0] shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-xl bg-[#2563EB]/10 border border-[#2563EB]/20 flex items-center justify-center text-[#2563EB]">
@@ -317,14 +317,14 @@ export const App: React.FC = () => {
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <span className="font-bold text-lg tracking-tight dark:text-[#CDCBCA] text-[#242424]">
+                <span className="font-bold text-lg tracking-tight dark:text-[#E8ECF5] text-[#242424]">
                   TrustPay Admin
                 </span>
                 <span className="text-[11px] px-2.5 py-0.5 rounded-full font-mono bg-[#2563EB]/10 text-[#2563EB] border border-[#2563EB]/20 font-semibold">
                   Enterprise Governance
                 </span>
               </div>
-              <span className="text-[11px] dark:text-[#777777] text-[#64748B]">
+              <span className="text-[11px] dark:text-[#9AA4B8] text-[#64748B]">
                 Administrative Oversight &amp; Audit Console
               </span>
             </div>
@@ -333,8 +333,8 @@ export const App: React.FC = () => {
           <div className="flex items-center space-x-3">
             {currentUser && (
               <div className="hidden sm:flex items-center space-x-2 text-xs">
-                <span className="dark:text-[#777777] text-[#64748B]">Signed in:</span>
-                <span className="font-semibold dark:text-[#CDCBCA] text-[#242424]">
+                <span className="dark:text-[#9AA4B8] text-[#64748B]">Signed in:</span>
+                <span className="font-semibold dark:text-[#E8ECF5] text-[#242424]">
                   {currentUser.firstName ? `${currentUser.firstName} ${currentUser.lastName || ''}` : currentUser.email}
                 </span>
                 <span
@@ -352,7 +352,7 @@ export const App: React.FC = () => {
             <button
               onClick={fetchStatus}
               disabled={isRefreshing}
-              className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl dark:bg-[#171717] bg-[#F1F5F9] hover:dark:bg-[#202020] hover:bg-[#E2E8F0] text-xs font-semibold dark:text-[#CDCBCA] text-[#242424] transition border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm"
+              className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl dark:bg-[#191B25] bg-[#F1F5F9] hover:dark:bg-[#191D2A] hover:bg-[#E2E8F0] text-xs font-semibold dark:text-[#E8ECF5] text-[#242424] transition border dark:border-[#272B38] border-[#E2E8F0] shadow-sm"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-[#2563EB]' : ''}`} />
               <span>Verify Cluster</span>
@@ -390,7 +390,7 @@ export const App: React.FC = () => {
               <CheckCircle2 className="w-4 h-4 shrink-0" />
               <span>{actionMessage}</span>
             </div>
-            <button onClick={() => setActionMessage(null)} className="dark:text-[#777777] text-[#64748B] hover:dark:text-white hover:text-black">
+            <button onClick={() => setActionMessage(null)} className="dark:text-[#9AA4B8] text-[#64748B] hover:dark:text-white hover:text-black">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -402,17 +402,17 @@ export const App: React.FC = () => {
               <AlertTriangle className="w-4 h-4 shrink-0" />
               <span>{errorMessage}</span>
             </div>
-            <button onClick={() => setErrorMessage(null)} className="dark:text-[#777777] text-[#64748B] hover:dark:text-white hover:text-black">
+            <button onClick={() => setErrorMessage(null)} className="dark:text-[#9AA4B8] text-[#64748B] hover:dark:text-white hover:text-black">
               <X className="w-4 h-4" />
             </button>
           </div>
         )}
 
         {!isSignedIn ? (
-          <div className="p-12 text-center dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl max-w-lg mx-auto space-y-4 shadow-sm">
+          <div className="p-12 text-center dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-2xl max-w-lg mx-auto space-y-4 shadow-sm">
             <Lock className="w-12 h-12 text-[#2563EB] mx-auto" />
-            <h3 className="text-xl font-bold dark:text-[#CDCBCA] text-[#242424]">Administrative Authentication Required</h3>
-            <p className="text-xs dark:text-[#A5A5A5] text-[#64748B] leading-relaxed">
+            <h3 className="text-xl font-bold dark:text-[#E8ECF5] text-[#242424]">Administrative Authentication Required</h3>
+            <p className="text-xs dark:text-[#9AA4B8] text-[#64748B] leading-relaxed">
               Only authorized administrators with verified Clerk identities and assigned ADMIN or SUPERADMIN
               roles may access this governance console.
             </p>
@@ -426,7 +426,7 @@ export const App: React.FC = () => {
           <div className="p-8 bg-rose-500/10 border border-rose-500/20 rounded-2xl max-w-lg mx-auto text-center space-y-3">
             <AlertTriangle className="w-10 h-10 text-rose-500 mx-auto" />
             <h3 className="text-lg font-bold text-rose-500">Insufficient Clearance</h3>
-            <p className="text-xs dark:text-[#CDCBCA] text-[#242424]">
+            <p className="text-xs dark:text-[#E8ECF5] text-[#242424]">
               Your verified identity has role <span className="font-bold">{currentUser.role?.name}</span>.
               Administrative access is strictly restricted to ADMIN and SUPERADMIN accounts.
             </p>
@@ -434,13 +434,13 @@ export const App: React.FC = () => {
         ) : (
           <div className="space-y-6">
             {/* Admin Tabs */}
-            <div className="flex flex-wrap items-center gap-2 border-b dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] pb-3">
+            <div className="flex flex-wrap items-center gap-2 border-b dark:border-[#272B38] border-[#E2E8F0] pb-3">
               <button
                 onClick={() => setActiveTab('metrics')}
                 className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center space-x-1.5 ${
                   activeTab === 'metrics'
                     ? 'bg-[#2563EB] text-white shadow-sm'
-                    : 'dark:bg-[#171717] bg-white dark:text-[#A5A5A5] text-[#64748B] hover:dark:text-white hover:text-black border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]'
+                    : 'dark:bg-[#191B25] bg-white dark:text-[#9AA4B8] text-[#64748B] hover:dark:text-white hover:text-black border dark:border-[#272B38] border-[#E2E8F0]'
                 }`}
               >
                 <Activity className="w-3.5 h-3.5" />
@@ -451,7 +451,7 @@ export const App: React.FC = () => {
                 className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center space-x-1.5 ${
                   activeTab === 'users'
                     ? 'bg-[#2563EB] text-white shadow-sm'
-                    : 'dark:bg-[#171717] bg-white dark:text-[#A5A5A5] text-[#64748B] hover:dark:text-white hover:text-black border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]'
+                    : 'dark:bg-[#191B25] bg-white dark:text-[#9AA4B8] text-[#64748B] hover:dark:text-white hover:text-black border dark:border-[#272B38] border-[#E2E8F0]'
                 }`}
               >
                 <UserCheck className="w-3.5 h-3.5" />
@@ -462,7 +462,7 @@ export const App: React.FC = () => {
                 className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center space-x-1.5 ${
                   activeTab === 'contracts'
                     ? 'bg-[#2563EB] text-white shadow-sm'
-                    : 'dark:bg-[#171717] bg-white dark:text-[#A5A5A5] text-[#64748B] hover:dark:text-white hover:text-black border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]'
+                    : 'dark:bg-[#191B25] bg-white dark:text-[#9AA4B8] text-[#64748B] hover:dark:text-white hover:text-black border dark:border-[#272B38] border-[#E2E8F0]'
                 }`}
               >
                 <FileText className="w-3.5 h-3.5" />
@@ -473,7 +473,7 @@ export const App: React.FC = () => {
                 className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center space-x-1.5 ${
                   activeTab === 'activities'
                     ? 'bg-[#2563EB] text-white shadow-sm'
-                    : 'dark:bg-[#171717] bg-white dark:text-[#A5A5A5] text-[#64748B] hover:dark:text-white hover:text-black border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]'
+                    : 'dark:bg-[#191B25] bg-white dark:text-[#9AA4B8] text-[#64748B] hover:dark:text-white hover:text-black border dark:border-[#272B38] border-[#E2E8F0]'
                 }`}
               >
                 <ShieldCheck className="w-3.5 h-3.5" />
@@ -484,7 +484,7 @@ export const App: React.FC = () => {
                 className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center space-x-1.5 ${
                   activeTab === 'financial'
                     ? 'bg-[#2563EB] text-white shadow-sm'
-                    : 'dark:bg-[#171717] bg-white dark:text-[#A5A5A5] text-[#64748B] hover:dark:text-white hover:text-black border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]'
+                    : 'dark:bg-[#191B25] bg-white dark:text-[#9AA4B8] text-[#64748B] hover:dark:text-white hover:text-black border dark:border-[#272B38] border-[#E2E8F0]'
                 }`}
               >
                 <DollarSign className="w-3.5 h-3.5" />
@@ -495,7 +495,7 @@ export const App: React.FC = () => {
                 className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center space-x-1.5 ${
                   activeTab === 'disputes'
                     ? 'bg-[#2563EB] text-white shadow-sm'
-                    : 'dark:bg-[#171717] bg-white dark:text-[#A5A5A5] text-[#64748B] hover:dark:text-white hover:text-black border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]'
+                    : 'dark:bg-[#191B25] bg-white dark:text-[#9AA4B8] text-[#64748B] hover:dark:text-white hover:text-black border dark:border-[#272B38] border-[#E2E8F0]'
                 }`}
               >
                 <Scale className="w-3.5 h-3.5" />
@@ -506,7 +506,7 @@ export const App: React.FC = () => {
                 className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center space-x-1.5 ${
                   activeTab === 'system'
                     ? 'bg-[#2563EB] text-white shadow-sm'
-                    : 'dark:bg-[#171717] bg-white dark:text-[#A5A5A5] text-[#64748B] hover:dark:text-white hover:text-black border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]'
+                    : 'dark:bg-[#191B25] bg-white dark:text-[#9AA4B8] text-[#64748B] hover:dark:text-white hover:text-black border dark:border-[#272B38] border-[#E2E8F0]'
                 }`}
               >
                 <Server className="w-3.5 h-3.5" />
@@ -518,10 +518,10 @@ export const App: React.FC = () => {
             {activeTab === 'metrics' && metrics && (
               <div className="space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                  <div className="p-5 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm space-y-2">
-                    <span className="text-xs font-medium dark:text-[#A5A5A5] text-[#64748B]">Total Registered Users</span>
-                    <div className="text-3xl font-bold font-mono dark:text-[#CDCBCA] text-[#242424]">{metrics.users?.total || 0}</div>
-                    <div className="text-[11px] dark:text-[#777777] text-[#64748B] flex items-center space-x-2 pt-1 border-t dark:border-[rgba(205,203,202,0.1)] border-[#E2E8F0]">
+                  <div className="p-5 rounded-2xl dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] shadow-sm space-y-2">
+                    <span className="text-xs font-medium dark:text-[#9AA4B8] text-[#64748B]">Total Registered Users</span>
+                    <div className="text-3xl font-bold font-mono dark:text-[#E8ECF5] text-[#242424]">{metrics.users?.total || 0}</div>
+                    <div className="text-[11px] dark:text-[#9AA4B8] text-[#64748B] flex items-center space-x-2 pt-1 border-t dark:border-[rgba(205,203,202,0.1)] border-[#E2E8F0]">
                       <span className="text-[#2563EB] font-mono">{metrics.users?.clients || 0} Clients</span>
                       <span>•</span>
                       <span className="text-emerald-500 font-mono">{metrics.users?.workers || 0} Workers</span>
@@ -530,46 +530,46 @@ export const App: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="p-5 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm space-y-2">
-                    <span className="text-xs font-medium dark:text-[#A5A5A5] text-[#64748B]">Active Digital Contracts</span>
+                  <div className="p-5 rounded-2xl dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] shadow-sm space-y-2">
+                    <span className="text-xs font-medium dark:text-[#9AA4B8] text-[#64748B]">Active Digital Contracts</span>
                     <div className="text-3xl font-bold font-mono text-emerald-500">{metrics.contracts?.active || 0}</div>
-                    <div className="text-[11px] dark:text-[#777777] text-[#64748B] flex items-center space-x-2 pt-1 border-t dark:border-[rgba(205,203,202,0.1)] border-[#E2E8F0]">
+                    <div className="text-[11px] dark:text-[#9AA4B8] text-[#64748B] flex items-center space-x-2 pt-1 border-t dark:border-[rgba(205,203,202,0.1)] border-[#E2E8F0]">
                       <span className="font-mono">{metrics.contracts?.total || 0} Total Formulated</span>
                       <span>•</span>
                       <span className="text-[#2563EB] font-mono">{metrics.contracts?.completed || 0} Completed</span>
                     </div>
                   </div>
 
-                  <div className="p-5 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm space-y-2">
-                    <span className="text-xs font-medium dark:text-[#A5A5A5] text-[#64748B]">Contractual Disputes</span>
+                  <div className="p-5 rounded-2xl dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] shadow-sm space-y-2">
+                    <span className="text-xs font-medium dark:text-[#9AA4B8] text-[#64748B]">Contractual Disputes</span>
                     <div className="text-3xl font-bold font-mono text-rose-500">{metrics.contracts?.disputed || 0}</div>
-                    <div className="text-[11px] dark:text-[#777777] text-[#64748B] flex items-center space-x-2 pt-1 border-t dark:border-[rgba(205,203,202,0.1)] border-[#E2E8F0]">
+                    <div className="text-[11px] dark:text-[#9AA4B8] text-[#64748B] flex items-center space-x-2 pt-1 border-t dark:border-[rgba(205,203,202,0.1)] border-[#E2E8F0]">
                       <span className="text-amber-500 font-mono">{metrics.disputes?.pending || 0} Pending Arbitration</span>
                       <span>•</span>
                       <span className="font-mono">{metrics.disputes?.total || 0} Total Ingested</span>
                     </div>
                   </div>
 
-                  <div className="p-5 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm space-y-2">
-                    <span className="text-xs font-medium dark:text-[#A5A5A5] text-[#64748B]">Total Verified Milestones</span>
+                  <div className="p-5 rounded-2xl dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] shadow-sm space-y-2">
+                    <span className="text-xs font-medium dark:text-[#9AA4B8] text-[#64748B]">Total Verified Milestones</span>
                     <div className="text-3xl font-bold font-mono text-[#2563EB]">{metrics.milestones?.total || 0}</div>
-                    <div className="text-[11px] dark:text-[#777777] text-[#64748B] pt-1 border-t dark:border-[rgba(205,203,202,0.1)] border-[#E2E8F0]">
+                    <div className="text-[11px] dark:text-[#9AA4B8] text-[#64748B] pt-1 border-t dark:border-[rgba(205,203,202,0.1)] border-[#E2E8F0]">
                       Cryptographically tracked milestone lifecycle
                     </div>
                   </div>
 
-                  <div className="p-5 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm space-y-2">
-                    <span className="text-xs font-medium dark:text-[#A5A5A5] text-[#64748B]">Hiring Requests</span>
-                    <div className="text-3xl font-bold font-mono dark:text-[#CDCBCA] text-[#242424]">{metrics.hiringRequests?.total || 0}</div>
-                    <div className="text-[11px] dark:text-[#777777] text-[#64748B] pt-1 border-t dark:border-[rgba(205,203,202,0.1)] border-[#E2E8F0]">
+                  <div className="p-5 rounded-2xl dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] shadow-sm space-y-2">
+                    <span className="text-xs font-medium dark:text-[#9AA4B8] text-[#64748B]">Hiring Requests</span>
+                    <div className="text-3xl font-bold font-mono dark:text-[#E8ECF5] text-[#242424]">{metrics.hiringRequests?.total || 0}</div>
+                    <div className="text-[11px] dark:text-[#9AA4B8] text-[#64748B] pt-1 border-t dark:border-[rgba(205,203,202,0.1)] border-[#E2E8F0]">
                       <span className="text-amber-500 font-mono">{metrics.hiringRequests?.pending || 0} Pending Review</span>
                     </div>
                   </div>
 
-                  <div className="p-5 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm space-y-2">
-                    <span className="text-xs font-medium dark:text-[#A5A5A5] text-[#64748B]">Active Escrow Protective Holds</span>
+                  <div className="p-5 rounded-2xl dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] shadow-sm space-y-2">
+                    <span className="text-xs font-medium dark:text-[#9AA4B8] text-[#64748B]">Active Escrow Protective Holds</span>
                     <div className="text-3xl font-bold font-mono text-amber-500">{metrics.escrow?.activeHolds || 0}</div>
-                    <div className="text-[11px] dark:text-[#777777] text-[#64748B] pt-1 border-t dark:border-[rgba(205,203,202,0.1)] border-[#E2E8F0]">
+                    <div className="text-[11px] dark:text-[#9AA4B8] text-[#64748B] pt-1 border-t dark:border-[rgba(205,203,202,0.1)] border-[#E2E8F0]">
                       Dispute hold preventing unauthorized release
                     </div>
                   </div>
@@ -581,27 +581,27 @@ export const App: React.FC = () => {
             {activeTab === 'users' && (
               <div className="space-y-4">
                 {/* Search & Filter Bar */}
-                <div className="p-4 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+                <div className="p-4 rounded-2xl dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
                   <div className="flex flex-1 items-center space-x-3">
                     <div className="relative flex-1 max-w-md">
-                      <Search className="w-4 h-4 absolute left-3 top-2.5 dark:text-[#777777] text-[#94A3B8]" />
+                      <Search className="w-4 h-4 absolute left-3 top-2.5 dark:text-[#9AA4B8] text-[#94A3B8]" />
                       <input
                         type="text"
                         placeholder="Search users by name, email, or ID..."
                         value={userSearch}
                         onChange={(e) => setUserSearch(e.target.value)}
-                        className="pl-9 pr-3 py-1.5 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] placeholder-slate-400 w-full focus:outline-none focus:border-[#2563EB]"
+                        className="pl-9 pr-3 py-1.5 rounded-xl dark:bg-[#0B0D14] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#E8ECF5] text-[#242424] placeholder-slate-400 w-full focus:outline-none focus:border-[#2563EB]"
                       />
                     </div>
                   </div>
 
                   <div className="flex flex-wrap items-center gap-3">
                     <div className="flex items-center space-x-1.5 text-xs">
-                      <Filter className="w-3.5 h-3.5 dark:text-[#777777] text-[#64748B]" />
+                      <Filter className="w-3.5 h-3.5 dark:text-[#9AA4B8] text-[#64748B]" />
                       <select
                         value={userRoleFilter}
                         onChange={(e) => setUserRoleFilter(e.target.value)}
-                        className="px-2.5 py-1.5 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#2563EB]"
+                        className="px-2.5 py-1.5 rounded-xl dark:bg-[#0B0D14] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#E8ECF5] text-[#242424] focus:outline-none focus:border-[#2563EB]"
                       >
                         <option value="ALL">All Roles</option>
                         <option value={UserRole.CLIENT}>Clients</option>
@@ -615,7 +615,7 @@ export const App: React.FC = () => {
                       <select
                         value={userStatusFilter}
                         onChange={(e) => setUserStatusFilter(e.target.value)}
-                        className="px-2.5 py-1.5 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#2563EB]"
+                        className="px-2.5 py-1.5 rounded-xl dark:bg-[#0B0D14] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#E8ECF5] text-[#242424] focus:outline-none focus:border-[#2563EB]"
                       >
                         <option value="ALL">All Statuses</option>
                         <option value="ACTIVE">Active</option>
@@ -624,17 +624,17 @@ export const App: React.FC = () => {
                       </select>
                     </div>
 
-                    <span className="text-xs font-mono dark:text-[#777777] text-[#64748B] px-2.5 py-1 rounded-lg dark:bg-[#202020] bg-[#F1F5F9] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]">
+                    <span className="text-xs font-mono dark:text-[#9AA4B8] text-[#64748B] px-2.5 py-1 rounded-lg dark:bg-[#191D2A] bg-[#F1F5F9] border dark:border-[#272B38] border-[#E2E8F0]">
                       Showing {filteredUsers.length} of {usersList.length}
                     </span>
                   </div>
                 </div>
 
                 {/* Users Table */}
-                <div className="dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl overflow-hidden shadow-sm">
+                <div className="dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-2xl overflow-hidden shadow-sm">
                   <div className="divide-y dark:divide-[rgba(205,203,202,0.1)] divide-[#E2E8F0]">
                     {filteredUsers.length === 0 ? (
-                      <div className="p-8 text-center dark:text-[#777777] text-[#64748B] text-xs">
+                      <div className="p-8 text-center dark:text-[#9AA4B8] text-[#64748B] text-xs">
                         No registered users match the applied search and filter criteria.
                       </div>
                     ) : (
@@ -647,10 +647,10 @@ export const App: React.FC = () => {
                           (currentUser?.role.name === UserRole.SUPERADMIN || (!isTargetSuper && !isTargetAdmin));
 
                         return (
-                          <div key={u.id} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs hover:dark:bg-[#202020]/40 hover:bg-[#F8FAFC] transition">
+                          <div key={u.id} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs hover:dark:bg-[#191D2A]/40 hover:bg-[#F8FAFC] transition">
                             <div className="space-y-1">
                               <div className="flex items-center space-x-2">
-                                <span className="font-semibold dark:text-[#CDCBCA] text-[#242424]">
+                                <span className="font-semibold dark:text-[#E8ECF5] text-[#242424]">
                                   {u.firstName ? `${u.firstName} ${u.lastName || ''}` : u.email}
                                 </span>
                                 <span className={`px-2 py-0.5 rounded font-mono text-[10px] font-bold ${
@@ -660,7 +660,7 @@ export const App: React.FC = () => {
                                       ? 'bg-[#2563EB]/10 text-[#2563EB] border border-[#2563EB]/20'
                                       : u.role?.name === UserRole.WORKER
                                         ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
-                                        : 'dark:bg-[#202020] bg-[#F1F5F9] dark:text-[#CDCBCA] text-[#475569] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]'
+                                        : 'dark:bg-[#191D2A] bg-[#F1F5F9] dark:text-[#E8ECF5] text-[#475569] border dark:border-[#272B38] border-[#E2E8F0]'
                                 }`}>
                                   {u.role?.name}
                                 </span>
@@ -681,7 +681,7 @@ export const App: React.FC = () => {
                                   </span>
                                 )}
                               </div>
-                              <div className="dark:text-[#777777] text-[#64748B] font-mono text-[11px]">
+                              <div className="dark:text-[#9AA4B8] text-[#64748B] font-mono text-[11px]">
                                 {u.email} | ID: {u.id}
                               </div>
                             </div>
@@ -689,7 +689,7 @@ export const App: React.FC = () => {
                             <div className="flex items-center space-x-2">
                               <button
                                 onClick={() => setInspectUser(u)}
-                                className="px-3 py-1 rounded-lg dark:bg-[#202020] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] dark:text-[#CDCBCA] text-[#242424] text-xs transition flex items-center space-x-1 border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm"
+                                className="px-3 py-1 rounded-lg dark:bg-[#191D2A] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] dark:text-[#E8ECF5] text-[#242424] text-xs transition flex items-center space-x-1 border dark:border-[#272B38] border-[#E2E8F0] shadow-sm"
                               >
                                 <Eye className="w-3.5 h-3.5 text-[#2563EB]" />
                                 <span>Inspect</span>
@@ -712,7 +712,7 @@ export const App: React.FC = () => {
                                   </button>
                                 )
                               ) : (
-                                <span className="text-[11px] dark:text-[#777777] text-[#94A3B8] italic">Protected</span>
+                                <span className="text-[11px] dark:text-[#9AA4B8] text-[#94A3B8] italic">Protected</span>
                               )}
                             </div>
                           </div>
@@ -732,26 +732,26 @@ export const App: React.FC = () => {
             {/* Admin Activity History */}
             {activeTab === 'activities' && (
               <div className="space-y-4">
-                <div className="p-4 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+                <div className="p-4 rounded-2xl dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
                   <div className="flex flex-1 items-center space-x-3">
                     <div className="relative flex-1 max-w-md">
-                      <Search className="w-4 h-4 absolute left-3 top-2.5 dark:text-[#777777] text-[#94A3B8]" />
+                      <Search className="w-4 h-4 absolute left-3 top-2.5 dark:text-[#9AA4B8] text-[#94A3B8]" />
                       <input
                         type="text"
                         placeholder="Search logs by action, admin, or target ID..."
                         value={activitySearch}
                         onChange={(e) => setActivitySearch(e.target.value)}
-                        className="pl-9 pr-3 py-1.5 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] placeholder-slate-400 w-full focus:outline-none focus:border-[#2563EB]"
+                        className="pl-9 pr-3 py-1.5 rounded-xl dark:bg-[#0B0D14] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#E8ECF5] text-[#242424] placeholder-slate-400 w-full focus:outline-none focus:border-[#2563EB]"
                       />
                     </div>
                   </div>
 
                   <div className="flex items-center space-x-1.5 text-xs">
-                    <Filter className="w-3.5 h-3.5 dark:text-[#777777] text-[#64748B]" />
+                    <Filter className="w-3.5 h-3.5 dark:text-[#9AA4B8] text-[#64748B]" />
                     <select
                       value={activityActionFilter}
                       onChange={(e) => setActivityActionFilter(e.target.value)}
-                      className="px-2.5 py-1.5 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#2563EB]"
+                      className="px-2.5 py-1.5 rounded-xl dark:bg-[#0B0D14] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#E8ECF5] text-[#242424] focus:outline-none focus:border-[#2563EB]"
                     >
                       <option value="ALL">All Actions</option>
                       <option value="UPDATE_USER_STATUS">UPDATE_USER_STATUS</option>
@@ -763,34 +763,34 @@ export const App: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl overflow-hidden shadow-sm">
+                <div className="dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-2xl overflow-hidden shadow-sm">
                   <div className="divide-y dark:divide-[rgba(205,203,202,0.1)] divide-[#E2E8F0]">
                     {filteredActivities.length === 0 ? (
-                      <div className="p-8 text-center dark:text-[#777777] text-[#64748B] text-xs">
+                      <div className="p-8 text-center dark:text-[#9AA4B8] text-[#64748B] text-xs">
                         No administrative activity records match the criteria.
                       </div>
                     ) : (
                       filteredActivities.map((act) => (
-                        <div key={act.id} className="p-4 space-y-1 text-xs hover:dark:bg-[#202020]/40 hover:bg-[#F8FAFC] transition">
+                        <div key={act.id} className="p-4 space-y-1 text-xs hover:dark:bg-[#191D2A]/40 hover:bg-[#F8FAFC] transition">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-2">
                               <span className="font-mono font-bold text-[#2563EB]">{act.action}</span>
-                              <span className="dark:text-[#777777] text-[#64748B]">by</span>
-                              <span className="font-semibold dark:text-[#CDCBCA] text-[#242424]">
+                              <span className="dark:text-[#9AA4B8] text-[#64748B]">by</span>
+                              <span className="font-semibold dark:text-[#E8ECF5] text-[#242424]">
                                 {act.admin?.firstName ? `${act.admin.firstName} (${act.admin.email})` : act.admin?.email || 'System'}
                               </span>
                             </div>
-                            <span className="dark:text-[#777777] text-[#64748B] font-mono text-[11px]">
+                            <span className="dark:text-[#9AA4B8] text-[#64748B] font-mono text-[11px]">
                               {new Date(act.createdAt).toLocaleString()}
                             </span>
                           </div>
 
-                          <div className="dark:text-[#A5A5A5] text-[#64748B] font-mono text-[11px] flex items-center space-x-2">
+                          <div className="dark:text-[#9AA4B8] text-[#64748B] font-mono text-[11px] flex items-center space-x-2">
                             <span>Target ID: {act.targetUserId || 'N/A'}</span>
                             {act.details && (
                               <>
                                 <span>•</span>
-                                <span className="dark:text-[#777777] text-[#94A3B8]">
+                                <span className="dark:text-[#9AA4B8] text-[#94A3B8]">
                                   {JSON.stringify(act.details)}
                                 </span>
                               </>
@@ -824,77 +824,77 @@ export const App: React.FC = () => {
 
                 {/* Financial KPI Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                  <div className="p-5 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm space-y-1">
-                    <span className="text-xs dark:text-[#A5A5A5] text-[#64748B]">Total Contractual Agreed</span>
-                    <div className="text-2xl font-bold font-mono dark:text-[#CDCBCA] text-[#242424]">
+                  <div className="p-5 rounded-2xl dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] shadow-sm space-y-1">
+                    <span className="text-xs dark:text-[#9AA4B8] text-[#64748B]">Total Contractual Agreed</span>
+                    <div className="text-2xl font-bold font-mono dark:text-[#E8ECF5] text-[#242424]">
                       {financialOverview ? formatCurrencyMinor(financialOverview.totalContractualAgreedMinor, 'USD') : '$0.00'}
                     </div>
-                    <div className="text-[11px] dark:text-[#777777] text-[#64748B]">Agreed commitments across all contracts</div>
+                    <div className="text-[11px] dark:text-[#9AA4B8] text-[#64748B]">Agreed commitments across all contracts</div>
                   </div>
 
-                  <div className="p-5 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm space-y-1">
-                    <span className="text-xs dark:text-[#A5A5A5] text-[#64748B]">Custodial Escrow Held</span>
+                  <div className="p-5 rounded-2xl dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] shadow-sm space-y-1">
+                    <span className="text-xs dark:text-[#9AA4B8] text-[#64748B]">Custodial Escrow Held</span>
                     <div className="text-2xl font-bold font-mono text-emerald-500">
                       {financialOverview ? formatCurrencyMinor(financialOverview.totalFundedInEscrowMinor, 'USD') : '$0.00'}
                     </div>
-                    <div className="text-[11px] dark:text-[#777777] text-[#64748B]">Locked in escrow ledger</div>
+                    <div className="text-[11px] dark:text-[#9AA4B8] text-[#64748B]">Locked in escrow ledger</div>
                   </div>
 
-                  <div className="p-5 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm space-y-1">
-                    <span className="text-xs dark:text-[#A5A5A5] text-[#64748B]">Released to Workers</span>
+                  <div className="p-5 rounded-2xl dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] shadow-sm space-y-1">
+                    <span className="text-xs dark:text-[#9AA4B8] text-[#64748B]">Released to Workers</span>
                     <div className="text-2xl font-bold font-mono text-[#2563EB]">
                       {financialOverview ? formatCurrencyMinor(financialOverview.totalReleasedToWorkersMinor, 'USD') : '$0.00'}
                     </div>
-                    <div className="text-[11px] dark:text-[#777777] text-[#64748B]">Verified milestone disbursements</div>
+                    <div className="text-[11px] dark:text-[#9AA4B8] text-[#64748B]">Verified milestone disbursements</div>
                   </div>
 
-                  <div className="p-5 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm space-y-1">
-                    <span className="text-xs dark:text-[#A5A5A5] text-[#64748B]">System Double-Entry Status</span>
+                  <div className="p-5 rounded-2xl dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] shadow-sm space-y-1">
+                    <span className="text-xs dark:text-[#9AA4B8] text-[#64748B]">System Double-Entry Status</span>
                     <div className="text-2xl font-bold flex items-center space-x-1.5 text-emerald-500">
                       <CheckCircle2 className="w-5 h-5 text-emerald-500" />
                       <span>{financialOverview?.systemTrialBalanceBalanced ? 'Balanced' : 'Unbalanced'}</span>
                     </div>
-                    <div className="text-[11px] dark:text-[#777777] text-[#64748B]">Debits strictly equal credits</div>
+                    <div className="text-[11px] dark:text-[#9AA4B8] text-[#64748B]">Debits strictly equal credits</div>
                   </div>
                 </div>
 
                 {/* Escrow Records Table */}
-                <div className="rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] overflow-hidden shadow-sm">
-                  <div className="p-4 border-b dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] flex flex-col sm:flex-row sm:items-center justify-between gap-3 dark:bg-[#202020] bg-[#F1F5F9]">
+                <div className="rounded-2xl dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] overflow-hidden shadow-sm">
+                  <div className="p-4 border-b dark:border-[#272B38] border-[#E2E8F0] flex flex-col sm:flex-row sm:items-center justify-between gap-3 dark:bg-[#191D2A] bg-[#F1F5F9]">
                     <div>
-                      <h4 className="text-sm font-semibold dark:text-[#CDCBCA] text-[#242424]">Digital Contract Escrow Records</h4>
-                      <p className="text-xs dark:text-[#777777] text-[#64748B]">Lifecycle state machine and dispute hold governance</p>
+                      <h4 className="text-sm font-semibold dark:text-[#E8ECF5] text-[#242424]">Digital Contract Escrow Records</h4>
+                      <p className="text-xs dark:text-[#9AA4B8] text-[#64748B]">Lifecycle state machine and dispute hold governance</p>
                     </div>
                     <div className="flex items-center space-x-3">
                       <div className="relative">
-                        <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 dark:text-[#777777] text-[#94A3B8]" />
+                        <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 dark:text-[#9AA4B8] text-[#94A3B8]" />
                         <input
                           type="text"
                           placeholder="Filter escrow records..."
                           value={escrowSearch}
                           onChange={(e) => setEscrowSearch(e.target.value)}
-                          className="pl-8 pr-3 py-1.5 rounded-xl dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] placeholder-slate-400 w-48 sm:w-56 focus:outline-none focus:border-[#2563EB]"
+                          className="pl-8 pr-3 py-1.5 rounded-xl dark:bg-[#0B0D14] bg-white border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#E8ECF5] text-[#242424] placeholder-slate-400 w-48 sm:w-56 focus:outline-none focus:border-[#2563EB]"
                         />
                       </div>
-                      <span className="text-xs font-mono px-2.5 py-1 rounded-lg dark:bg-[#080808] bg-white dark:text-[#CDCBCA] text-[#242424] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]">
+                      <span className="text-xs font-mono px-2.5 py-1 rounded-lg dark:bg-[#0B0D14] bg-white dark:text-[#E8ECF5] text-[#242424] border dark:border-[#272B38] border-[#E2E8F0]">
                         {filteredEscrows.length} Escrows
                       </span>
                     </div>
                   </div>
 
                   {isLoadingFinancial ? (
-                    <div className="p-8 text-center dark:text-[#777777] text-[#64748B] text-xs">Loading escrow records...</div>
+                    <div className="p-8 text-center dark:text-[#9AA4B8] text-[#64748B] text-xs">Loading escrow records...</div>
                   ) : filteredEscrows.length === 0 ? (
-                    <div className="p-8 text-center dark:text-[#777777] text-[#64748B] text-xs">
+                    <div className="p-8 text-center dark:text-[#9AA4B8] text-[#64748B] text-xs">
                       No escrow records found.
                     </div>
                   ) : (
                     <div className="divide-y dark:divide-[rgba(205,203,202,0.1)] divide-[#E2E8F0]">
                       {filteredEscrows.map((esc) => (
-                        <div key={esc.id} className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs hover:dark:bg-[#202020]/40 hover:bg-[#F8FAFC] transition">
+                        <div key={esc.id} className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs hover:dark:bg-[#191D2A]/40 hover:bg-[#F8FAFC] transition">
                           <div className="space-y-1">
                             <div className="flex items-center space-x-2">
-                              <span className="font-mono font-bold dark:text-[#CDCBCA] text-[#242424]">{esc.contractNumber || 'Contract'}</span>
+                              <span className="font-mono font-bold dark:text-[#E8ECF5] text-[#242424]">{esc.contractNumber || 'Contract'}</span>
                               <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                                 esc.status === 'FUNDED'
                                   ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
@@ -910,8 +910,8 @@ export const App: React.FC = () => {
                                 </span>
                               )}
                             </div>
-                            <div className="dark:text-[#A5A5A5] text-[#64748B]">{esc.contractTitle}</div>
-                            <div className="dark:text-[#777777] text-[#64748B] text-[11px] font-mono">
+                            <div className="dark:text-[#9AA4B8] text-[#64748B]">{esc.contractTitle}</div>
+                            <div className="dark:text-[#9AA4B8] text-[#64748B] text-[11px] font-mono">
                               Contractual: {formatCurrencyMinor(esc.contractualAmountMinor, esc.currency)} |
                               Funded: {formatCurrencyMinor(esc.fundedAmountMinor, esc.currency)} |
                               Released: {formatCurrencyMinor(esc.releasedAmountMinor, esc.currency)}
@@ -937,33 +937,33 @@ export const App: React.FC = () => {
                 </div>
 
                 {/* Payment Transactions Audit */}
-                <div className="rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] overflow-hidden shadow-sm">
-                  <div className="p-4 border-b dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] flex items-center justify-between dark:bg-[#202020] bg-[#F1F5F9]">
+                <div className="rounded-2xl dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] overflow-hidden shadow-sm">
+                  <div className="p-4 border-b dark:border-[#272B38] border-[#E2E8F0] flex items-center justify-between dark:bg-[#191D2A] bg-[#F1F5F9]">
                     <div>
-                      <h4 className="text-sm font-semibold dark:text-[#CDCBCA] text-[#242424]">Payment Transactions Audit</h4>
-                      <p className="text-xs dark:text-[#777777] text-[#64748B]">Provider transactions and settlement status</p>
+                      <h4 className="text-sm font-semibold dark:text-[#E8ECF5] text-[#242424]">Payment Transactions Audit</h4>
+                      <p className="text-xs dark:text-[#9AA4B8] text-[#64748B]">Provider transactions and settlement status</p>
                     </div>
-                    <span className="text-xs font-mono px-2.5 py-1 rounded-lg dark:bg-[#080808] bg-white dark:text-[#CDCBCA] text-[#242424] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]">
+                    <span className="text-xs font-mono px-2.5 py-1 rounded-lg dark:bg-[#0B0D14] bg-white dark:text-[#E8ECF5] text-[#242424] border dark:border-[#272B38] border-[#E2E8F0]">
                       {paymentsList.length} Transactions
                     </span>
                   </div>
 
                   {paymentsList.length === 0 ? (
-                    <div className="p-8 text-center dark:text-[#777777] text-[#64748B] text-xs">
+                    <div className="p-8 text-center dark:text-[#9AA4B8] text-[#64748B] text-xs">
                       No payment transactions recorded.
                     </div>
                   ) : (
                     <div className="divide-y dark:divide-[rgba(205,203,202,0.1)] divide-[#E2E8F0]">
                       {paymentsList.map((tx) => (
-                        <div key={tx.id} className="p-4 flex items-center justify-between text-xs font-mono hover:dark:bg-[#202020]/40 hover:bg-[#F8FAFC] transition">
+                        <div key={tx.id} className="p-4 flex items-center justify-between text-xs font-mono hover:dark:bg-[#191D2A]/40 hover:bg-[#F8FAFC] transition">
                           <div>
-                            <span className="dark:text-[#CDCBCA] text-[#242424] font-bold">{tx.transactionReference}</span>
-                            <div className="dark:text-[#777777] text-[#64748B] text-[11px] font-sans">
+                            <span className="dark:text-[#E8ECF5] text-[#242424] font-bold">{tx.transactionReference}</span>
+                            <div className="dark:text-[#9AA4B8] text-[#64748B] text-[11px] font-sans">
                               Payer: {tx.payerName || tx.payerId} | Type: {tx.type} | Provider: {tx.provider || 'PENDING'}
                             </div>
                           </div>
                           <div className="text-right">
-                            <div className="dark:text-[#CDCBCA] text-[#242424] font-bold">{formatCurrencyMinor(tx.amountMinor, tx.currency)}</div>
+                            <div className="dark:text-[#E8ECF5] text-[#242424] font-bold">{formatCurrencyMinor(tx.amountMinor, tx.currency)}</div>
                             <span className="text-amber-500 text-[11px] font-medium font-sans">{tx.status}</span>
                           </div>
                         </div>
@@ -980,36 +980,36 @@ export const App: React.FC = () => {
             {/* Telemetry Tab */}
             {activeTab === 'system' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="p-6 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm space-y-3">
-                  <div className="flex items-center space-x-2 text-sm font-semibold dark:text-[#CDCBCA] text-[#242424]">
+                <div className="p-6 rounded-2xl dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] shadow-sm space-y-3">
+                  <div className="flex items-center space-x-2 text-sm font-semibold dark:text-[#E8ECF5] text-[#242424]">
                     <Server className="w-4 h-4 text-[#2563EB]" />
                     <span>Express API Service</span>
                   </div>
                   {apiHealth ? (
-                    <div className="text-xs dark:text-[#A5A5A5] text-[#64748B] space-y-1.5 font-mono">
+                    <div className="text-xs dark:text-[#9AA4B8] text-[#64748B] space-y-1.5 font-mono">
                       <div>Status: <span className="text-emerald-500 font-bold">{apiHealth.status}</span></div>
                       <div>Service: {apiHealth.service}</div>
                       <div>Version: {apiHealth.version}</div>
                       <div>Uptime: {apiHealth.uptimeSeconds}s</div>
                     </div>
                   ) : (
-                    <div className="text-xs dark:text-[#777777] text-[#64748B]">Checking API health...</div>
+                    <div className="text-xs dark:text-[#9AA4B8] text-[#64748B]">Checking API health...</div>
                   )}
                 </div>
 
-                <div className="p-6 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-sm space-y-3">
-                  <div className="flex items-center space-x-2 text-sm font-semibold dark:text-[#CDCBCA] text-[#242424]">
+                <div className="p-6 rounded-2xl dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] shadow-sm space-y-3">
+                  <div className="flex items-center space-x-2 text-sm font-semibold dark:text-[#E8ECF5] text-[#242424]">
                     <Database className="w-4 h-4 text-emerald-500" />
                     <span>Supabase PostgreSQL DB</span>
                   </div>
                   {dbHealth ? (
-                    <div className="text-xs dark:text-[#A5A5A5] text-[#64748B] space-y-1.5 font-mono">
+                    <div className="text-xs dark:text-[#9AA4B8] text-[#64748B] space-y-1.5 font-mono">
                       <div>Status: <span className="text-emerald-500 font-bold">{dbHealth.status}</span></div>
                       <div>Database: {dbHealth.database}</div>
                       {dbHealth.latencyMs && <div>Latency: <span className="text-[#2563EB] font-bold">{dbHealth.latencyMs}ms</span></div>}
                     </div>
                   ) : (
-                    <div className="text-xs dark:text-[#777777] text-[#64748B]">Checking DB health...</div>
+                    <div className="text-xs dark:text-[#9AA4B8] text-[#64748B]">Checking DB health...</div>
                   )}
                 </div>
               </div>
@@ -1021,70 +1021,70 @@ export const App: React.FC = () => {
       {/* Inspect User Modal */}
       {inspectUser && (
         <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl">
-            <div className="flex items-center justify-between border-b dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] pb-3">
+          <div className="dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl">
+            <div className="flex items-center justify-between border-b dark:border-[#272B38] border-[#E2E8F0] pb-3">
               <div className="flex items-center space-x-2">
                 <UserCheck className="w-5 h-5 text-[#2563EB]" />
-                <h3 className="font-bold dark:text-[#CDCBCA] text-[#242424] text-base">Account Inspection</h3>
+                <h3 className="font-bold dark:text-[#E8ECF5] text-[#242424] text-base">Account Inspection</h3>
               </div>
-              <button onClick={() => setInspectUser(null)} className="dark:text-[#777777] text-[#64748B] hover:dark:text-white hover:text-black">
+              <button onClick={() => setInspectUser(null)} className="dark:text-[#9AA4B8] text-[#64748B] hover:dark:text-white hover:text-black">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="space-y-3 text-xs">
-              <div className="grid grid-cols-2 gap-3 p-3.5 rounded-xl dark:bg-[#080808] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]">
+              <div className="grid grid-cols-2 gap-3 p-3.5 rounded-xl dark:bg-[#0B0D14] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0]">
                 <div>
-                  <span className="dark:text-[#777777] text-[#64748B]">Full Name</span>
-                  <div className="font-semibold dark:text-[#CDCBCA] text-[#242424] mt-0.5">
+                  <span className="dark:text-[#9AA4B8] text-[#64748B]">Full Name</span>
+                  <div className="font-semibold dark:text-[#E8ECF5] text-[#242424] mt-0.5">
                     {inspectUser.firstName ? `${inspectUser.firstName} ${inspectUser.lastName || ''}` : 'Not Provided'}
                   </div>
                 </div>
                 <div>
-                  <span className="dark:text-[#777777] text-[#64748B]">Role</span>
+                  <span className="dark:text-[#9AA4B8] text-[#64748B]">Role</span>
                   <div className="font-semibold text-[#2563EB] mt-0.5">{inspectUser.role?.name}</div>
                 </div>
                 <div>
-                  <span className="dark:text-[#777777] text-[#64748B]">Account Status</span>
+                  <span className="dark:text-[#9AA4B8] text-[#64748B]">Account Status</span>
                   <div className="font-semibold text-emerald-500 mt-0.5">{inspectUser.status}</div>
                 </div>
                 <div>
-                  <span className="dark:text-[#777777] text-[#64748B]">Registered</span>
-                  <div className="font-mono dark:text-[#A5A5A5] text-[#475569] mt-0.5">
+                  <span className="dark:text-[#9AA4B8] text-[#64748B]">Registered</span>
+                  <div className="font-mono dark:text-[#9AA4B8] text-[#475569] mt-0.5">
                     {inspectUser.createdAt ? new Date(inspectUser.createdAt).toLocaleDateString() : 'N/A'}
                   </div>
                 </div>
               </div>
 
               <div className="space-y-1">
-                <span className="dark:text-[#777777] text-[#64748B]">Email Address</span>
-                <div className="font-mono dark:text-[#CDCBCA] text-[#242424] p-2.5 rounded-xl dark:bg-[#080808] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]">
+                <span className="dark:text-[#9AA4B8] text-[#64748B]">Email Address</span>
+                <div className="font-mono dark:text-[#E8ECF5] text-[#242424] p-2.5 rounded-xl dark:bg-[#0B0D14] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0]">
                   {inspectUser.email}
                 </div>
               </div>
 
               <div className="space-y-1">
-                <span className="dark:text-[#777777] text-[#64748B]">Internal User ID</span>
-                <div className="font-mono text-[11px] dark:text-[#A5A5A5] text-[#64748B] p-2.5 rounded-xl dark:bg-[#080808] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] select-all">
+                <span className="dark:text-[#9AA4B8] text-[#64748B]">Internal User ID</span>
+                <div className="font-mono text-[11px] dark:text-[#9AA4B8] text-[#64748B] p-2.5 rounded-xl dark:bg-[#0B0D14] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] select-all">
                   {inspectUser.id}
                 </div>
               </div>
 
               {inspectUser.profile && (
                 <div className="space-y-1">
-                  <span className="dark:text-[#777777] text-[#64748B]">Profile Details</span>
-                  <div className="dark:text-[#CDCBCA] text-[#242424] p-3 rounded-xl dark:bg-[#080808] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] space-y-1">
+                  <span className="dark:text-[#9AA4B8] text-[#64748B]">Profile Details</span>
+                  <div className="dark:text-[#E8ECF5] text-[#242424] p-3 rounded-xl dark:bg-[#0B0D14] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] space-y-1">
                     {inspectUser.profile.phone && <div>Phone: {inspectUser.profile.phone}</div>}
                     {inspectUser.profile.country && <div>Country: {inspectUser.profile.country}</div>}
-                    {inspectUser.profile.bio && <div className="italic dark:text-[#A5A5A5] text-[#64748B]">"{inspectUser.profile.bio}"</div>}
+                    {inspectUser.profile.bio && <div className="italic dark:text-[#9AA4B8] text-[#64748B]">"{inspectUser.profile.bio}"</div>}
                   </div>
                 </div>
               )}
 
               {inspectUser.workerProfile && (
                 <div className="space-y-1">
-                  <span className="dark:text-[#777777] text-[#64748B]">Worker Profile</span>
-                  <div className="dark:text-[#CDCBCA] text-[#242424] p-3 rounded-xl dark:bg-[#080808] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] space-y-1">
+                  <span className="dark:text-[#9AA4B8] text-[#64748B]">Worker Profile</span>
+                  <div className="dark:text-[#E8ECF5] text-[#242424] p-3 rounded-xl dark:bg-[#0B0D14] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] space-y-1">
                     <div>Title: {inspectUser.workerProfile.title || 'Not specified'}</div>
                     {inspectUser.workerProfile.hourlyRate && (
                       <div className="font-mono">Hourly Rate: ${(inspectUser.workerProfile.hourlyRate / 100).toFixed(2)}/hr</div>
@@ -1095,10 +1095,10 @@ export const App: React.FC = () => {
               )}
             </div>
 
-            <div className="flex justify-end pt-2 border-t dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]">
+            <div className="flex justify-end pt-2 border-t dark:border-[#272B38] border-[#E2E8F0]">
               <button
                 onClick={() => setInspectUser(null)}
-                className="px-4 py-2 rounded-xl dark:bg-[#202020] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] text-xs font-semibold dark:text-[#CDCBCA] text-[#242424] transition shadow-sm"
+                className="px-4 py-2 rounded-xl dark:bg-[#191D2A] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] text-xs font-semibold dark:text-[#E8ECF5] text-[#242424] transition shadow-sm"
               >
                 Close Inspection
               </button>
@@ -1110,21 +1110,21 @@ export const App: React.FC = () => {
       {/* User Status Change Confirmation Modal */}
       {statusModalUser && (
         <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+          <div className="dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center space-x-2 text-amber-500">
               <AlertTriangle className="w-5 h-5 shrink-0" />
-              <h3 className="font-bold dark:text-[#CDCBCA] text-[#242424] text-base">Confirm Account Status Modification</h3>
+              <h3 className="font-bold dark:text-[#E8ECF5] text-[#242424] text-base">Confirm Account Status Modification</h3>
             </div>
 
-            <p className="text-xs dark:text-[#A5A5A5] text-[#64748B] leading-relaxed">
+            <p className="text-xs dark:text-[#9AA4B8] text-[#64748B] leading-relaxed">
               You are modifying the status of{' '}
-              <span className="font-bold dark:text-[#CDCBCA] text-[#242424]">{statusModalUser.email}</span> from{' '}
+              <span className="font-bold dark:text-[#E8ECF5] text-[#242424]">{statusModalUser.email}</span> from{' '}
               <span className="font-semibold">{statusModalUser.status}</span> to{' '}
               <span className="font-bold text-amber-500">{statusModalTargetStatus}</span>.
             </p>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold dark:text-[#CDCBCA] text-[#242424]">
+              <label className="text-xs font-semibold dark:text-[#E8ECF5] text-[#242424]">
                 Administrative Rationale (Required for Audit Compliance)
               </label>
               <textarea
@@ -1132,7 +1132,7 @@ export const App: React.FC = () => {
                 placeholder="Enter detailed reason for account suspension or status change (min 5 characters)..."
                 value={statusModalReason}
                 onChange={(e) => setStatusModalReason(e.target.value)}
-                className="w-full p-2.5 rounded-xl dark:bg-[#080808] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] placeholder-slate-400 focus:outline-none focus:border-[#2563EB]"
+                className="w-full p-2.5 rounded-xl dark:bg-[#0B0D14] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#E8ECF5] text-[#242424] placeholder-slate-400 focus:outline-none focus:border-[#2563EB]"
               />
             </div>
 
@@ -1140,7 +1140,7 @@ export const App: React.FC = () => {
               <button
                 onClick={() => setStatusModalUser(null)}
                 disabled={isSubmittingStatus}
-                className="px-4 py-2 rounded-xl dark:bg-[#202020] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] text-xs font-semibold dark:text-[#CDCBCA] text-[#475569] transition shadow-sm"
+                className="px-4 py-2 rounded-xl dark:bg-[#191D2A] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] text-xs font-semibold dark:text-[#E8ECF5] text-[#475569] transition shadow-sm"
               >
                 Cancel
               </button>

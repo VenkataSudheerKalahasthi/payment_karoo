@@ -350,15 +350,15 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
   return (
     <div className="space-y-6 font-sans">
       {/* Header Banner */}
-      <div className="interactive-card flex flex-col md:flex-row md:items-center justify-between gap-4 dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl p-6 shadow-sm">
+      <div className="interactive-card flex flex-col md:flex-row md:items-center justify-between gap-4 dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-2xl p-6 shadow-sm">
         <div className="space-y-1">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-xl bg-[#5046E5]/10 border border-[#5046E5]/20 text-[#5046E5] flex items-center justify-center">
               <FolderKanban className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-xl font-bold dark:text-[#CDCBCA] text-[#242424] tracking-tight">Projects &amp; Milestones Workspace</h1>
-              <p className="text-xs dark:text-[#A5A5A5] text-[#64748B]">
+              <h1 className="text-xl font-bold dark:text-[#E8ECF5] text-[#242424] tracking-tight">Projects &amp; Milestones Workspace</h1>
+              <p className="text-xs dark:text-[#9AA4B8] text-[#64748B]">
                 End-to-end milestone lifecycle management, deliverable submissions, and ledger-verified progress tracking.
               </p>
             </div>
@@ -371,7 +371,7 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
               if (selectedProjectId) loadProjectDetails(selectedProjectId);
               loadProjects();
             }}
-            className="px-4 py-2 rounded-xl dark:bg-[#202020] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] text-xs font-semibold dark:text-[#CDCBCA] text-[#242424] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] flex items-center space-x-2 transition shadow-sm"
+            className="px-4 py-2 rounded-xl dark:bg-[#191D2A] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] text-xs font-semibold dark:text-[#E8ECF5] text-[#242424] border dark:border-[#272B38] border-[#E2E8F0] flex items-center space-x-2 transition shadow-sm"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isLoadingDetails ? 'animate-spin text-[#5046E5]' : ''}`} />
             <span>Refresh State</span>
@@ -385,7 +385,7 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
             <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
             <span>{actionSuccess}</span>
           </div>
-          <button onClick={() => setActionSuccess(null)} className="dark:text-[#777777] text-[#64748B] hover:text-black hover:dark:text-white" aria-label="Dismiss">✕</button>
+          <button onClick={() => setActionSuccess(null)} className="dark:text-[#9AA4B8] text-[#64748B] hover:text-black hover:dark:text-white" aria-label="Dismiss">✕</button>
         </div>
       )}
 
@@ -395,7 +395,7 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
             <AlertTriangle className="w-4 h-4 flex-shrink-0" />
             <span>{actionError}</span>
           </div>
-          <button onClick={() => setActionError(null)} className="dark:text-[#777777] text-[#64748B] hover:text-black hover:dark:text-white" aria-label="Dismiss">✕</button>
+          <button onClick={() => setActionError(null)} className="dark:text-[#9AA4B8] text-[#64748B] hover:text-black hover:dark:text-white" aria-label="Dismiss">✕</button>
         </div>
       )}
 
@@ -403,18 +403,18 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Projects List */}
         <div className="lg:col-span-4 space-y-4">
-          <div className="interactive-card dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl p-4 shadow-sm space-y-3">
-            <h2 className="text-xs font-bold dark:text-[#A5A5A5] text-[#64748B] uppercase tracking-wider px-1">
+          <div className="interactive-card dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-2xl p-4 shadow-sm space-y-3">
+            <h2 className="text-xs font-bold dark:text-[#9AA4B8] text-[#64748B] uppercase tracking-wider px-1">
               Active Engagements ({projects.length})
             </h2>
 
             {isLoadingList ? (
-              <div className="py-8 text-center text-xs dark:text-[#777777] text-[#64748B] flex items-center justify-center space-x-2">
+              <div className="py-8 text-center text-xs dark:text-[#9AA4B8] text-[#64748B] flex items-center justify-center space-x-2">
                 <RefreshCw className="w-4 h-4 animate-spin text-[#5046E5]" />
                 <span>Loading projects...</span>
               </div>
             ) : projects.length === 0 ? (
-              <div className="p-6 text-center text-xs dark:text-[#777777] text-[#64748B] dark:bg-[#080808]/40 bg-[#F8FAFC] rounded-xl border border-dashed dark:border-[rgba(205,203,202,0.15)] border-[#E2E8F0]">
+              <div className="p-6 text-center text-xs dark:text-[#9AA4B8] text-[#64748B] dark:bg-[#0B0D14]/40 bg-[#F8FAFC] rounded-xl border border-dashed dark:border-[rgba(205,203,202,0.15)] border-[#E2E8F0]">
                 No active projects found. Projects are automatically initialized when digital contracts achieve mutual cryptographic sign-off.
               </div>
             ) : (
@@ -427,12 +427,12 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
                       onClick={() => setSelectedProjectId(p.id)}
                       className={`w-full text-left p-3.5 rounded-xl border transition flex flex-col space-y-2 ${
                         isSelected
-                          ? 'dark:bg-[#202020] bg-[#EEF2FF] border-[#5046E5] shadow-sm ring-1 ring-[#5046E5]'
-                          : 'dark:bg-[#080808]/40 bg-white dark:border-[rgba(205,203,202,0.15)] border-[#E2E8F0] hover:border-[#5046E5]/40'
+                          ? 'dark:bg-[#191D2A] bg-[#EEF2FF] border-[#5046E5] shadow-sm ring-1 ring-[#5046E5]'
+                          : 'dark:bg-[#0B0D14]/40 bg-white dark:border-[rgba(205,203,202,0.15)] border-[#E2E8F0] hover:border-[#5046E5]/40'
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold dark:text-[#CDCBCA] text-[#242424] line-clamp-1">{p.title}</span>
+                        <span className="text-xs font-bold dark:text-[#E8ECF5] text-[#242424] line-clamp-1">{p.title}</span>
                         <span
                           className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
                             p.status === 'COMPLETED'
@@ -444,9 +444,9 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
                         </span>
                       </div>
 
-                      <p className="text-[11px] dark:text-[#A5A5A5] text-[#64748B] line-clamp-2 leading-relaxed">{p.description}</p>
+                      <p className="text-[11px] dark:text-[#9AA4B8] text-[#64748B] line-clamp-2 leading-relaxed">{p.description}</p>
 
-                      <div className="flex items-center justify-between text-[10px] dark:text-[#777777] text-[#64748B] pt-1 border-t dark:border-[rgba(205,203,202,0.1)] border-[#E2E8F0]">
+                      <div className="flex items-center justify-between text-[10px] dark:text-[#9AA4B8] text-[#64748B] pt-1 border-t dark:border-[rgba(205,203,202,0.1)] border-[#E2E8F0]">
                         <span>Milestones: {p.milestones?.length || 0}</span>
                         <span className="font-semibold text-emerald-500 font-mono">{p.progressPercentage}% Complete</span>
                       </div>
@@ -463,21 +463,21 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
           {selectedProject ? (
             <div className="space-y-6">
               {/* Project Card & Progress Metric Summary */}
-              <div className="interactive-card dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl p-6 shadow-sm space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] pb-4">
+              <div className="interactive-card dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-2xl p-6 shadow-sm space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b dark:border-[#272B38] border-[#E2E8F0] pb-4">
                   <div>
-                    <h2 className="text-lg font-bold dark:text-[#CDCBCA] text-[#242424]">{selectedProject.title}</h2>
-                    <p className="text-xs dark:text-[#A5A5A5] text-[#64748B] mt-0.5">
+                    <h2 className="text-lg font-bold dark:text-[#E8ECF5] text-[#242424]">{selectedProject.title}</h2>
+                    <p className="text-xs dark:text-[#9AA4B8] text-[#64748B] mt-0.5">
                       Contract Ref: <span className="font-mono text-[#5046E5] font-semibold">#{selectedProject.contract?.contractNumber}</span>
                     </p>
                   </div>
 
                   <div className="flex items-center space-x-2">
-                    <span className="text-xs dark:text-[#777777] text-[#64748B]">Parties:</span>
-                    <span className="text-xs px-2.5 py-1 rounded-lg dark:bg-[#202020] bg-[#F1F5F9] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] dark:text-[#CDCBCA] text-[#242424]">
+                    <span className="text-xs dark:text-[#9AA4B8] text-[#64748B]">Parties:</span>
+                    <span className="text-xs px-2.5 py-1 rounded-lg dark:bg-[#191D2A] bg-[#F1F5F9] border dark:border-[#272B38] border-[#E2E8F0] dark:text-[#E8ECF5] text-[#242424]">
                       Client: {selectedProject.client?.firstName || selectedProject.client?.email}
                     </span>
-                    <span className="text-xs px-2.5 py-1 rounded-lg dark:bg-[#202020] bg-[#F1F5F9] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] dark:text-[#CDCBCA] text-[#242424]">
+                    <span className="text-xs px-2.5 py-1 rounded-lg dark:bg-[#191D2A] bg-[#F1F5F9] border dark:border-[#272B38] border-[#E2E8F0] dark:text-[#E8ECF5] text-[#242424]">
                       Specialist: {selectedProject.worker?.firstName || selectedProject.worker?.email}
                     </span>
                   </div>
@@ -485,24 +485,24 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
 
                 {/* Scope & Dates */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                  <div className="p-3.5 rounded-xl dark:bg-[#080808] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] space-y-1">
-                    <span className="text-[11px] font-semibold dark:text-[#A5A5A5] text-[#475569]">Statement of Work Scope</span>
-                    <p className="dark:text-[#CDCBCA] text-[#242424] leading-relaxed">{selectedProject.scope || selectedProject.description}</p>
+                  <div className="p-3.5 rounded-xl dark:bg-[#0B0D14] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] space-y-1">
+                    <span className="text-[11px] font-semibold dark:text-[#9AA4B8] text-[#475569]">Statement of Work Scope</span>
+                    <p className="dark:text-[#E8ECF5] text-[#242424] leading-relaxed">{selectedProject.scope || selectedProject.description}</p>
                   </div>
-                  <div className="p-3.5 rounded-xl dark:bg-[#080808] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] space-y-2">
+                  <div className="p-3.5 rounded-xl dark:bg-[#0B0D14] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="flex items-center space-x-1.5 dark:text-[#A5A5A5] text-[#64748B]">
+                      <span className="flex items-center space-x-1.5 dark:text-[#9AA4B8] text-[#64748B]">
                         <Calendar className="w-3.5 h-3.5" />
                         <span>Start Date:</span>
                       </span>
-                      <span className="font-mono dark:text-[#CDCBCA] text-[#242424]">{selectedProject.startDate ? new Date(selectedProject.startDate).toLocaleDateString() : 'Immediate'}</span>
+                      <span className="font-mono dark:text-[#E8ECF5] text-[#242424]">{selectedProject.startDate ? new Date(selectedProject.startDate).toLocaleDateString() : 'Immediate'}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="flex items-center space-x-1.5 dark:text-[#A5A5A5] text-[#64748B]">
+                      <span className="flex items-center space-x-1.5 dark:text-[#9AA4B8] text-[#64748B]">
                         <Clock className="w-3.5 h-3.5" />
                         <span>Expected Completion:</span>
                       </span>
-                      <span className="font-mono dark:text-[#CDCBCA] text-[#242424]">{selectedProject.expectedCompletionDate ? new Date(selectedProject.expectedCompletionDate).toLocaleDateString() : 'Open-ended'}</span>
+                      <span className="font-mono dark:text-[#E8ECF5] text-[#242424]">{selectedProject.expectedCompletionDate ? new Date(selectedProject.expectedCompletionDate).toLocaleDateString() : 'Open-ended'}</span>
                     </div>
                   </div>
                 </div>
@@ -512,10 +512,10 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
                   <div className="space-y-4 pt-2">
                     <div className="space-y-1.5">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="font-semibold dark:text-[#A5A5A5] text-[#475569]">Overall Milestone Completion</span>
+                        <span className="font-semibold dark:text-[#9AA4B8] text-[#475569]">Overall Milestone Completion</span>
                         <span className="font-bold text-emerald-500 font-mono">{summary.progressPercentage}%</span>
                       </div>
-                      <div className="w-full dark:bg-[#080808] bg-[#E2E8F0] rounded-full h-2.5 overflow-hidden border dark:border-[rgba(205,203,202,0.18)] border-[#CBD5E1]">
+                      <div className="w-full dark:bg-[#0B0D14] bg-[#E2E8F0] rounded-full h-2.5 overflow-hidden border dark:border-[#272B38] border-[#CBD5E1]">
                         <div
                           className="bg-emerald-500 h-2.5 rounded-full transition-all duration-500"
                           style={{ width: `${summary.progressPercentage}%` }}
@@ -524,12 +524,12 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                      <div className="p-3.5 rounded-xl dark:bg-[#080808] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]">
-                        <span className="text-[10px] uppercase font-bold dark:text-[#777777] text-[#64748B]">Agreed Value</span>
-                        <p className="text-sm font-bold font-mono dark:text-[#CDCBCA] text-[#242424] mt-0.5">
+                      <div className="p-3.5 rounded-xl dark:bg-[#0B0D14] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0]">
+                        <span className="text-[10px] uppercase font-bold dark:text-[#9AA4B8] text-[#64748B]">Agreed Value</span>
+                        <p className="text-sm font-bold font-mono dark:text-[#E8ECF5] text-[#242424] mt-0.5">
                           {formatCurrencyMinor(summary.totalValueMinor, summary.currency)}
                         </p>
-                        <span className="text-[10px] dark:text-[#777777] text-[#64748B] font-mono">{summary.totalMilestones} Milestones</span>
+                        <span className="text-[10px] dark:text-[#9AA4B8] text-[#64748B] font-mono">{summary.totalMilestones} Milestones</span>
                       </div>
 
                       <div className="p-3.5 rounded-xl bg-emerald-500/5 border border-emerald-500/20">
@@ -537,7 +537,7 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
                         <p className="text-sm font-bold font-mono text-emerald-500 mt-0.5">
                           {formatCurrencyMinor(summary.approvedValueMinor, summary.currency)}
                         </p>
-                        <span className="text-[10px] dark:text-[#777777] text-[#64748B] font-mono">{summary.completedMilestones} Completed</span>
+                        <span className="text-[10px] dark:text-[#9AA4B8] text-[#64748B] font-mono">{summary.completedMilestones} Completed</span>
                       </div>
 
                       <div className="p-3.5 rounded-xl bg-[#5046E5]/5 border border-[#5046E5]/20">
@@ -545,7 +545,7 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
                         <p className="text-sm font-bold font-mono text-[#5046E5] mt-0.5">
                           {formatCurrencyMinor(summary.pendingValueMinor, summary.currency)}
                         </p>
-                        <span className="text-[10px] dark:text-[#777777] text-[#64748B] font-mono">{summary.inProgressMilestones + summary.inRevisionMilestones} In Progress</span>
+                        <span className="text-[10px] dark:text-[#9AA4B8] text-[#64748B] font-mono">{summary.inProgressMilestones + summary.inRevisionMilestones} In Progress</span>
                       </div>
 
                       <div className="p-3.5 rounded-xl bg-amber-500/5 border border-amber-500/20">
@@ -553,7 +553,7 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
                         <p className="text-sm font-bold font-mono text-amber-500 mt-0.5">
                           {formatCurrencyMinor(summary.remainingUnapprovedValueMinor, summary.currency)}
                         </p>
-                        <span className="text-[10px] dark:text-[#777777] text-[#64748B] font-mono">{summary.pendingMilestones} Not Started</span>
+                        <span className="text-[10px] dark:text-[#9AA4B8] text-[#64748B] font-mono">{summary.pendingMilestones} Not Started</span>
                       </div>
                     </div>
                   </div>
@@ -561,13 +561,13 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
               </div>
 
               {/* Sub-Navigation Tabs */}
-              <div className="flex border-b dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] space-x-6 text-xs font-semibold">
+              <div className="flex border-b dark:border-[#272B38] border-[#E2E8F0] space-x-6 text-xs font-semibold">
                 <button
                   onClick={() => setActiveTab('milestones')}
                   className={`pb-3 transition flex items-center space-x-2 border-b-2 ${
                     activeTab === 'milestones'
                       ? 'border-[#5046E5] text-[#5046E5]'
-                      : 'border-transparent dark:text-[#A5A5A5] text-[#64748B] hover:dark:text-white hover:text-black'
+                      : 'border-transparent dark:text-[#9AA4B8] text-[#64748B] hover:dark:text-white hover:text-black'
                   }`}
                 >
                   <FileCheck2 className="w-4 h-4" />
@@ -579,7 +579,7 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
                   className={`pb-3 transition flex items-center space-x-2 border-b-2 ${
                     activeTab === 'activity'
                       ? 'border-[#5046E5] text-[#5046E5]'
-                      : 'border-transparent dark:text-[#A5A5A5] text-[#64748B] hover:dark:text-white hover:text-black'
+                      : 'border-transparent dark:text-[#9AA4B8] text-[#64748B] hover:dark:text-white hover:text-black'
                   }`}
                 >
                   <History className="w-4 h-4" />
@@ -600,16 +600,16 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
                     return (
                       <div
                         key={m.id}
-                        className="interactive-card dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl p-5 shadow-sm space-y-4 hover:border-[#5046E5]/40 transition"
+                        className="interactive-card dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-2xl p-5 shadow-sm space-y-4 hover:border-[#5046E5]/40 transition"
                       >
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                           <div className="flex items-center space-x-3">
-                            <span className="w-7 h-7 rounded-lg dark:bg-[#202020] bg-[#F1F5F9] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] text-xs font-mono font-bold dark:text-[#CDCBCA] text-[#242424] flex items-center justify-center">
+                            <span className="w-7 h-7 rounded-lg dark:bg-[#191D2A] bg-[#F1F5F9] border dark:border-[#272B38] border-[#E2E8F0] text-xs font-mono font-bold dark:text-[#E8ECF5] text-[#242424] flex items-center justify-center">
                               #{m.order}
                             </span>
                             <div>
-                              <h3 className="text-sm font-bold dark:text-[#CDCBCA] text-[#242424]">{m.title}</h3>
-                              <p className="text-xs dark:text-[#A5A5A5] text-[#64748B]">{m.description}</p>
+                              <h3 className="text-sm font-bold dark:text-[#E8ECF5] text-[#242424]">{m.title}</h3>
+                              <p className="text-xs dark:text-[#9AA4B8] text-[#64748B]">{m.description}</p>
                             </div>
                           </div>
 
@@ -629,7 +629,7 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
                                   ? 'bg-[#5046E5]/10 text-[#5046E5] border-[#5046E5]/20'
                                   : isInRevision
                                   ? 'bg-amber-500/10 text-amber-500 border-amber-500/20'
-                                  : 'dark:bg-[#202020] bg-[#F1F5F9] dark:text-[#777777] text-[#64748B] dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]'
+                                  : 'dark:bg-[#191D2A] bg-[#F1F5F9] dark:text-[#9AA4B8] text-[#64748B] dark:border-[#272B38] border-[#E2E8F0]'
                               }`}
                             >
                               {m.status}
@@ -639,22 +639,22 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
 
                         {/* Submission and Deliverable Details if present */}
                         {latestSubmission && (
-                          <div className="p-3.5 rounded-xl dark:bg-[#080808] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] space-y-2.5 text-xs">
-                            <div className="flex items-center justify-between text-[11px] dark:text-[#A5A5A5] text-[#64748B] border-b dark:border-[rgba(205,203,202,0.1)] border-[#E2E8F0] pb-2">
+                          <div className="p-3.5 rounded-xl dark:bg-[#0B0D14] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] space-y-2.5 text-xs">
+                            <div className="flex items-center justify-between text-[11px] dark:text-[#9AA4B8] text-[#64748B] border-b dark:border-[rgba(205,203,202,0.1)] border-[#E2E8F0] pb-2">
                               <span>
                                 Submitted by {latestSubmission.worker?.firstName || 'Specialist'} on{' '}
                                 {new Date(latestSubmission.submittedAt).toLocaleString()}
                               </span>
-                              <span className="font-semibold dark:text-[#CDCBCA] text-[#242424]">
+                              <span className="font-semibold dark:text-[#E8ECF5] text-[#242424]">
                                 Status: {latestSubmission.status}
                               </span>
                             </div>
 
-                            <p className="dark:text-[#CDCBCA] text-[#242424] leading-relaxed">{latestSubmission.notes}</p>
+                            <p className="dark:text-[#E8ECF5] text-[#242424] leading-relaxed">{latestSubmission.notes}</p>
 
                             {latestSubmission.attachmentUrls && latestSubmission.attachmentUrls.length > 0 && (
                               <div className="space-y-1.5 pt-1">
-                                <span className="text-[10px] uppercase font-bold dark:text-[#777777] text-[#64748B]">
+                                <span className="text-[10px] uppercase font-bold dark:text-[#9AA4B8] text-[#64748B]">
                                   Deliverable Evidence Attachments:
                                 </span>
                                 <div className="flex flex-wrap gap-2">
@@ -662,11 +662,11 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
                                     <button
                                       key={idx}
                                       onClick={() => handleDownloadAttachment(att)}
-                                      className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-lg dark:bg-[#202020] bg-white hover:dark:bg-[#303030] hover:bg-[#F1F5F9] dark:text-[#CDCBCA] text-[#242424] text-[11px] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] transition shadow-sm"
+                                      className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-lg dark:bg-[#191D2A] bg-white hover:dark:bg-[#303030] hover:bg-[#F1F5F9] dark:text-[#E8ECF5] text-[#242424] text-[11px] border dark:border-[#272B38] border-[#E2E8F0] transition shadow-sm"
                                     >
                                       <Download className="w-3 h-3 text-[#5046E5]" />
                                       <span>{att.split('/').pop() || 'Attachment'}</span>
-                                      <ExternalLink className="w-2.5 h-2.5 dark:text-[#777777] text-[#64748B]" />
+                                      <ExternalLink className="w-2.5 h-2.5 dark:text-[#9AA4B8] text-[#64748B]" />
                                     </button>
                                   ))}
                                 </div>
@@ -733,7 +733,7 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
                                   setSelectedMilestone(m);
                                   setRevisionModalOpen(true);
                                 }}
-                                className="px-3.5 py-1.5 rounded-xl dark:bg-[#202020] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] text-xs font-semibold text-amber-500 border border-amber-500/30 flex items-center space-x-1.5 transition shadow-sm"
+                                className="px-3.5 py-1.5 rounded-xl dark:bg-[#191D2A] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] text-xs font-semibold text-amber-500 border border-amber-500/30 flex items-center space-x-1.5 transition shadow-sm"
                               >
                                 <RotateCcw className="w-3.5 h-3.5" />
                                 <span>Request Revision</span>
@@ -778,35 +778,35 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
 
               {/* Tab 2: Activity Audit Log */}
               {activeTab === 'activity' && (
-                <div className="dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl p-6 shadow-sm space-y-4">
-                  <h3 className="text-sm font-bold dark:text-[#CDCBCA] text-[#242424] flex items-center space-x-2">
+                <div className="dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-2xl p-6 shadow-sm space-y-4">
+                  <h3 className="text-sm font-bold dark:text-[#E8ECF5] text-[#242424] flex items-center space-x-2">
                     <History className="w-4 h-4 text-[#5046E5]" />
                     <span>Chronological Milestone Activity Log</span>
                   </h3>
 
                   {activities.length === 0 ? (
-                    <p className="text-xs dark:text-[#777777] text-[#64748B] py-4 text-center">No activity records recorded yet.</p>
+                    <p className="text-xs dark:text-[#9AA4B8] text-[#64748B] py-4 text-center">No activity records recorded yet.</p>
                   ) : (
                     <div className="space-y-3">
                       {activities.map((a) => (
                         <div
                           key={a.id}
-                          className="p-3.5 rounded-xl dark:bg-[#080808] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] flex items-start justify-between gap-4 text-xs"
+                          className="p-3.5 rounded-xl dark:bg-[#0B0D14] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] flex items-start justify-between gap-4 text-xs"
                         >
                           <div className="space-y-1">
                             <div className="flex items-center space-x-2">
-                              <span className="font-bold dark:text-[#CDCBCA] text-[#242424]">{a.action}</span>
+                              <span className="font-bold dark:text-[#E8ECF5] text-[#242424]">{a.action}</span>
                               {a.previousState && a.newState && (
-                                <span className="text-[10px] px-2 py-0.5 rounded font-mono dark:bg-[#202020] bg-slate-200 dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] dark:text-[#A5A5A5] text-[#64748B]">
+                                <span className="text-[10px] px-2 py-0.5 rounded font-mono dark:bg-[#191D2A] bg-slate-200 dark:border-[#272B38] border-[#E2E8F0] dark:text-[#9AA4B8] text-[#64748B]">
                                   {a.previousState} ➔ {a.newState}
                                 </span>
                               )}
                             </div>
-                            <p className="dark:text-[#A5A5A5] text-[#64748B] text-[11px]">
+                            <p className="dark:text-[#9AA4B8] text-[#64748B] text-[11px]">
                               Actor: {a.actor?.firstName || a.actor?.email} ({a.actorRole})
                             </p>
                           </div>
-                          <span className="text-[10px] dark:text-[#777777] text-[#64748B] font-mono flex-shrink-0">
+                          <span className="text-[10px] dark:text-[#9AA4B8] text-[#64748B] font-mono flex-shrink-0">
                             {new Date(a.createdAt).toLocaleString()}
                           </span>
                         </div>
@@ -817,10 +817,10 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
               )}
             </div>
           ) : (
-            <div className="p-12 text-center dark:text-[#A5A5A5] text-[#64748B] dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl shadow-sm space-y-3">
-              <FolderKanban className="w-10 h-10 dark:text-[#777777] text-[#94A3B8] mx-auto" />
-              <h3 className="text-sm font-bold dark:text-[#CDCBCA] text-[#242424]">Select a Project</h3>
-              <p className="text-xs dark:text-[#777777] text-[#64748B] max-w-sm mx-auto">
+            <div className="p-12 text-center dark:text-[#9AA4B8] text-[#64748B] dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-2xl shadow-sm space-y-3">
+              <FolderKanban className="w-10 h-10 dark:text-[#9AA4B8] text-[#94A3B8] mx-auto" />
+              <h3 className="text-sm font-bold dark:text-[#E8ECF5] text-[#242424]">Select a Project</h3>
+              <p className="text-xs dark:text-[#9AA4B8] text-[#64748B] max-w-sm mx-auto">
                 Choose an engagement from the left to inspect milestones, deliverable submissions, and ledger-verified progress tracking.
               </p>
             </div>
@@ -831,34 +831,34 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
       {/* Modal 1: Worker Milestone Submission Modal */}
       {submissionModalOpen && selectedMilestone && (
         <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl">
-            <div className="flex items-center justify-between border-b dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] pb-3">
-              <h3 className="text-base font-bold dark:text-[#CDCBCA] text-[#242424] flex items-center space-x-2">
+          <div className="dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl">
+            <div className="flex items-center justify-between border-b dark:border-[#272B38] border-[#E2E8F0] pb-3">
+              <h3 className="text-base font-bold dark:text-[#E8ECF5] text-[#242424] flex items-center space-x-2">
                 <Send className="w-5 h-5 text-[#5046E5]" />
                 <span>Submit Deliverable: {selectedMilestone.title}</span>
               </h3>
-              <button onClick={() => setSubmissionModalOpen(false)} className="dark:text-[#777777] text-[#64748B] hover:text-black hover:dark:text-white" aria-label="Close modal">✕</button>
+              <button onClick={() => setSubmissionModalOpen(false)} className="dark:text-[#9AA4B8] text-[#64748B] hover:text-black hover:dark:text-white" aria-label="Close modal">✕</button>
             </div>
 
             <div className="space-y-3 text-xs">
               <div className="space-y-1">
-                <label className="font-semibold dark:text-[#A5A5A5] text-[#475569]">Completion Notes &amp; Summary *</label>
+                <label className="font-semibold dark:text-[#9AA4B8] text-[#475569]">Completion Notes &amp; Summary *</label>
                 <textarea
                   rows={4}
                   value={submissionNotes}
                   onChange={(e) => setSubmissionNotes(e.target.value)}
                   placeholder="Detail completed deliverables, implementation highlights, and testing notes..."
-                  className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5] text-xs"
+                  className="w-full px-3 py-2 rounded-xl dark:bg-[#0B0D14] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] dark:text-[#E8ECF5] text-[#242424] focus:outline-none focus:border-[#5046E5] text-xs"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="font-semibold dark:text-[#A5A5A5] text-[#475569]">Deliverable Evidence (PDF, PNG, JPG, ZIP)</label>
+                <label className="font-semibold dark:text-[#9AA4B8] text-[#475569]">Deliverable Evidence (PDF, PNG, JPG, ZIP)</label>
                 <input
                   type="file"
                   onChange={handleFileUpload}
                   disabled={isUploading}
-                  className="w-full text-xs dark:text-[#A5A5A5] text-[#64748B] file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#5046E5] file:text-white hover:file:bg-[#4338CA] cursor-pointer"
+                  className="w-full text-xs dark:text-[#9AA4B8] text-[#64748B] file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#5046E5] file:text-white hover:file:bg-[#4338CA] cursor-pointer"
                 />
                 {isUploading && (
                   <p className="text-[11px] text-[#5046E5] flex items-center space-x-1.5">
@@ -870,9 +870,9 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
 
                 {submissionAttachmentUrls.length > 0 && (
                   <div className="space-y-1 pt-1">
-                    <span className="text-[10px] dark:text-[#777777] text-[#64748B] uppercase font-bold">Attached Evidence:</span>
+                    <span className="text-[10px] dark:text-[#9AA4B8] text-[#64748B] uppercase font-bold">Attached Evidence:</span>
                     {submissionAttachmentUrls.map((att, idx) => (
-                      <div key={idx} className="p-2 rounded-lg dark:bg-[#080808] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] text-[11px] dark:text-[#CDCBCA] text-[#242424] flex items-center justify-between">
+                      <div key={idx} className="p-2 rounded-lg dark:bg-[#0B0D14] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] text-[11px] dark:text-[#E8ECF5] text-[#242424] flex items-center justify-between">
                         <span className="truncate">{att.split('/').pop()}</span>
                         <span className="text-[10px] text-emerald-500 font-semibold">Attached</span>
                       </div>
@@ -882,11 +882,11 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
               </div>
             </div>
 
-            <div className="flex items-center justify-end space-x-3 pt-3 border-t dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]">
+            <div className="flex items-center justify-end space-x-3 pt-3 border-t dark:border-[#272B38] border-[#E2E8F0]">
               <button
                 type="button"
                 onClick={() => setSubmissionModalOpen(false)}
-                className="px-4 py-2 rounded-xl dark:bg-[#202020] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#475569] transition shadow-sm"
+                className="px-4 py-2 rounded-xl dark:bg-[#191D2A] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] text-xs dark:text-[#E8ECF5] text-[#475569] transition shadow-sm"
               >
                 Cancel
               </button>
@@ -907,13 +907,13 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
       {/* Modal 2: Client Revision Request Modal */}
       {revisionModalOpen && selectedMilestone && (
         <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl">
-            <div className="flex items-center justify-between border-b dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] pb-3">
-              <h3 className="text-base font-bold dark:text-[#CDCBCA] text-[#242424] flex items-center space-x-2">
+          <div className="dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl">
+            <div className="flex items-center justify-between border-b dark:border-[#272B38] border-[#E2E8F0] pb-3">
+              <h3 className="text-base font-bold dark:text-[#E8ECF5] text-[#242424] flex items-center space-x-2">
                 <RotateCcw className="w-5 h-5 text-amber-500" />
                 <span>Request Revision: {selectedMilestone.title}</span>
               </h3>
-              <button onClick={() => setRevisionModalOpen(false)} className="dark:text-[#777777] text-[#64748B] hover:text-black hover:dark:text-white" aria-label="Close modal">✕</button>
+              <button onClick={() => setRevisionModalOpen(false)} className="dark:text-[#9AA4B8] text-[#64748B] hover:text-black hover:dark:text-white" aria-label="Close modal">✕</button>
             </div>
 
             <div className="space-y-3 text-xs">
@@ -922,22 +922,22 @@ export const ProjectsWorkspace: React.FC<ProjectsWorkspaceProps> = ({
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold dark:text-[#A5A5A5] text-[#475569]">Revision Reason &amp; Deficiencies *</label>
+                <label className="font-semibold dark:text-[#9AA4B8] text-[#475569]">Revision Reason &amp; Deficiencies *</label>
                 <textarea
                   rows={4}
                   value={revisionReason}
                   onChange={(e) => setRevisionReason(e.target.value)}
                   placeholder="Detail the specific corrections required before approval..."
-                  className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-amber-500 text-xs"
+                  className="w-full px-3 py-2 rounded-xl dark:bg-[#0B0D14] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] dark:text-[#E8ECF5] text-[#242424] focus:outline-none focus:border-amber-500 text-xs"
                 />
               </div>
             </div>
 
-            <div className="flex items-center justify-end space-x-3 pt-3 border-t dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]">
+            <div className="flex items-center justify-end space-x-3 pt-3 border-t dark:border-[#272B38] border-[#E2E8F0]">
               <button
                 type="button"
                 onClick={() => setRevisionModalOpen(false)}
-                className="px-4 py-2 rounded-xl dark:bg-[#202020] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#475569] transition shadow-sm"
+                className="px-4 py-2 rounded-xl dark:bg-[#191D2A] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] text-xs dark:text-[#E8ECF5] text-[#475569] transition shadow-sm"
               >
                 Cancel
               </button>

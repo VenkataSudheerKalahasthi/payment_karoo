@@ -130,10 +130,10 @@ export const PaymentHistory: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="interactive-card flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm p-6 rounded-2xl">
+      <div className="interactive-card flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-slate-200 shadow-sm p-6 rounded-2xl">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl dark:bg-[#8BFF24]/10 bg-[#EEF2FF] border dark:border-[#8BFF24]/30 border-[#C7D2FE] flex items-center justify-center">
-            <CreditCard className="w-5 h-5 dark:text-[#8BFF24] text-[#5046E5]" />
+          <div className="w-10 h-10 rounded-xl dark:bg-[#1C2740] bg-[#EEF2FF] border dark:border-[#1F61EF]/30 border-[#C7D2FE] flex items-center justify-center">
+            <CreditCard className="w-5 h-5 dark:text-[#8FB5FF] text-[#5046E5]" />
           </div>
           <div>
             <h1 className="text-xl sm:text-2xl font-bold dark:text-white text-slate-900 tracking-tight">Payment & Escrow History</h1>
@@ -146,7 +146,7 @@ export const PaymentHistory: React.FC = () => {
         <button
           onClick={fetchTransactions}
           disabled={loading}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl dark:bg-[#1e201e] bg-slate-100 border dark:border-[#2e322e] border-slate-300 dark:text-zinc-300 text-slate-700 hover:dark:text-white hover:text-slate-900 hover:dark:bg-[#282c28] hover:bg-slate-200 hover:dark:border-[#8BFF24]/40 border-[#C7D2FE] transition text-sm font-medium"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl dark:bg-[#191D2A] bg-slate-100 border dark:border-[#272B38] border-slate-300 dark:text-zinc-300 text-slate-700 hover:dark:text-white hover:text-slate-900 hover:dark:bg-[#282c28] hover:bg-slate-200 hover:dark:border-[#1F61EF]/40 border-[#C7D2FE] transition text-sm font-medium"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           Refresh Ledger
@@ -155,25 +155,25 @@ export const PaymentHistory: React.FC = () => {
 
       {/* KPI Metrics */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
-        <div className="interactive-card dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm p-4 rounded-xl">
+        <div className="interactive-card dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-slate-200 shadow-sm p-4 rounded-xl">
           <p className="text-xs dark:text-zinc-400 text-slate-500 uppercase tracking-wider font-medium">Total Transactions</p>
           <p className="text-2xl font-bold dark:text-white text-slate-900 mt-1">{metrics.count}</p>
           <p className="text-xs text-zinc-500 mt-1">Immutable ledger entries</p>
         </div>
 
-        <div className="interactive-card dark:bg-[#121412] bg-white border dark:border-[#8BFF24]/30 border-[#C7D2FE] shadow-sm p-4 rounded-xl">
-          <p className="text-xs dark:text-[#8BFF24] text-[#5046E5] uppercase tracking-wider font-semibold">Total Escrow Inflow</p>
-          <p className="text-2xl font-bold dark:text-[#8BFF24] text-[#5046E5] mt-1 font-mono">${metrics.totalDeposited.toLocaleString()}</p>
+        <div className="interactive-card dark:bg-[#191B25] bg-white border dark:border-[#1F61EF]/30 border-[#C7D2FE] shadow-sm p-4 rounded-xl">
+          <p className="text-xs dark:text-[#8FB5FF] text-[#5046E5] uppercase tracking-wider font-semibold">Total Escrow Inflow</p>
+          <p className="text-2xl font-bold dark:text-[#8FB5FF] text-[#5046E5] mt-1 font-mono">${metrics.totalDeposited.toLocaleString()}</p>
           <p className="text-xs dark:text-zinc-400 text-slate-500 mt-1">Client funded escrow</p>
         </div>
 
-        <div className="interactive-card dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm p-4 rounded-xl">
+        <div className="interactive-card dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-slate-200 shadow-sm p-4 rounded-xl">
           <p className="text-xs dark:text-zinc-400 text-slate-500 uppercase tracking-wider font-medium">Settled to Specialists</p>
           <p className="text-2xl font-bold text-emerald-400 mt-1 font-mono">${metrics.totalSettled.toLocaleString()}</p>
           <p className="text-xs text-zinc-500 mt-1">Disbursed on milestone approval</p>
         </div>
 
-        <div className="interactive-card dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm p-4 rounded-xl">
+        <div className="interactive-card dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-slate-200 shadow-sm p-4 rounded-xl">
           <p className="text-xs dark:text-zinc-400 text-slate-500 uppercase tracking-wider font-medium">Refunded Escrow</p>
           <p className="text-2xl font-bold text-amber-400 mt-1 font-mono">${metrics.totalRefunded.toLocaleString()}</p>
           <p className="text-xs text-zinc-500 mt-1">Returned to wallet</p>
@@ -181,7 +181,7 @@ export const PaymentHistory: React.FC = () => {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="interactive-card dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm p-4 rounded-xl flex flex-col md:flex-row gap-3 items-center justify-between">
+      <div className="interactive-card dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-slate-200 shadow-sm p-4 rounded-xl flex flex-col md:flex-row gap-3 items-center justify-between">
         <div className="relative w-full md:w-80">
           <Search className="w-4 h-4 dark:text-zinc-400 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
@@ -189,7 +189,7 @@ export const PaymentHistory: React.FC = () => {
             placeholder="Search by reference or description..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full dark:bg-[#181a18] bg-slate-50 border dark:border-[#2e322e] border-slate-300 rounded-lg pl-9 pr-4 py-2 text-sm dark:text-white text-slate-900 placeholder-zinc-400 focus:outline-none focus:dark:border-[#8BFF24]/60 focus:border-[#5046E5] transition"
+            className="w-full dark:bg-[#191B25] bg-slate-50 border dark:border-[#272B38] border-slate-300 rounded-lg pl-9 pr-4 py-2 text-sm dark:text-white text-slate-900 placeholder-zinc-400 focus:outline-none focus:dark:border-[#1F61EF]/60 focus:border-[#5046E5] transition"
           />
         </div>
 
@@ -200,8 +200,8 @@ export const PaymentHistory: React.FC = () => {
               onClick={() => setStatusFilter(st)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
                 statusFilter === st
-                  ? 'dark:bg-[#8BFF24] bg-[#5046E5] dark:text-black text-white shadow-sm'
-                  : 'dark:bg-[#181a18] bg-slate-50 dark:text-zinc-300 text-slate-700 hover:dark:text-white hover:text-[#5046E5] hover:dark:bg-[#202220] hover:bg-[#EEF2FF] border dark:border-[#2e322e] border-slate-300'
+                  ? 'dark:bg-[#1F61EF] bg-[#5046E5] dark:text-black text-white shadow-sm'
+                  : 'dark:bg-[#191B25] bg-slate-50 dark:text-zinc-300 text-slate-700 hover:dark:text-white hover:text-[#5046E5] hover:dark:bg-[#191D2A] hover:bg-[#EEF2FF] border dark:border-[#272B38] border-slate-300'
               }`}
             >
               {st}
@@ -212,8 +212,8 @@ export const PaymentHistory: React.FC = () => {
 
       {/* Transactions Table */}
       {loading ? (
-        <div className="dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm p-12 rounded-2xl flex flex-col items-center justify-center text-center">
-          <RefreshCw className="w-8 h-8 dark:text-[#8BFF24] text-[#5046E5] animate-spin mb-3" />
+        <div className="dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-slate-200 shadow-sm p-12 rounded-2xl flex flex-col items-center justify-center text-center">
+          <RefreshCw className="w-8 h-8 dark:text-[#8FB5FF] text-[#5046E5] animate-spin mb-3" />
           <p className="dark:text-zinc-400 text-slate-500 text-sm">Querying verified ledger transactions...</p>
         </div>
       ) : error ? (
@@ -222,7 +222,7 @@ export const PaymentHistory: React.FC = () => {
           <p className="text-sm">{error}</p>
         </div>
       ) : filteredTransactions.length === 0 ? (
-        <div className="dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm p-12 rounded-2xl text-center">
+        <div className="dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-slate-200 shadow-sm p-12 rounded-2xl text-center">
           <CreditCard className="w-10 h-10 text-zinc-600 mx-auto mb-3" />
           <h3 className="text-base font-semibold dark:text-white text-slate-900">No payment transactions recorded</h3>
           <p className="text-xs dark:text-zinc-400 text-slate-500 mt-1 max-w-sm mx-auto">
@@ -232,10 +232,10 @@ export const PaymentHistory: React.FC = () => {
           </p>
         </div>
       ) : (
-        <div className="interactive-card dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm rounded-2xl overflow-hidden">
+        <div className="interactive-card dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-slate-200 shadow-sm rounded-2xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="dark:bg-[#181a18] bg-slate-50 border-b dark:border-[#262926] border-slate-200 text-xs uppercase dark:text-zinc-400 text-slate-500 tracking-wider">
+              <thead className="dark:bg-[#191B25] bg-slate-50 border-b dark:border-[#272B38] border-slate-200 text-xs uppercase dark:text-zinc-400 text-slate-500 tracking-wider">
                 <tr>
                   <th className="py-3.5 px-4 font-semibold">Transaction / Ref</th>
                   <th className="py-3.5 px-4 font-semibold">Date & Time</th>
@@ -270,9 +270,9 @@ export const PaymentHistory: React.FC = () => {
                     <td className="py-3.5 px-4 text-right">
                       <button
                         onClick={() => setSelectedTx(tx)}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg dark:bg-[#1e201e] bg-slate-100 hover:dark:bg-[#282c28] hover:bg-[#EEF2FF] border dark:border-[#2e322e] border-slate-300 dark:text-zinc-300 text-slate-700 hover:dark:text-white hover:text-[#5046E5] text-xs transition"
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg dark:bg-[#191D2A] bg-slate-100 hover:dark:bg-[#282c28] hover:bg-[#EEF2FF] border dark:border-[#272B38] border-slate-300 dark:text-zinc-300 text-slate-700 hover:dark:text-white hover:text-[#5046E5] text-xs transition"
                       >
-                        <Eye className="w-3 h-3 dark:text-[#8BFF24] text-[#5046E5]" />
+                        <Eye className="w-3 h-3 dark:text-[#8FB5FF] text-[#5046E5]" />
                         Details
                       </button>
                     </td>
@@ -287,7 +287,7 @@ export const PaymentHistory: React.FC = () => {
       {/* Transaction Details Modal */}
       {selectedTx && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm w-full max-w-lg rounded-2xl p-6 space-y-4 shadow-2xl relative">
+          <div className="dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-slate-200 shadow-sm w-full max-w-lg rounded-2xl p-6 space-y-4 shadow-2xl relative">
             <button
               onClick={() => setSelectedTx(null)}
               className="absolute top-4 right-4 dark:text-zinc-400 text-slate-500 hover:dark:text-white hover:text-slate-900 p-1 rounded-lg hover:dark:bg-zinc-800 hover:bg-slate-100"
@@ -296,7 +296,7 @@ export const PaymentHistory: React.FC = () => {
             </button>
 
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl dark:bg-[#8BFF24]/10 bg-[#EEF2FF] border dark:border-[#8BFF24]/30 border-[#C7D2FE] flex items-center justify-center dark:text-[#8BFF24] text-[#5046E5]">
+              <div className="w-10 h-10 rounded-xl dark:bg-[#1C2740] bg-[#EEF2FF] border dark:border-[#1F61EF]/30 border-[#C7D2FE] flex items-center justify-center dark:text-[#8FB5FF] text-[#5046E5]">
                 <ShieldCheck className="w-5 h-5" />
               </div>
               <div>
@@ -305,14 +305,14 @@ export const PaymentHistory: React.FC = () => {
               </div>
             </div>
 
-            <div className="p-4 rounded-xl dark:bg-[#181a18] bg-slate-50 border dark:border-[#262926] border-slate-200 space-y-3 text-xs">
+            <div className="p-4 rounded-xl dark:bg-[#191B25] bg-slate-50 border dark:border-[#272B38] border-slate-200 space-y-3 text-xs">
               <div className="flex justify-between items-center">
                 <span className="dark:text-zinc-400 text-slate-500">Timestamp:</span>
                 <span className="dark:text-white text-slate-900 font-mono">{new Date(selectedTx.createdAt).toUTCString()}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="dark:text-zinc-400 text-slate-500">Amount:</span>
-                <span className="font-mono font-bold text-sm dark:text-[#8BFF24] text-[#5046E5]">
+                <span className="font-mono font-bold text-sm dark:text-[#8FB5FF] text-[#5046E5]">
                   ${(Number(selectedTx.amountMinor || 0) / 100).toLocaleString()} {selectedTx.currency || 'USD'}
                 </span>
               </div>
@@ -338,8 +338,8 @@ export const PaymentHistory: React.FC = () => {
               )}
             </div>
 
-            <div className="p-3 dark:bg-[#181a18] bg-slate-50 rounded-xl border dark:border-[#262926] border-slate-200 flex items-center gap-2 text-xs dark:text-zinc-400 text-slate-500">
-              <ShieldCheck className="w-4 h-4 dark:text-[#8BFF24] text-[#5046E5] flex-shrink-0" />
+            <div className="p-3 dark:bg-[#191B25] bg-slate-50 rounded-xl border dark:border-[#272B38] border-slate-200 flex items-center gap-2 text-xs dark:text-zinc-400 text-slate-500">
+              <ShieldCheck className="w-4 h-4 dark:text-[#8FB5FF] text-[#5046E5] flex-shrink-0" />
               <span>Immutable double-entry cryptographic ledger transaction recorded by TrustPay Enterprise.</span>
             </div>
 

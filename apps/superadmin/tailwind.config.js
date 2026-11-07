@@ -9,18 +9,21 @@ export default {
         mono: ['JetBrains Mono', 'monospace'],
       },
       colors: {
-        // Dark Theme — Obsidian Chrome
+        // Dark Theme — Exact Dark Navy & Electric Blue Palette
         obsidian: {
-          DEFAULT: '#080808',
-          bg: '#080808',
-          sidebar: '#080808',
-          card: '#171717',
-          elevated: '#202020',
-          hover: '#303030',
-          text: '#CDCBCA',
-          secondary: '#A5A5A5',
-          muted: '#777777',
-          border: 'rgba(205, 203, 202, 0.18)',
+          DEFAULT: '#0B0D14',
+          bg: '#0B0D14',
+          sidebar: '#0B0D14',
+          card: '#191B25',
+          elevated: '#191D2A',
+          hover: '#1C2740',
+          text: '#E8ECF5',
+          secondary: '#9AA4B8',
+          muted: '#9AA4B8',
+          border: '#272B38',
+          accent: '#1C2740',
+          accentText: '#8FB5FF',
+          primary: '#1F61EF',
         },
         // Light Theme — Pearl White + Royal Blue
         pearl: {

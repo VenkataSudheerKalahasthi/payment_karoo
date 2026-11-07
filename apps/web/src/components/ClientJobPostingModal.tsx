@@ -122,23 +122,23 @@ export const ClientJobPostingModal: React.FC<Props> = ({ isOpen, onClose, onSucc
 
   return (
     <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="dark:bg-[#121212] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl max-w-3xl w-full max-h-[92vh] overflow-y-auto p-6 space-y-6 shadow-2xl dark:text-[#CDCBCA] text-[#242424]">
+      <div className="dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-2xl max-w-3xl w-full max-h-[92vh] overflow-y-auto p-6 space-y-6 shadow-2xl dark:text-[#E8ECF5] text-[#242424]">
         {/* Header */}
         <div className="flex items-center justify-between border-b dark:border-[rgba(205,203,202,0.15)] border-[#E2E8F0] pb-4">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl dark:bg-[#1C1F1C] bg-[#EEF2FF] border dark:border-[rgba(139,255,36,0.3)] border-[#C7D2FE] flex items-center justify-center text-[#5046E5] dark:text-[#8BFF24]">
+            <div className="w-10 h-10 rounded-xl dark:bg-[#1C2740] bg-[#EEF2FF] border dark:border-[rgba(31,97,239,0.25)] border-[#C7D2FE] flex items-center justify-center text-[#5046E5] dark:text-[#8FB5FF]">
               <Briefcase className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold dark:text-[#CDCBCA] text-[#111827]">Post a Work Opportunity</h3>
-              <p className="text-xs dark:text-[#A5A5A5] text-[#64748B]">
+              <h3 className="text-base font-bold dark:text-[#E8ECF5] text-[#111827]">Post a Work Opportunity</h3>
+              <p className="text-xs dark:text-[#9AA4B8] text-[#64748B]">
                 Publish project requirements, budget, team scale, and location preferences for verified Specialists.
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg dark:hover:bg-[#202020] hover:bg-[#F1F5F9] dark:text-[#A5A5A5] text-[#64748B] transition cursor-pointer"
+            className="p-1.5 rounded-lg dark:hover:bg-[#1C2740] hover:bg-[#F1F5F9] dark:text-[#9AA4B8] text-[#64748B] transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -153,7 +153,7 @@ export const ClientJobPostingModal: React.FC<Props> = ({ isOpen, onClose, onSucc
         <div className="space-y-5 text-xs">
           {/* 1. Basic Info */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider dark:text-[#8BFF24] text-[#5046E5] flex items-center gap-1.5">
+            <h4 className="text-xs font-bold uppercase tracking-wider dark:text-[#8FB5FF] text-[#5046E5] flex items-center gap-1.5">
               <span>1. Basic Job Information</span>
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -164,7 +164,7 @@ export const ClientJobPostingModal: React.FC<Props> = ({ isOpen, onClose, onSucc
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g. Enterprise Full-Stack Healthcare Portal Development"
-                  className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.12)] border-[#E2E8F0] dark:text-[#CDCBCA] text-[#111827] focus:outline-none focus:border-[#5046E5] dark:focus:border-[#8BFF24]"
+                  className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] dark:text-[#E8ECF5] text-[#111827] focus:outline-none focus:border-[#5046E5] dark:focus:border-[#1F61EF]"
                 />
               </div>
               <div className="space-y-1">
@@ -172,7 +172,7 @@ export const ClientJobPostingModal: React.FC<Props> = ({ isOpen, onClose, onSucc
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.12)] border-[#E2E8F0] dark:text-[#CDCBCA] text-[#111827] focus:outline-none"
+                  className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] dark:text-[#E8ECF5] text-[#111827] focus:outline-none"
                 >
                   <option value="Software Engineering">Software Engineering</option>
                   <option value="AI & Machine Learning">AI & Machine Learning</option>
@@ -192,7 +192,7 @@ export const ClientJobPostingModal: React.FC<Props> = ({ isOpen, onClose, onSucc
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Comprehensive overview of the work requirements, scope, and technical context..."
-                className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.12)] border-[#E2E8F0] dark:text-[#CDCBCA] text-[#111827] focus:outline-none focus:border-[#5046E5] dark:focus:border-[#8BFF24]"
+                className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] dark:text-[#E8ECF5] text-[#111827] focus:outline-none focus:border-[#5046E5] dark:focus:border-[#1F61EF]"
               />
             </div>
 
@@ -204,7 +204,7 @@ export const ClientJobPostingModal: React.FC<Props> = ({ isOpen, onClose, onSucc
                   value={objectives}
                   onChange={(e) => setObjectives(e.target.value)}
                   placeholder="Goals, performance targets, and success criteria..."
-                  className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.12)] border-[#E2E8F0] dark:text-[#CDCBCA] text-[#111827] focus:outline-none"
+                  className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] dark:text-[#E8ECF5] text-[#111827] focus:outline-none"
                 />
               </div>
               <div className="space-y-1">
@@ -214,15 +214,15 @@ export const ClientJobPostingModal: React.FC<Props> = ({ isOpen, onClose, onSucc
                   value={deliverables}
                   onChange={(e) => setDeliverables(e.target.value)}
                   placeholder="Specific outputs, milestones, artifacts, or source code..."
-                  className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.12)] border-[#E2E8F0] dark:text-[#CDCBCA] text-[#111827] focus:outline-none"
+                  className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] dark:text-[#E8ECF5] text-[#111827] focus:outline-none"
                 />
               </div>
             </div>
           </div>
 
           {/* 2. Work Mode & Location */}
-          <div className="space-y-3 pt-3 border-t dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0]">
-            <h4 className="text-xs font-bold uppercase tracking-wider dark:text-[#8BFF24] text-[#5046E5] flex items-center gap-1.5">
+          <div className="space-y-3 pt-3 border-t dark:border-[#272B38] border-[#E2E8F0]">
+            <h4 className="text-xs font-bold uppercase tracking-wider dark:text-[#8FB5FF] text-[#5046E5] flex items-center gap-1.5">
               <MapPin className="w-3.5 h-3.5" />
               <span>2. Work Location & Operational Mode</span>
             </h4>
@@ -232,7 +232,7 @@ export const ClientJobPostingModal: React.FC<Props> = ({ isOpen, onClose, onSucc
                 <select
                   value={workMode}
                   onChange={(e) => setWorkMode(e.target.value as any)}
-                  className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.12)] border-[#E2E8F0] dark:text-[#CDCBCA] text-[#111827] focus:outline-none"
+                  className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] dark:text-[#E8ECF5] text-[#111827] focus:outline-none"
                 >
                   <option value="REMOTE">Remote (Any Location)</option>
                   <option value="HYBRID">Hybrid (Partial On-Site)</option>
@@ -246,7 +246,7 @@ export const ClientJobPostingModal: React.FC<Props> = ({ isOpen, onClose, onSucc
                   value={country}
                   onChange={(e) => setCountry(e.target.value)}
                   placeholder="e.g. India, United States"
-                  className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.12)] border-[#E2E8F0] dark:text-[#CDCBCA] text-[#111827] focus:outline-none"
+                  className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] dark:text-[#E8ECF5] text-[#111827] focus:outline-none"
                 />
               </div>
               <div className="space-y-1">
@@ -256,7 +256,7 @@ export const ClientJobPostingModal: React.FC<Props> = ({ isOpen, onClose, onSucc
                   value={state}
                   onChange={(e) => setState(e.target.value)}
                   placeholder="e.g. Andhra Pradesh, California"
-                  className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.12)] border-[#E2E8F0] dark:text-[#CDCBCA] text-[#111827] focus:outline-none"
+                  className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] dark:text-[#E8ECF5] text-[#111827] focus:outline-none"
                 />
               </div>
               <div className="space-y-1">
@@ -266,7 +266,7 @@ export const ClientJobPostingModal: React.FC<Props> = ({ isOpen, onClose, onSucc
                   value={district}
                   onChange={(e) => setDistrict(e.target.value)}
                   placeholder="e.g. Prakasam, Orange"
-                  className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.12)] border-[#E2E8F0] dark:text-[#CDCBCA] text-[#111827] focus:outline-none"
+                  className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] dark:text-[#E8ECF5] text-[#111827] focus:outline-none"
                 />
               </div>
             </div>
@@ -279,7 +279,7 @@ export const ClientJobPostingModal: React.FC<Props> = ({ isOpen, onClose, onSucc
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   placeholder="e.g. Ongole, Hyderabad, Bangalore"
-                  className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.12)] border-[#E2E8F0] dark:text-[#CDCBCA] text-[#111827] focus:outline-none"
+                  className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] dark:text-[#E8ECF5] text-[#111827] focus:outline-none"
                 />
               </div>
               <div className="space-y-1">
@@ -289,7 +289,7 @@ export const ClientJobPostingModal: React.FC<Props> = ({ isOpen, onClose, onSucc
                   value={postalCode}
                   onChange={(e) => setPostalCode(e.target.value)}
                   placeholder="e.g. 523001"
-                  className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.12)] border-[#E2E8F0] dark:text-[#CDCBCA] text-[#111827] focus:outline-none font-mono"
+                  className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] dark:text-[#E8ECF5] text-[#111827] focus:outline-none font-mono"
                 />
               </div>
               <div className="space-y-1">
@@ -299,15 +299,15 @@ export const ClientJobPostingModal: React.FC<Props> = ({ isOpen, onClose, onSucc
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   placeholder="e.g. Tech Park Phase 2"
-                  className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.12)] border-[#E2E8F0] dark:text-[#CDCBCA] text-[#111827] focus:outline-none"
+                  className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] dark:text-[#E8ECF5] text-[#111827] focus:outline-none"
                 />
               </div>
             </div>
           </div>
 
           {/* 3. Budget & Team Scaling */}
-          <div className="space-y-3 pt-3 border-t dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0]">
-            <h4 className="text-xs font-bold uppercase tracking-wider dark:text-[#8BFF24] text-[#5046E5] flex items-center gap-1.5">
+          <div className="space-y-3 pt-3 border-t dark:border-[#272B38] border-[#E2E8F0]">
+            <h4 className="text-xs font-bold uppercase tracking-wider dark:text-[#8FB5FF] text-[#5046E5] flex items-center gap-1.5">
               <DollarSign className="w-3.5 h-3.5" />
               <span>3. Budget & Hiring Specifications</span>
             </h4>
@@ -319,7 +319,7 @@ export const ClientJobPostingModal: React.FC<Props> = ({ isOpen, onClose, onSucc
                   min="0"
                   value={minBudget}
                   onChange={(e) => setMinBudget(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.12)] border-[#E2E8F0] dark:text-[#CDCBCA] text-[#111827] focus:outline-none font-mono tabular-nums"
+                  className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] dark:text-[#E8ECF5] text-[#111827] focus:outline-none font-mono tabular-nums"
                 />
               </div>
               <div className="space-y-1">
@@ -329,7 +329,7 @@ export const ClientJobPostingModal: React.FC<Props> = ({ isOpen, onClose, onSucc
                   min="0"
                   value={maxBudget}
                   onChange={(e) => setMaxBudget(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.12)] border-[#E2E8F0] dark:text-[#CDCBCA] text-[#111827] focus:outline-none font-mono tabular-nums"
+                  className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] dark:text-[#E8ECF5] text-[#111827] focus:outline-none font-mono tabular-nums"
                 />
               </div>
               <div className="space-y-1">
@@ -337,7 +337,7 @@ export const ClientJobPostingModal: React.FC<Props> = ({ isOpen, onClose, onSucc
                 <select
                   value={currency}
                   onChange={(e) => setCurrency(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.12)] border-[#E2E8F0] dark:text-[#CDCBCA] text-[#111827] focus:outline-none font-mono"
+                  className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] dark:text-[#E8ECF5] text-[#111827] focus:outline-none font-mono"
                 >
                   <option value="USD">USD ($)</option>
                   <option value="EUR">EUR (€)</option>
@@ -350,7 +350,7 @@ export const ClientJobPostingModal: React.FC<Props> = ({ isOpen, onClose, onSucc
                 <select
                   value={paymentType}
                   onChange={(e) => setPaymentType(e.target.value as any)}
-                  className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.12)] border-[#E2E8F0] dark:text-[#CDCBCA] text-[#111827] focus:outline-none"
+                  className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] dark:text-[#E8ECF5] text-[#111827] focus:outline-none"
                 >
                   <option value="MILESTONE_BASED">Milestone-Based Escrow</option>
                   <option value="FIXED">Fixed Price Agreement</option>
@@ -365,7 +365,7 @@ export const ClientJobPostingModal: React.FC<Props> = ({ isOpen, onClose, onSucc
                 <select
                   value={hiringType}
                   onChange={(e) => setHiringType(e.target.value as any)}
-                  className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.12)] border-[#E2E8F0] dark:text-[#CDCBCA] text-[#111827] focus:outline-none"
+                  className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] dark:text-[#E8ECF5] text-[#111827] focus:outline-none"
                 >
                   <option value="INDIVIDUAL">Individual Specialist</option>
                   <option value="TEAM">Specialist Team (Multi-Member)</option>
@@ -382,7 +382,7 @@ export const ClientJobPostingModal: React.FC<Props> = ({ isOpen, onClose, onSucc
                       max="30"
                       value={requiredSpecialists}
                       onChange={(e) => setRequiredSpecialists(parseInt(e.target.value, 10) || 2)}
-                      className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.12)] border-[#E2E8F0] dark:text-[#CDCBCA] text-[#111827] focus:outline-none font-mono"
+                      className="w-full px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] dark:text-[#E8ECF5] text-[#111827] focus:outline-none font-mono"
                     />
                   </div>
                   <div className="space-y-1 flex items-center pt-5">
@@ -391,7 +391,7 @@ export const ClientJobPostingModal: React.FC<Props> = ({ isOpen, onClose, onSucc
                         type="checkbox"
                         checked={teamLeadRequired}
                         onChange={(e) => setTeamLeadRequired(e.target.checked)}
-                        className="rounded accent-[#5046E5] dark:accent-[#8BFF24]"
+                        className="rounded accent-[#5046E5] dark:accent-[#1F61EF]"
                       />
                       <span className="font-medium">Designated Team Lead Required</span>
                     </label>
@@ -402,8 +402,8 @@ export const ClientJobPostingModal: React.FC<Props> = ({ isOpen, onClose, onSucc
           </div>
 
           {/* 4. Required Skills */}
-          <div className="space-y-3 pt-3 border-t dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0]">
-            <h4 className="text-xs font-bold uppercase tracking-wider dark:text-[#8BFF24] text-[#5046E5] flex items-center gap-1.5">
+          <div className="space-y-3 pt-3 border-t dark:border-[#272B38] border-[#E2E8F0]">
+            <h4 className="text-xs font-bold uppercase tracking-wider dark:text-[#8FB5FF] text-[#5046E5] flex items-center gap-1.5">
               <span>4. Required Skills Taxonomy</span>
             </h4>
             <div className="flex gap-2">
@@ -418,12 +418,12 @@ export const ClientJobPostingModal: React.FC<Props> = ({ isOpen, onClose, onSucc
                   }
                 }}
                 placeholder="Type skill name (e.g. Next.js, PostgreSQL, UI Design) or comma-separated..."
-                className="flex-1 px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.12)] border-[#E2E8F0] dark:text-[#CDCBCA] text-[#111827] focus:outline-none"
+                className="flex-1 px-3 py-2 rounded-xl dark:bg-[#1A1A1A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] dark:text-[#E8ECF5] text-[#111827] focus:outline-none"
               />
               <button
                 type="button"
                 onClick={handleAddSkill}
-                className="px-4 py-2 rounded-xl bg-[#5046E5] dark:bg-[#8BFF24] text-white dark:text-[#050605] font-semibold text-xs flex items-center space-x-1 cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-[#5046E5] dark:bg-[#1F61EF] text-white dark:text-white font-semibold text-xs flex items-center space-x-1 cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
                 <span>Add</span>
@@ -434,9 +434,9 @@ export const ClientJobPostingModal: React.FC<Props> = ({ isOpen, onClose, onSucc
               {skillsList.map((skill) => (
                 <span
                   key={skill}
-                  className="px-2.5 py-1 rounded-lg dark:bg-[#202020] bg-[#EEF2FF] border dark:border-[rgba(255,255,255,0.1)] border-[#C7D2FE] flex items-center space-x-1.5 text-[11px]"
+                  className="px-2.5 py-1 rounded-lg dark:bg-[#191D2A] bg-[#EEF2FF] border dark:border-[rgba(255,255,255,0.1)] border-[#C7D2FE] flex items-center space-x-1.5 text-[11px]"
                 >
-                  <span className="dark:text-[#CDCBCA] text-[#5046E5] font-medium">{skill}</span>
+                  <span className="dark:text-[#E8ECF5] text-[#5046E5] font-medium">{skill}</span>
                   <button
                     type="button"
                     onClick={() => handleRemoveSkill(skill)}
@@ -451,11 +451,11 @@ export const ClientJobPostingModal: React.FC<Props> = ({ isOpen, onClose, onSucc
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-end space-x-3 pt-4 border-t dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0]">
+        <div className="flex items-center justify-end space-x-3 pt-4 border-t dark:border-[#272B38] border-[#E2E8F0]">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-xl border dark:border-[rgba(255,255,255,0.15)] border-[#E2E8F0] hover:bg-slate-100 dark:hover:bg-[#202020] text-xs font-semibold dark:text-[#CDCBCA] text-[#64748B] transition cursor-pointer"
+            className="px-4 py-2 rounded-xl border dark:border-[rgba(255,255,255,0.15)] border-[#E2E8F0] hover:bg-slate-100 dark:hover:bg-[#1C2740] text-xs font-semibold dark:text-[#E8ECF5] text-[#64748B] transition cursor-pointer"
           >
             Cancel
           </button>
@@ -463,7 +463,7 @@ export const ClientJobPostingModal: React.FC<Props> = ({ isOpen, onClose, onSucc
             type="button"
             disabled={isSubmitting}
             onClick={() => handleSubmit('DRAFT')}
-            className="px-4 py-2 rounded-xl border dark:border-[rgba(255,255,255,0.2)] border-[#C7D2FE] bg-[#F1F5F9] dark:bg-[#202020] hover:scale-105 text-xs font-semibold dark:text-[#E8EAE6] text-[#475569] transition cursor-pointer"
+            className="px-4 py-2 rounded-xl border dark:border-[rgba(255,255,255,0.2)] border-[#C7D2FE] bg-[#F1F5F9] dark:bg-[#191D2A] hover:scale-105 text-xs font-semibold dark:text-[#E8EAE6] text-[#475569] transition cursor-pointer"
           >
             Save Draft
           </button>
@@ -471,7 +471,7 @@ export const ClientJobPostingModal: React.FC<Props> = ({ isOpen, onClose, onSucc
             type="button"
             disabled={isSubmitting}
             onClick={() => handleSubmit('PUBLISHED')}
-            className="px-5 py-2 rounded-xl bg-[#5046E5] dark:bg-[#8BFF24] hover:bg-[#4338CA] dark:hover:bg-[#7AE01F] text-white dark:text-[#050605] font-bold text-xs shadow-md transition cursor-pointer active:scale-95"
+            className="px-5 py-2 rounded-xl bg-[#5046E5] dark:bg-[#1F61EF] hover:bg-[#4338CA] dark:hover:bg-[#7AE01F] text-white dark:text-white font-bold text-xs shadow-md transition cursor-pointer active:scale-95"
           >
             {isSubmitting ? 'Publishing...' : 'Publish Job Listing'}
           </button>

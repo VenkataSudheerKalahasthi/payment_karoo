@@ -18,20 +18,74 @@
   --brand-soft: #EEF2FF;
 }
 
-html.dark {
+html.dark, .dark {
   color-scheme: dark;
-  --bg-main: #080808;
-  --bg-sidebar: #080808;
-  --bg-card: #171717;
-  --bg-elevated: #202020;
-  --bg-hover: #303030;
-  --text-primary: #CDCBCA;
-  --text-secondary: #A5A5A5;
-  --text-muted: #777777;
-  --border-color: rgba(205, 203, 202, 0.18);
-  --brand-primary: #2563EB;
-  --brand-hover: #1D4ED8;
-  --brand-soft: rgba(37, 99, 235, 0.15);
+  --background: #0B0D14;
+  --foreground: #E8ECF5;
+
+  --card: #191B25;
+  --card-foreground: #E8ECF5;
+
+  --popover: #191B25;
+  --popover-foreground: #E8ECF5;
+
+  --primary: #1F61EF;
+  --primary-foreground: #FFFFFF;
+
+  --secondary: #191D2A;
+  --secondary-foreground: #E8ECF5;
+
+  --muted: #191B25;
+  --muted-foreground: #9AA4B8;
+
+  --accent: #1C2740;
+  --accent-foreground: #8FB5FF;
+
+  --destructive: #EF5350;
+  --destructive-foreground: #FFFFFF;
+
+  --border: #272B38;
+  --input: #191B25;
+  --ring: #2563EB;
+
+  --sidebar: #0B0D14;
+  --sidebar-foreground: #E8ECF5;
+  --sidebar-primary: #1F61EF;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #191D2A;
+  --sidebar-accent-foreground: #8FB5FF;
+  --sidebar-border: #272B38;
+  --sidebar-ring: #2563EB;
+
+  --chart-1: #2563EB;
+  --chart-2: #3B82F6;
+  --chart-3: #60A5FA;
+  --chart-4: #818CF8;
+  --chart-5: #38BDF8;
+
+  --radius: 0.75rem;
+
+  /* Backward-compatible semantic bridges */
+  --bg-main: #0B0D14;
+  --bg-sidebar: #0B0D14;
+  --bg-card: #191B25;
+  --bg-elevated: #191D2A;
+  --bg-hover: #1C2740;
+  --text-primary: #E8ECF5;
+  --text-secondary: #9AA4B8;
+  --text-muted: #9AA4B8;
+  --border-color: #272B38;
+  --brand-primary: #1F61EF;
+  --brand-hover: #174EC4;
+  --brand-soft: #1C2740;
+}
+
+/* Strict Dark Theme Text Selection */
+html.dark ::selection,
+.dark ::selection,
+.dark *::selection {
+  background-color: #1F61EF !important;
+  color: #FFFFFF !important;
 }
 
 html {
@@ -64,13 +118,13 @@ body {
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: #202020;
+  background: #191D2A;
   border-radius: 9999px;
-  border: 1px solid rgba(205, 203, 202, 0.12);
+  border: 1px solid #272B38;
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: #303030;
+  background: #1C2740;
 }
 
 html:not(.dark) ::-webkit-scrollbar-thumb {
@@ -116,8 +170,8 @@ html:not(.dark) .interactive-card:hover {
 }
 
 html.dark .interactive-card:hover {
-  box-shadow: 0 14px 32px -6px rgba(0, 0, 0, 0.6), 0 0 18px -2px rgba(139, 255, 36, 0.16) !important;
-  border-color: rgba(139, 255, 36, 0.35) !important;
+  box-shadow: 0 14px 32px -6px rgba(0, 0, 0, 0.6), 0 0 18px -2px rgba(31, 97, 239, 0.25) !important;
+  border-color: rgba(31, 97, 239, 0.45) !important;
 }
 
 /* Dashboard Top-to-Bottom Drop-In Staggered Animation */

@@ -199,15 +199,15 @@ export const ClientStampConsole: React.FC<ClientStampConsoleProps> = ({ onNaviga
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 p-6 rounded-2xl shadow-sm">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-slate-200 p-6 rounded-2xl shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl dark:bg-[#8BFF24]/10 bg-[#EEF2FF] border dark:border-[#8BFF24]/30 border-[#C7D2FE] flex items-center justify-center">
-            <Stamp className="w-5 h-5 dark:text-[#8BFF24] text-[#5046E5]" />
+          <div className="w-10 h-10 rounded-xl dark:bg-[#1C2740] bg-[#EEF2FF] border dark:border-[#1F61EF]/30 border-[#C7D2FE] flex items-center justify-center">
+            <Stamp className="w-5 h-5 dark:text-[#8FB5FF] text-[#5046E5]" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-xl sm:text-2xl font-bold dark:text-white text-slate-900 tracking-tight">Client Digital Office Stamp</h1>
-              <span className="text-[10px] uppercase font-bold font-mono px-2 py-0.5 rounded-full dark:bg-[#8BFF24]/10 bg-[#EEF2FF] dark:text-[#8BFF24] text-[#5046E5] dark:border-[#8BFF24]/30 border-[#C7D2FE]">
+              <span className="text-[10px] uppercase font-bold font-mono px-2 py-0.5 rounded-full dark:bg-[#1C2740] bg-[#EEF2FF] dark:text-[#8FB5FF] text-[#5046E5] dark:border-[#1F61EF]/30 border-[#C7D2FE]">
                 Official Seal
               </span>
             </div>
@@ -220,7 +220,7 @@ export const ClientStampConsole: React.FC<ClientStampConsoleProps> = ({ onNaviga
         <button
           onClick={fetchData}
           disabled={loading}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl dark:bg-[#1e201e] bg-slate-100 border dark:border-[#2e322e] border-slate-200 dark:text-zinc-300 text-slate-700 hover:dark:text-white hover:text-slate-900 hover:dark:border-[#8BFF24]/40 hover:border-[#5046E5]/40 transition text-sm font-medium shadow-sm"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl dark:bg-[#191D2A] bg-slate-100 border dark:border-[#272B38] border-slate-200 dark:text-zinc-300 text-slate-700 hover:dark:text-white hover:text-slate-900 hover:dark:border-[#1F61EF]/40 hover:border-[#5046E5]/40 transition text-sm font-medium shadow-sm"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           Refresh
@@ -248,8 +248,8 @@ export const ClientStampConsole: React.FC<ClientStampConsoleProps> = ({ onNaviga
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Official Stamp Preview (5 cols) */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="interactive-card dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 p-6 rounded-2xl space-y-6 shadow-sm">
-            <div className="flex items-center justify-between border-b dark:border-[#262926] border-slate-200 pb-3">
+          <div className="interactive-card dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-slate-200 p-6 rounded-2xl space-y-6 shadow-sm">
+            <div className="flex items-center justify-between border-b dark:border-[#272B38] border-slate-200 pb-3">
               <span className="text-xs font-semibold dark:text-zinc-400 text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-[#10b981]" />
                 Stamp Visual Specification
@@ -258,7 +258,7 @@ export const ClientStampConsole: React.FC<ClientStampConsoleProps> = ({ onNaviga
             </div>
 
             {/* Circular Stamp Visual Box (Transparent Authentic Paper Preview) */}
-            <div className="flex flex-col items-center justify-center p-6 dark:bg-[#181a18] bg-white rounded-xl border dark:border-[#222422] border-slate-200 relative overflow-hidden shadow-inner">
+            <div className="flex flex-col items-center justify-center p-6 dark:bg-[#191B25] bg-white rounded-xl border dark:border-[#222422] border-slate-200 relative overflow-hidden shadow-inner">
               {/* Outer subtle emerald glow */}
               <div className="absolute w-48 h-48 rounded-full bg-[#10b981]/10 blur-2xl pointer-events-none" />
 
@@ -316,12 +316,12 @@ export const ClientStampConsole: React.FC<ClientStampConsoleProps> = ({ onNaviga
             </div>
 
             {/* Profile Snapshot Credentials */}
-            <div className="space-y-3 p-4 rounded-xl dark:bg-[#181a18] bg-slate-50 border dark:border-[#262926] border-slate-200 text-xs">
+            <div className="space-y-3 p-4 rounded-xl dark:bg-[#191B25] bg-slate-50 border dark:border-[#272B38] border-slate-200 text-xs">
               <span className="dark:text-zinc-500 text-slate-400 uppercase font-semibold text-[10px] block">Authenticated Signer Dossier</span>
 
               <div className="flex items-center justify-between">
                 <span className="dark:text-zinc-400 text-slate-500 flex items-center gap-1.5">
-                  <User className="w-3.5 h-3.5 dark:text-[#8BFF24] text-[#5046E5]" />
+                  <User className="w-3.5 h-3.5 dark:text-[#8FB5FF] text-[#5046E5]" />
                   Client Name:
                 </span>
                 <span className="font-semibold dark:text-white text-slate-900">{previewData?.profileName || 'Authenticated User'}</span>
@@ -329,7 +329,7 @@ export const ClientStampConsole: React.FC<ClientStampConsoleProps> = ({ onNaviga
 
               <div className="flex items-center justify-between">
                 <span className="dark:text-zinc-400 text-slate-500 flex items-center gap-1.5">
-                  <Phone className="w-3.5 h-3.5 dark:text-[#8BFF24] text-[#5046E5]" />
+                  <Phone className="w-3.5 h-3.5 dark:text-[#8FB5FF] text-[#5046E5]" />
                   Verified Mobile:
                 </span>
                 {editingPhone ? (
@@ -339,12 +339,12 @@ export const ClientStampConsole: React.FC<ClientStampConsoleProps> = ({ onNaviga
                       value={phoneNumberInput}
                       onChange={(e) => setPhoneNumberInput(e.target.value)}
                       placeholder="+91..."
-                      className="w-32 dark:bg-[#121412] bg-white border dark:border-[#2e322e] border-slate-300 rounded px-2 py-0.5 text-xs dark:text-white text-slate-900"
+                      className="w-32 dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-slate-300 rounded px-2 py-0.5 text-xs dark:text-white text-slate-900"
                     />
                     <button
                       type="submit"
                       disabled={savingPhone}
-                      className="px-2 py-0.5 rounded dark:bg-[#8BFF24] bg-[#5046E5] dark:text-black text-white text-xs font-bold"
+                      className="px-2 py-0.5 rounded dark:bg-[#1F61EF] bg-[#5046E5] dark:text-black text-white text-xs font-bold"
                     >
                       {savingPhone ? '...' : 'Save'}
                     </button>
@@ -364,7 +364,7 @@ export const ClientStampConsole: React.FC<ClientStampConsoleProps> = ({ onNaviga
                     <button
                       type="button"
                       onClick={() => setEditingPhone(true)}
-                      className="text-[10px] dark:text-[#8BFF24] text-[#5046E5] hover:underline font-semibold"
+                      className="text-[10px] dark:text-[#8FB5FF] text-[#5046E5] hover:underline font-semibold"
                     >
                       {previewData?.verifiedMobile ? 'Edit' : 'Add Mobile'}
                     </button>
@@ -374,7 +374,7 @@ export const ClientStampConsole: React.FC<ClientStampConsoleProps> = ({ onNaviga
 
               <div className="flex items-center justify-between">
                 <span className="dark:text-zinc-400 text-slate-500 flex items-center gap-1.5">
-                  <Calendar className="w-3.5 h-3.5 dark:text-[#8BFF24] text-[#5046E5]" />
+                  <Calendar className="w-3.5 h-3.5 dark:text-[#8FB5FF] text-[#5046E5]" />
                   Server Timestamp:
                 </span>
                 <span className="font-mono dark:text-emerald-400 text-[#5046E5] font-semibold">{previewData?.previewDate || 'Live UTC'}</span>
@@ -385,7 +385,7 @@ export const ClientStampConsole: React.FC<ClientStampConsoleProps> = ({ onNaviga
 
         {/* Right Column: Contract Stamping Studio (7 cols) */}
         <div className="lg:col-span-7 space-y-4">
-          <div className="interactive-card dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 p-6 rounded-2xl space-y-5 shadow-sm">
+          <div className="interactive-card dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-slate-200 p-6 rounded-2xl space-y-5 shadow-sm">
             <div>
               <h2 className="text-lg font-bold dark:text-white text-slate-900">Apply Stamp to Approved Contract</h2>
               <p className="text-xs dark:text-zinc-400 text-slate-500 mt-0.5">
@@ -407,7 +407,7 @@ export const ClientStampConsole: React.FC<ClientStampConsoleProps> = ({ onNaviga
                 <select
                   value={selectedContractId}
                   onChange={(e) => setSelectedContractId(e.target.value)}
-                  className="w-full dark:bg-[#181a18] bg-slate-50 border dark:border-[#2e322e] border-slate-300 rounded-xl px-4 py-2.5 text-xs dark:text-white text-slate-900 focus:outline-none dark:focus:border-[#8BFF24]/60 focus:border-[#5046E5]"
+                  className="w-full dark:bg-[#191B25] bg-slate-50 border dark:border-[#272B38] border-slate-300 rounded-xl px-4 py-2.5 text-xs dark:text-white text-slate-900 focus:outline-none dark:focus:border-[#1F61EF]/60 focus:border-[#5046E5]"
                 >
                   {eligibleContracts.map((c) => (
                     <option key={c.id} value={c.id}>
@@ -420,7 +420,7 @@ export const ClientStampConsole: React.FC<ClientStampConsoleProps> = ({ onNaviga
 
             {/* Selected Contract Info Card */}
             {selectedContract && (
-              <div className="p-4 rounded-xl dark:bg-[#181a18] bg-slate-50 border dark:border-[#262926] border-slate-200 space-y-3 text-xs">
+              <div className="p-4 rounded-xl dark:bg-[#191B25] bg-slate-50 border dark:border-[#272B38] border-slate-200 space-y-3 text-xs">
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="font-mono dark:text-zinc-400 text-slate-500 text-[11px]">{selectedContract.contractNumber}</span>
@@ -431,7 +431,7 @@ export const ClientStampConsole: React.FC<ClientStampConsoleProps> = ({ onNaviga
                       {selectedContract.status}
                     </span>
                     {selectedContractHasStamp && (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold dark:bg-[#8BFF24]/10 bg-[#EEF2FF] dark:text-[#8BFF24] text-[#5046E5] dark:border-[#8BFF24]/30 border-[#C7D2FE] flex items-center gap-1">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold dark:bg-[#1C2740] bg-[#EEF2FF] dark:text-[#8FB5FF] text-[#5046E5] dark:border-[#1F61EF]/30 border-[#C7D2FE] flex items-center gap-1">
                         <Check className="w-3 h-3" />
                         Stamp Applied
                       </span>
@@ -439,7 +439,7 @@ export const ClientStampConsole: React.FC<ClientStampConsoleProps> = ({ onNaviga
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 pt-2 border-t dark:border-[#262926] border-slate-200 dark:text-zinc-400 text-slate-600">
+                <div className="grid grid-cols-2 gap-3 pt-2 border-t dark:border-[#272B38] border-slate-200 dark:text-zinc-400 text-slate-600">
                   <div>
                     <span className="dark:text-zinc-500 text-slate-400 text-[10px] block">Assigned Specialist</span>
                     <span className="dark:text-zinc-200 text-slate-800 font-medium">
@@ -450,7 +450,7 @@ export const ClientStampConsole: React.FC<ClientStampConsoleProps> = ({ onNaviga
                   </div>
                   <div>
                     <span className="dark:text-zinc-500 text-slate-400 text-[10px] block">Agreed Valuation</span>
-                    <span className="dark:text-[#8BFF24] text-[#5046E5] font-mono font-bold">
+                    <span className="dark:text-[#8FB5FF] text-[#5046E5] font-mono font-bold">
                       ${selectedContract.totalAmount.toLocaleString()} {selectedContract.currency}
                     </span>
                   </div>
@@ -473,8 +473,8 @@ export const ClientStampConsole: React.FC<ClientStampConsoleProps> = ({ onNaviga
                     onClick={() => setStampPosition(pos.id as any)}
                     className={`p-3 rounded-xl border text-left transition ${
                       stampPosition === pos.id
-                        ? 'dark:bg-[#8BFF24]/10 bg-[#EEF2FF] dark:border-[#8BFF24] border-[#5046E5] dark:text-white text-[#5046E5] dark:shadow-[0_0_12px_rgba(139,255,36,0.15)] shadow-sm'
-                        : 'dark:bg-[#181a18] bg-slate-50 dark:border-[#262926] border-slate-200 dark:text-zinc-400 text-slate-600 hover:dark:text-white hover:text-slate-900'
+                        ? 'dark:bg-[#1C2740] bg-[#EEF2FF] dark:border-[#1F61EF] border-[#5046E5] dark:text-white text-[#5046E5] dark:shadow-[0_0_12px_rgba(31,97,239,0.12)] shadow-sm'
+                        : 'dark:bg-[#191B25] bg-slate-50 dark:border-[#272B38] border-slate-200 dark:text-zinc-400 text-slate-600 hover:dark:text-white hover:text-slate-900'
                     }`}
                   >
                     <p className="text-xs font-bold">{pos.label}</p>
@@ -485,9 +485,9 @@ export const ClientStampConsole: React.FC<ClientStampConsoleProps> = ({ onNaviga
             </div>
 
             {/* Simulated Official Contract Document Page Preview with Bottom Base Stamping */}
-            <div className="p-4 sm:p-5 rounded-2xl dark:bg-[#0b0c0b] bg-slate-100 border dark:border-[#262926] border-slate-200 space-y-3">
+            <div className="p-4 sm:p-5 rounded-2xl dark:bg-[#0b0c0b] bg-slate-100 border dark:border-[#272B38] border-slate-200 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold uppercase dark:text-[#8BFF24] text-[#5046E5] flex items-center gap-1.5">
+                <span className="text-xs font-mono font-bold uppercase dark:text-[#8FB5FF] text-[#5046E5] flex items-center gap-1.5">
                   <FileText className="w-4 h-4" />
                   Official Contract Document Preview (Page Base Seal)
                 </span>
@@ -608,9 +608,9 @@ export const ClientStampConsole: React.FC<ClientStampConsoleProps> = ({ onNaviga
             </div>
 
             {/* Actions */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t dark:border-[#262926] border-slate-200">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t dark:border-[#272B38] border-slate-200">
               {selectedContractHasStamp ? (
-                <div className="flex items-center gap-2 text-xs dark:text-[#8BFF24] text-emerald-600">
+                <div className="flex items-center gap-2 text-xs dark:text-[#8FB5FF] text-emerald-600">
                   <CheckCircle2 className="w-4 h-4" />
                   <span>Official stamp already applied to active version.</span>
                 </div>
@@ -625,7 +625,7 @@ export const ClientStampConsole: React.FC<ClientStampConsoleProps> = ({ onNaviga
                   <button
                     onClick={() => handleDownloadPdf(selectedContract.id, selectedContract.contractNumber)}
                     disabled={downloadingContractId === selectedContract.id}
-                    className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl dark:bg-[#1e201e] bg-slate-100 hover:dark:bg-[#282c28] hover:bg-slate-200 border dark:border-[#2e322e] border-slate-200 dark:text-zinc-200 text-slate-700 text-xs font-semibold transition"
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl dark:bg-[#191D2A] bg-slate-100 hover:dark:bg-[#282c28] hover:bg-slate-200 border dark:border-[#272B38] border-slate-200 dark:text-zinc-200 text-slate-700 text-xs font-semibold transition"
                   >
                     <Download className={`w-3.5 h-3.5 ${downloadingContractId === selectedContract.id ? 'animate-bounce' : ''}`} />
                     <span>{downloadingContractId === selectedContract.id ? 'Downloading...' : 'Download Contract PDF'}</span>
@@ -635,7 +635,7 @@ export const ClientStampConsole: React.FC<ClientStampConsoleProps> = ({ onNaviga
                 <button
                   onClick={handleApplyStamp}
                   disabled={applying || eligibleContracts.length === 0 || selectedContractHasStamp}
-                  className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl dark:bg-[#8BFF24] bg-[#5046E5] hover:dark:bg-[#78e018] hover:bg-[#4338CA] dark:text-black text-white text-xs font-bold transition dark:shadow-[0_0_15px_rgba(139,255,36,0.25)] shadow-md shadow-[#5046E5]/25 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl dark:bg-[#1F61EF] bg-[#5046E5] hover:dark:bg-[#78e018] hover:bg-[#4338CA] dark:text-black text-white text-xs font-bold transition dark:shadow-[0_0_15px_rgba(31,97,239,0.2)] shadow-md shadow-[#5046E5]/25 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <Stamp className={`w-4 h-4 ${applying ? 'animate-spin' : ''}`} />
                   <span>{applying ? 'Applying Official Stamp...' : selectedContractHasStamp ? 'Stamp Applied' : 'Apply Official Stamp'}</span>
@@ -647,7 +647,7 @@ export const ClientStampConsole: React.FC<ClientStampConsoleProps> = ({ onNaviga
       </div>
 
       {/* Section 2: Stamp History Table */}
-      <div className="interactive-card dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 p-6 rounded-2xl space-y-4 shadow-sm">
+      <div className="interactive-card dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-slate-200 p-6 rounded-2xl space-y-4 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-base font-bold dark:text-white text-slate-900">Client Stamp Application Audit Log</h3>
@@ -659,7 +659,7 @@ export const ClientStampConsole: React.FC<ClientStampConsoleProps> = ({ onNaviga
         </div>
 
         {stampHistory.length === 0 ? (
-          <div className="p-8 text-center dark:bg-[#181a18] bg-slate-50 rounded-xl border dark:border-[#262926] border-slate-200">
+          <div className="p-8 text-center dark:bg-[#191B25] bg-slate-50 rounded-xl border dark:border-[#272B38] border-slate-200">
             <Stamp className="w-8 h-8 dark:text-zinc-600 text-slate-400 mx-auto mb-2" />
             <p className="text-xs dark:text-zinc-400 text-slate-600">No contracts have been stamped yet.</p>
             <p className="text-[11px] dark:text-zinc-500 text-slate-400 mt-0.5">
@@ -667,9 +667,9 @@ export const ClientStampConsole: React.FC<ClientStampConsoleProps> = ({ onNaviga
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-xl border dark:border-[#262926] border-slate-200">
+          <div className="overflow-x-auto rounded-xl border dark:border-[#272B38] border-slate-200">
             <table className="w-full text-left text-xs">
-              <thead className="dark:bg-[#181a18] bg-slate-50 dark:text-zinc-400 text-slate-600 uppercase font-semibold border-b dark:border-[#262926] border-slate-200">
+              <thead className="dark:bg-[#191B25] bg-slate-50 dark:text-zinc-400 text-slate-600 uppercase font-semibold border-b dark:border-[#272B38] border-slate-200">
                 <tr>
                   <th className="py-3 px-4">Contract #</th>
                   <th className="py-3 px-4">Agreement Title</th>
@@ -697,7 +697,7 @@ export const ClientStampConsole: React.FC<ClientStampConsoleProps> = ({ onNaviga
                     </td>
                     <td className="py-3 px-4 font-mono">v{stamp.pdfVersion}</td>
                     <td className="py-3 px-4">
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold dark:bg-[#8BFF24]/10 bg-[#EEF2FF] dark:text-[#8BFF24] text-[#5046E5] dark:border-[#8BFF24]/30 border-[#C7D2FE]">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold dark:bg-[#1C2740] bg-[#EEF2FF] dark:text-[#8FB5FF] text-[#5046E5] dark:border-[#1F61EF]/30 border-[#C7D2FE]">
                         {stamp.status}
                       </span>
                     </td>
@@ -705,7 +705,7 @@ export const ClientStampConsole: React.FC<ClientStampConsoleProps> = ({ onNaviga
                       <button
                         onClick={() => handleDownloadPdf(stamp.contractId, stamp.contract?.contractNumber || 'contract')}
                         disabled={downloadingContractId === stamp.contractId}
-                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg dark:bg-[#8BFF24]/10 bg-[#EEF2FF] hover:dark:bg-[#8BFF24]/20 hover:bg-[#E0E7FF] dark:border-[#8BFF24]/30 border-[#C7D2FE] dark:text-[#8BFF24] text-[#5046E5] text-[11px] font-bold transition cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg dark:bg-[#1C2740] bg-[#EEF2FF] hover:dark:bg-[#1C2740] hover:bg-[#E0E7FF] dark:border-[#1F61EF]/30 border-[#C7D2FE] dark:text-[#8FB5FF] text-[#5046E5] text-[11px] font-bold transition cursor-pointer"
                       >
                         <Download className="w-3 h-3" />
                         <span>PDF</span>

@@ -27,20 +27,20 @@ export class ErrorBoundary extends Component<Props, State> {
   public render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen dark:bg-[#080808] bg-[#F5F7FA] dark:text-[#CDCBCA] text-[#242424] flex items-center justify-center p-4 transition-colors">
-          <div className="max-w-xl w-full dark:bg-[#171717] bg-white border dark:border-red-500/30 border-red-500/20 rounded-2xl p-6 sm:p-8 space-y-5 shadow-2xl">
+        <div className="min-h-screen dark:bg-[#0B0D14] bg-[#F5F7FA] dark:text-[#E8ECF5] text-[#242424] flex items-center justify-center p-4 transition-colors">
+          <div className="max-w-xl w-full dark:bg-[#191B25] bg-white border dark:border-red-500/30 border-red-500/20 rounded-2xl p-6 sm:p-8 space-y-5 shadow-2xl">
             <div className="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 flex items-center justify-center">
               <AlertTriangle className="w-6 h-6" />
             </div>
 
             <div>
-              <h2 className="text-xl font-bold dark:text-[#CDCBCA] text-[#242424]">Application Runtime Error</h2>
-              <p className="text-xs dark:text-[#777777] text-[#64748B] mt-1">
+              <h2 className="text-xl font-bold dark:text-[#E8ECF5] text-[#242424]">Application Runtime Error</h2>
+              <p className="text-xs dark:text-[#9AA4B8] text-[#64748B] mt-1">
                 An unexpected exception was encountered while rendering the application component tree.
               </p>
             </div>
 
-            <div className="p-4 rounded-xl dark:bg-[#080808] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] text-xs font-mono text-red-500 dark:text-red-400 break-all overflow-x-auto max-h-48">
+            <div className="p-4 rounded-xl dark:bg-[#0B0D14] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] text-xs font-mono text-red-500 dark:text-red-400 break-all overflow-x-auto max-h-48">
               {this.state.error?.message || 'Unknown runtime error'}
             </div>
 
@@ -57,7 +57,7 @@ export class ErrorBoundary extends Component<Props, State> {
                   localStorage.clear();
                   window.location.reload();
                 }}
-                className="px-4 py-2 rounded-lg dark:bg-[#202020] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] text-xs font-medium dark:text-[#CDCBCA] text-[#242424] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] transition"
+                className="px-4 py-2 rounded-lg dark:bg-[#191D2A] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] text-xs font-medium dark:text-[#E8ECF5] text-[#242424] border dark:border-[#272B38] border-[#E2E8F0] transition"
               >
                 Clear Cache &amp; Reload
               </button>

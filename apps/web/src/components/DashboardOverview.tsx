@@ -148,10 +148,10 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-24 rounded-2xl dark:bg-[#151715] bg-white border dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0]" />
+        <div className="h-24 rounded-2xl dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0]" />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="h-32 rounded-2xl dark:bg-[#151715] bg-white border dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0]" />
+            <div key={i} className="h-32 rounded-2xl dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0]" />
           ))}
         </div>
       </div>
@@ -203,15 +203,15 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
     <div className="space-y-6">
       {/* Bento Section 1: Executive Command Bar */}
       <div
-        className="card-drop-in p-6 rounded-2xl dark:bg-[#151715] bg-white border dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5 transition-colors"
+        className="card-drop-in p-6 rounded-2xl dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5 transition-colors"
         style={{ animationDelay: '40ms' }}
       >
         <div className="space-y-1.5">
           <div className="inline-flex items-center space-x-2">
-            <span className="text-[10px] font-semibold tracking-wider uppercase px-2.5 py-0.5 rounded-full dark:bg-[#202220] bg-[#EEF2FF] dark:text-[#8BFF24] text-[#5046E5] border dark:border-[rgba(139,255,36,0.25)] border-[#C7D2FE] font-mono">
+            <span className="text-[10px] font-semibold tracking-wider uppercase px-2.5 py-0.5 rounded-full dark:bg-[#191D2A] bg-[#EEF2FF] dark:text-[#8FB5FF] text-[#5046E5] border dark:border-[rgba(31,97,239,0.2)] border-[#C7D2FE] font-mono">
               {isClient ? 'CLIENT COMMAND HUB' : isWorker ? 'SPECIALIST WORKSPACE' : 'OPERATIONS HUB'}
             </span>
-            <span className="inline-flex items-center space-x-1 text-[11px] dark:text-[#8BFF24] text-[#5046E5] font-mono font-medium">
+            <span className="inline-flex items-center space-x-1 text-[11px] dark:text-[#8FB5FF] text-[#5046E5] font-mono font-medium">
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>LEDGER SYNCHRONIZED</span>
             </span>
@@ -224,7 +224,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                 ? 'Specialist Milestone Workspace'
                 : 'Platform Operations Oversight'}
           </h2>
-          <p className="text-xs dark:text-[#A5AAA2] text-[#64748B]">
+          <p className="text-xs dark:text-[#9AA4B8] text-[#64748B]">
             Real-time digital agreement lifecycle, milestone deliverable reviews, and non-custodial financial custody.
           </p>
         </div>
@@ -234,16 +234,16 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             <>
               <button
                 onClick={() => onNavigate('marketplace')}
-                className="px-4 py-2 rounded-xl dark:bg-[#8BFF24] dark:hover:bg-[#A3FF50] dark:text-[#050605] bg-[#5046E5] hover:bg-[#4338CA] text-white text-xs font-bold flex items-center space-x-1.5 shadow-md shadow-[#5046E5]/25 transition active:scale-[0.99] cursor-pointer"
+                className="px-4 py-2 rounded-xl dark:bg-[#1F61EF] dark:hover:bg-[#174EC4] dark:text-white bg-[#5046E5] hover:bg-[#4338CA] text-white text-xs font-bold flex items-center space-x-1.5 shadow-md shadow-[#5046E5]/25 transition active:scale-[0.99] cursor-pointer"
               >
                 <Users className="w-4 h-4" />
                 <span>Find Specialists</span>
               </button>
               <button
                 onClick={() => onNavigate('hiring')}
-                className="px-3.5 py-2 rounded-xl dark:bg-[#202220] bg-white hover:dark:bg-[#292C28] hover:bg-[#EEF2FF] text-xs font-semibold dark:text-[#E8EAE6] text-[#111827] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] hover:border-[#5046E5] flex items-center space-x-1.5 transition cursor-pointer shadow-sm"
+                className="px-3.5 py-2 rounded-xl dark:bg-[#191D2A] bg-white hover:dark:bg-[#191D2A] hover:bg-[#EEF2FF] text-xs font-semibold dark:text-[#E8EAE6] text-[#111827] border dark:border-[#272B38] border-[#CBD5E1] hover:border-[#5046E5] flex items-center space-x-1.5 transition cursor-pointer shadow-sm"
               >
-                <Send className="w-4 h-4 dark:text-[#8BFF24] text-[#5046E5]" />
+                <Send className="w-4 h-4 dark:text-[#8FB5FF] text-[#5046E5]" />
                 <span>Proposals</span>
               </button>
             </>
@@ -251,9 +251,9 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
 
           <button
             onClick={() => onNavigate('wallet')}
-            className="px-3.5 py-2 rounded-xl dark:bg-[#202220] bg-white hover:dark:bg-[#292C28] hover:bg-[#EEF2FF] text-xs font-semibold dark:text-[#E8EAE6] text-[#111827] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] hover:border-[#5046E5] flex items-center space-x-1.5 transition cursor-pointer shadow-sm"
+            className="px-3.5 py-2 rounded-xl dark:bg-[#191D2A] bg-white hover:dark:bg-[#191D2A] hover:bg-[#EEF2FF] text-xs font-semibold dark:text-[#E8EAE6] text-[#111827] border dark:border-[#272B38] border-[#CBD5E1] hover:border-[#5046E5] flex items-center space-x-1.5 transition cursor-pointer shadow-sm"
           >
-            <Wallet className="w-4 h-4 dark:text-[#8BFF24] text-[#5046E5]" />
+            <Wallet className="w-4 h-4 dark:text-[#8FB5FF] text-[#5046E5]" />
             <span>Virtual Vault</span>
           </button>
         </div>
@@ -263,22 +263,22 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Card 1: Escrow in Custody */}
         <div
-          className="interactive-card card-drop-in p-5 rounded-2xl dark:bg-[#151715] bg-white border dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] space-y-3 shadow-sm hover:dark:border-[rgba(139,255,36,0.3)] hover:border-[#5046E5]/40 transition group"
+          className="interactive-card card-drop-in p-5 rounded-2xl dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] space-y-3 shadow-sm hover:dark:border-[rgba(31,97,239,0.25)] hover:border-[#5046E5]/40 transition group"
           style={{ animationDelay: '100ms' }}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold dark:text-[#A5AAA2] text-[#64748B]">
+            <span className="text-xs font-semibold dark:text-[#9AA4B8] text-[#64748B]">
               Escrow in Custody - USD
             </span>
-            <div className="w-8 h-8 rounded-lg dark:bg-[#202220] bg-[#EEF2FF] border dark:border-[rgba(139,255,36,0.25)] border-[#C7D2FE] flex items-center justify-center dark:text-[#8BFF24] text-[#5046E5]">
+            <div className="w-8 h-8 rounded-lg dark:bg-[#191D2A] bg-[#EEF2FF] border dark:border-[rgba(31,97,239,0.2)] border-[#C7D2FE] flex items-center justify-center dark:text-[#8FB5FF] text-[#5046E5]">
               <ShieldCheck className="w-4 h-4" />
             </div>
           </div>
           <div className="flex items-baseline space-x-1">
-            <span className="text-3xl font-extrabold dark:text-[#8BFF24] text-[#111827] font-mono tabular-nums tracking-tight">
+            <span className="text-3xl font-extrabold dark:text-[#8FB5FF] text-[#111827] font-mono tabular-nums tracking-tight">
               <AnimatedAmount value={activeEscrowAmount} />
             </span>
-            <span className="text-xs dark:text-[#A5AAA2] text-[#64748B] font-mono">USD</span>
+            <span className="text-xs dark:text-[#9AA4B8] text-[#64748B] font-mono">USD</span>
           </div>
 
           {/* Smooth Wave Line Visual with Base Growth Animation */}
@@ -287,46 +287,46 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
               <path
                 d="M 0 30 Q 50 10 100 25 T 200 15"
                 fill="none"
-                className="dark:stroke-[#8BFF24] stroke-[#6366F1]"
+                className="dark:stroke-[#2563EB] stroke-[#6366F1]"
                 strokeWidth="2"
               />
               <path
                 d="M 0 30 Q 50 10 100 25 T 200 15 L 200 40 L 0 40 Z"
-                className="dark:fill-[#8BFF24]/10 fill-[#6366F1]/15"
+                className="dark:fill-[#2563EB]/15 fill-[#6366F1]/15"
               />
             </svg>
           </div>
 
-          <div className="pt-2 border-t dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] flex items-center justify-between text-xs">
+          <div className="pt-2 border-t dark:border-[#272B38] border-[#E2E8F0] flex items-center justify-between text-xs">
             <button
               onClick={() => onNavigate('contracts')}
-              className="dark:text-[#8BFF24] text-[#5046E5] underline hover:no-underline font-semibold font-mono inline-flex items-center space-x-1 cursor-pointer"
+              className="dark:text-[#8FB5FF] text-[#5046E5] underline hover:no-underline font-semibold font-mono inline-flex items-center space-x-1 cursor-pointer"
             >
               <span>Open Module</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
             </button>
-            <span className="text-[11px] dark:text-[#8BFF24] text-[#5046E5] font-mono">100% Secure</span>
+            <span className="text-[11px] dark:text-[#8FB5FF] text-[#5046E5] font-mono">100% Secure</span>
           </div>
         </div>
 
         {/* Card 2: Settled Deliverables */}
         <div
-          className="interactive-card card-drop-in p-5 rounded-2xl dark:bg-[#151715] bg-white border dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] space-y-3 shadow-sm hover:dark:border-[rgba(139,255,36,0.3)] hover:border-[#5046E5]/40 transition group"
+          className="interactive-card card-drop-in p-5 rounded-2xl dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] space-y-3 shadow-sm hover:dark:border-[rgba(31,97,239,0.25)] hover:border-[#5046E5]/40 transition group"
           style={{ animationDelay: '160ms' }}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold dark:text-[#A5AAA2] text-[#64748B]">
+            <span className="text-xs font-semibold dark:text-[#9AA4B8] text-[#64748B]">
               Settled Deliverables - USD
             </span>
-            <div className="w-8 h-8 rounded-lg dark:bg-[#202220] bg-[#EEF2FF] border dark:border-[rgba(139,255,36,0.25)] border-[#C7D2FE] flex items-center justify-center dark:text-[#8BFF24] text-[#5046E5]">
+            <div className="w-8 h-8 rounded-lg dark:bg-[#191D2A] bg-[#EEF2FF] border dark:border-[rgba(31,97,239,0.2)] border-[#C7D2FE] flex items-center justify-center dark:text-[#8FB5FF] text-[#5046E5]">
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
           <div className="flex items-baseline space-x-1">
-            <span className="text-3xl font-extrabold dark:text-[#8BFF24] text-[#111827] font-mono tabular-nums tracking-tight">
+            <span className="text-3xl font-extrabold dark:text-[#8FB5FF] text-[#111827] font-mono tabular-nums tracking-tight">
               <AnimatedAmount value={completedAmount} />
             </span>
-            <span className="text-xs dark:text-[#A5AAA2] text-[#64748B] font-mono">USD</span>
+            <span className="text-xs dark:text-[#9AA4B8] text-[#64748B] font-mono">USD</span>
           </div>
 
           {/* Stepped Mini Vertical Bars Visual with Growing Animation */}
@@ -334,34 +334,34 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             {[20, 35, 55, 75, 100].map((h, i) => (
               <div
                 key={i}
-                className="w-2.5 rounded-t dark:bg-[#8BFF24] bg-[#5046E5] bar-grow"
+                className="w-2.5 rounded-t dark:bg-[#1F61EF] bg-[#5046E5] bar-grow"
                 style={{ height: `${h}%`, opacity: 0.3 + (i * 0.175), animationDelay: `${200 + i * 70}ms` }}
               />
             ))}
           </div>
 
-          <div className="pt-2 border-t dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] flex items-center justify-between text-xs">
+          <div className="pt-2 border-t dark:border-[#272B38] border-[#E2E8F0] flex items-center justify-between text-xs">
             <button
               onClick={() => onNavigate('contracts')}
-              className="dark:text-[#8BFF24] text-[#5046E5] underline hover:no-underline font-semibold font-mono inline-flex items-center space-x-1 cursor-pointer"
+              className="dark:text-[#8FB5FF] text-[#5046E5] underline hover:no-underline font-semibold font-mono inline-flex items-center space-x-1 cursor-pointer"
             >
               <span>Open Module</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
             </button>
-            <span className="text-[11px] dark:text-[#8BFF24] text-[#5046E5] font-mono">Verified Payouts</span>
+            <span className="text-[11px] dark:text-[#8FB5FF] text-[#5046E5] font-mono">Verified Payouts</span>
           </div>
         </div>
 
         {/* Card 3: Pending Deliverables */}
         <div
-          className="interactive-card card-drop-in p-5 rounded-2xl dark:bg-[#151715] bg-white border dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] space-y-3 shadow-sm hover:dark:border-[rgba(139,255,36,0.3)] hover:border-[#5046E5]/40 transition group"
+          className="interactive-card card-drop-in p-5 rounded-2xl dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] space-y-3 shadow-sm hover:dark:border-[rgba(31,97,239,0.25)] hover:border-[#5046E5]/40 transition group"
           style={{ animationDelay: '220ms' }}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold dark:text-[#A5AAA2] text-[#64748B]">
+            <span className="text-xs font-semibold dark:text-[#9AA4B8] text-[#64748B]">
               Pending Deliverables - USD
             </span>
-            <div className="w-8 h-8 rounded-lg dark:bg-[#202220] bg-[#EEF2FF] border border-amber-500/20 flex items-center justify-center text-amber-500">
+            <div className="w-8 h-8 rounded-lg dark:bg-[#191D2A] bg-[#EEF2FF] border border-amber-500/20 flex items-center justify-center text-amber-500">
               <Clock className="w-4 h-4 text-amber-500" />
             </div>
           </div>
@@ -369,7 +369,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             <span className="text-3xl font-extrabold text-amber-500 font-mono tabular-nums tracking-tight">
               <AnimatedAmount value={pendingAmount} />
             </span>
-            <span className="text-xs dark:text-[#A5AAA2] text-[#64748B] font-mono">USD</span>
+            <span className="text-xs dark:text-[#9AA4B8] text-[#64748B] font-mono">USD</span>
           </div>
 
           {/* Stepped Mini Vertical Bars Visual with Growing Animation */}
@@ -377,13 +377,13 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             {[30, 45, 60, 40, 80].map((h, i) => (
               <div
                 key={i}
-                className="w-2.5 rounded-t dark:bg-[#8BFF24] bg-[#5046E5] bar-grow"
+                className="w-2.5 rounded-t dark:bg-[#1F61EF] bg-[#5046E5] bar-grow"
                 style={{ height: `${h}%`, opacity: 0.25 + (i * 0.15), animationDelay: `${250 + i * 70}ms` }}
               />
             ))}
           </div>
 
-          <div className="pt-2 border-t dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] flex items-center justify-between text-xs">
+          <div className="pt-2 border-t dark:border-[#272B38] border-[#E2E8F0] flex items-center justify-between text-xs">
             <button
               onClick={() => onNavigate('projects')}
               className="text-amber-500 underline hover:no-underline font-semibold font-mono inline-flex items-center space-x-1 cursor-pointer"
@@ -397,14 +397,14 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
 
         {/* Card 4: Total Escrow Agreements */}
         <div
-          className="interactive-card card-drop-in p-5 rounded-2xl dark:bg-[#151715] bg-white border dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] space-y-3 shadow-sm hover:dark:border-[rgba(139,255,36,0.3)] hover:border-[#5046E5]/40 transition group"
+          className="interactive-card card-drop-in p-5 rounded-2xl dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] space-y-3 shadow-sm hover:dark:border-[rgba(31,97,239,0.25)] hover:border-[#5046E5]/40 transition group"
           style={{ animationDelay: '280ms' }}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold dark:text-[#A5AAA2] text-[#64748B]">
+            <span className="text-xs font-semibold dark:text-[#9AA4B8] text-[#64748B]">
               Total Escrow Agreements
             </span>
-            <div className="w-8 h-8 rounded-lg dark:bg-[#202220] bg-[#EEF2FF] border dark:border-[rgba(139,255,36,0.25)] border-[#C7D2FE] flex items-center justify-center dark:text-[#8BFF24] text-[#5046E5]">
+            <div className="w-8 h-8 rounded-lg dark:bg-[#191D2A] bg-[#EEF2FF] border dark:border-[rgba(31,97,239,0.2)] border-[#C7D2FE] flex items-center justify-center dark:text-[#8FB5FF] text-[#5046E5]">
               <Briefcase className="w-4 h-4" />
             </div>
           </div>
@@ -412,43 +412,43 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             <span className="text-3xl font-extrabold dark:text-[#E8EAE6] text-[#111827] font-mono tabular-nums tracking-tight">
               <AnimatedInteger value={metrics?.activeContracts ?? 0} />
             </span>
-            <span className="text-xs font-medium dark:text-[#8BFF24] text-[#5046E5] font-mono">
+            <span className="text-xs font-medium dark:text-[#8FB5FF] text-[#5046E5] font-mono">
               / {metrics?.totalContracts ?? 1} Completed
             </span>
           </div>
 
           {/* Progress bar */}
-          <div className="w-full bg-[#E2E8F0] dark:bg-[#202220] h-2 rounded-full overflow-hidden my-2">
+          <div className="w-full bg-[#E2E8F0] dark:bg-[#191D2A] h-2 rounded-full overflow-hidden my-2">
             <div
-              className="dark:bg-[#8BFF24] bg-[#5046E5] h-full rounded-full transition-all duration-1000"
+              className="dark:bg-[#1F61EF] bg-[#5046E5] h-full rounded-full transition-all duration-1000"
               style={{
                 width: `${Math.min(100, Math.max(15, ((metrics?.activeContracts ?? 0) / (metrics?.totalContracts || 1)) * 100))}%`
               }}
             />
           </div>
 
-          <div className="pt-2 border-t dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] flex items-center justify-between text-xs">
+          <div className="pt-2 border-t dark:border-[#272B38] border-[#E2E8F0] flex items-center justify-between text-xs">
             <button
               onClick={() => onNavigate('contracts')}
-              className="dark:text-[#8BFF24] text-[#5046E5] underline hover:no-underline font-semibold font-mono inline-flex items-center space-x-1 cursor-pointer"
+              className="dark:text-[#8FB5FF] text-[#5046E5] underline hover:no-underline font-semibold font-mono inline-flex items-center space-x-1 cursor-pointer"
             >
               <span>Open Module</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
             </button>
-            <span className="text-[11px] dark:text-[#A5AAA2] text-[#64748B] font-mono">Bilateral Bound</span>
+            <span className="text-[11px] dark:text-[#9AA4B8] text-[#64748B] font-mono">Bilateral Bound</span>
           </div>
         </div>
 
         {/* Card 5: Virtual Vault Balance */}
         <div
-          className="interactive-card card-drop-in p-5 rounded-2xl dark:bg-[#151715] bg-white border dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] space-y-3 shadow-sm hover:dark:border-[rgba(139,255,36,0.3)] hover:border-[#5046E5]/40 transition group"
+          className="interactive-card card-drop-in p-5 rounded-2xl dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] space-y-3 shadow-sm hover:dark:border-[rgba(31,97,239,0.25)] hover:border-[#5046E5]/40 transition group"
           style={{ animationDelay: '340ms' }}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold dark:text-[#A5AAA2] text-[#64748B]">
+            <span className="text-xs font-semibold dark:text-[#9AA4B8] text-[#64748B]">
               Virtual Vault Balance
             </span>
-            <div className="w-8 h-8 rounded-lg dark:bg-[#202220] bg-[#EEF2FF] border dark:border-[rgba(139,255,36,0.25)] border-[#C7D2FE] flex items-center justify-center dark:text-[#8BFF24] text-[#5046E5]">
+            <div className="w-8 h-8 rounded-lg dark:bg-[#191D2A] bg-[#EEF2FF] border dark:border-[rgba(31,97,239,0.2)] border-[#C7D2FE] flex items-center justify-center dark:text-[#8FB5FF] text-[#5046E5]">
               <Wallet className="w-4 h-4" />
             </div>
           </div>
@@ -456,7 +456,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             <span className="text-3xl font-extrabold dark:text-[#E8EAE6] text-[#111827] font-mono tabular-nums tracking-tight">
               <AnimatedAmount value={activeEscrowAmount + completedAmount} />
             </span>
-            <span className="text-xs dark:text-[#A5AAA2] text-[#64748B] font-mono">USD</span>
+            <span className="text-xs dark:text-[#9AA4B8] text-[#64748B] font-mono">USD</span>
           </div>
 
           {/* Smooth Wave Line Visual with Base Growth Animation */}
@@ -465,38 +465,38 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
               <path
                 d="M 0 25 Q 50 35 100 15 T 200 20"
                 fill="none"
-                className="dark:stroke-[#8BFF24] stroke-[#6366F1]"
+                className="dark:stroke-[#2563EB] stroke-[#6366F1]"
                 strokeWidth="2"
               />
               <path
                 d="M 0 25 Q 50 35 100 15 T 200 20 L 200 40 L 0 40 Z"
-                className="dark:fill-[#8BFF24]/10 fill-[#6366F1]/15"
+                className="dark:fill-[#2563EB]/15 fill-[#6366F1]/15"
               />
             </svg>
           </div>
 
-          <div className="pt-2 border-t dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] flex items-center justify-between text-xs">
+          <div className="pt-2 border-t dark:border-[#272B38] border-[#E2E8F0] flex items-center justify-between text-xs">
             <button
               onClick={() => onNavigate('wallet')}
-              className="dark:text-[#8BFF24] text-[#5046E5] underline hover:no-underline font-semibold font-mono inline-flex items-center space-x-1 cursor-pointer"
+              className="dark:text-[#8FB5FF] text-[#5046E5] underline hover:no-underline font-semibold font-mono inline-flex items-center space-x-1 cursor-pointer"
             >
               <span>Open Module</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
             </button>
-            <span className="text-[11px] dark:text-[#8BFF24] text-[#5046E5] font-mono">Instant Rails</span>
+            <span className="text-[11px] dark:text-[#8FB5FF] text-[#5046E5] font-mono">Instant Rails</span>
           </div>
         </div>
 
         {/* Card 6: Protected Custody Holds */}
         <div
-          className="interactive-card card-drop-in p-5 rounded-2xl dark:bg-[#151715] bg-white border dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] space-y-3 shadow-sm hover:dark:border-[rgba(139,255,36,0.3)] hover:border-[#5046E5]/40 transition group"
+          className="interactive-card card-drop-in p-5 rounded-2xl dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] space-y-3 shadow-sm hover:dark:border-[rgba(31,97,239,0.25)] hover:border-[#5046E5]/40 transition group"
           style={{ animationDelay: '400ms' }}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold dark:text-[#A5AAA2] text-[#64748B]">
+            <span className="text-xs font-semibold dark:text-[#9AA4B8] text-[#64748B]">
               Protected Custody Holds
             </span>
-            <div className="w-8 h-8 rounded-lg dark:bg-[#202220] bg-[#EEF2FF] border border-rose-500/20 flex items-center justify-center text-rose-500">
+            <div className="w-8 h-8 rounded-lg dark:bg-[#191D2A] bg-[#EEF2FF] border border-rose-500/20 flex items-center justify-center text-rose-500">
               <ShieldAlert className="w-4 h-4 text-rose-500" />
             </div>
           </div>
@@ -504,7 +504,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             <span className="text-3xl font-extrabold text-rose-500 font-mono tabular-nums tracking-tight">
               <AnimatedAmount value={disputedAmount} />
             </span>
-            <span className="text-xs dark:text-[#A5AAA2] text-[#64748B] font-mono">USD</span>
+            <span className="text-xs dark:text-[#9AA4B8] text-[#64748B] font-mono">USD</span>
           </div>
 
           {/* Stepped Mini Vertical Bars Visual with Growing Animation */}
@@ -512,13 +512,13 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             {[40, 20, 60, 30, 70].map((h, i) => (
               <div
                 key={i}
-                className="w-2.5 rounded-t dark:bg-[#8BFF24] bg-[#5046E5] bar-grow"
+                className="w-2.5 rounded-t dark:bg-[#1F61EF] bg-[#5046E5] bar-grow"
                 style={{ height: `${h}%`, opacity: 0.25 + (i * 0.15), animationDelay: `${300 + i * 70}ms` }}
               />
             ))}
           </div>
 
-          <div className="pt-2 border-t dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] flex items-center justify-between text-xs">
+          <div className="pt-2 border-t dark:border-[#272B38] border-[#E2E8F0] flex items-center justify-between text-xs">
             <button
               onClick={() => onNavigate('contracts')}
               className="text-rose-500 underline hover:no-underline font-semibold font-mono inline-flex items-center space-x-1 cursor-pointer"
@@ -526,7 +526,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
               <span>Open Module</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
             </button>
-            <span className="text-[11px] dark:text-[#A5AAA2] text-[#64748B] font-mono">Zero Disputed Losses</span>
+            <span className="text-[11px] dark:text-[#9AA4B8] text-[#64748B] font-mono">Zero Disputed Losses</span>
           </div>
         </div>
       </div>
@@ -535,17 +535,17 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left (Span 7): Escrow Overview with 7 Day Trend Chart */}
         <div
-          className="interactive-card card-drop-in lg:col-span-7 dark:bg-[#151715] bg-white border dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] rounded-2xl p-6 space-y-4 shadow-sm transition-colors"
+          className="interactive-card card-drop-in lg:col-span-7 dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-2xl p-6 space-y-4 shadow-sm transition-colors"
           style={{ animationDelay: '460ms' }}
         >
-          <div className="flex items-center justify-between border-b dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] pb-3">
+          <div className="flex items-center justify-between border-b dark:border-[#272B38] border-[#E2E8F0] pb-3">
             <div>
               <h3 className="text-sm font-bold dark:text-[#E8EAE6] text-[#111827]">Escrow Overview</h3>
-              <p className="text-xs dark:text-[#A5AAA2] text-[#64748B] mt-0.5">
-                Total 7D Escrows: <strong className="dark:text-[#8BFF24] text-[#5046E5] font-mono"><AnimatedAmount value={activeEscrowAmount || 26} decimals={0} /></strong>
+              <p className="text-xs dark:text-[#9AA4B8] text-[#64748B] mt-0.5">
+                Total 7D Escrows: <strong className="dark:text-[#8FB5FF] text-[#5046E5] font-mono"><AnimatedAmount value={activeEscrowAmount || 26} decimals={0} /></strong>
               </p>
             </div>
-            <span className="px-3 py-1 rounded-full text-[11px] font-bold font-mono dark:bg-[#202220] bg-[#EEF2FF] dark:text-[#8BFF24] text-[#5046E5] border dark:border-[rgba(139,255,36,0.3)] border-[#C7D2FE]">
+            <span className="px-3 py-1 rounded-full text-[11px] font-bold font-mono dark:bg-[#191D2A] bg-[#EEF2FF] dark:text-[#8FB5FF] text-[#5046E5] border dark:border-[rgba(31,97,239,0.25)] border-[#C7D2FE]">
               7 DAY TREND
             </span>
           </div>
@@ -559,8 +559,8 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                   <stop offset="100%" stopColor="#6366F1" stopOpacity="0.0" />
                 </linearGradient>
                 <linearGradient id="escrowTrendGradDark" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#8BFF24" stopOpacity="0.45" />
-                  <stop offset="100%" stopColor="#8BFF24" stopOpacity="0.0" />
+                  <stop offset="0%" stopColor="#1F61EF" stopOpacity="0.45" />
+                  <stop offset="100%" stopColor="#1F61EF" stopOpacity="0.0" />
                 </linearGradient>
               </defs>
 
@@ -575,12 +575,12 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                 <path d={areaD} className="dark:fill-[url(#escrowTrendGradDark)] fill-[url(#escrowTrendGradLight)]" />
 
                 {/* Foreground Spline Line */}
-                <path d={pathD} fill="none" className="dark:stroke-[#8BFF24] stroke-[#6366F1]" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d={pathD} fill="none" className="dark:stroke-[#2563EB] stroke-[#6366F1]" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
 
                 {/* Interactive Data Points */}
                 {points.map((pt, i) => (
                   <g key={i}>
-                    <circle cx={pt.x} cy={pt.y} r="4" className="dark:fill-[#8BFF24] fill-[#5046E5] dark:drop-shadow-[0_0_8px_rgba(139,255,36,0.8)] drop-shadow-[0_0_6px_rgba(79,70,229,0.5)]" />
+                    <circle cx={pt.x} cy={pt.y} r="4" className="dark:fill-[#2563EB] fill-[#5046E5] dark:drop-shadow-[0_0_8px_rgba(31,97,239,0.8)] drop-shadow-[0_0_6px_rgba(79,70,229,0.5)]" />
                     <text
                       x={pt.x}
                       y={height - 2}
@@ -598,23 +598,23 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
 
         {/* Right (Span 5): Wallet Activity Card */}
         <div
-          className="interactive-card card-drop-in lg:col-span-5 dark:bg-[#151715] bg-white border dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] rounded-2xl p-6 space-y-4 shadow-sm transition-colors flex flex-col justify-between"
+          className="interactive-card card-drop-in lg:col-span-5 dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-2xl p-6 space-y-4 shadow-sm transition-colors flex flex-col justify-between"
           style={{ animationDelay: '520ms' }}
         >
           <div>
-            <div className="flex items-center justify-between border-b dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] pb-3">
+            <div className="flex items-center justify-between border-b dark:border-[#272B38] border-[#E2E8F0] pb-3">
               <h3 className="text-sm font-bold dark:text-[#E8EAE6] text-[#111827]">Wallet Activity</h3>
-              <span className="text-[11px] font-mono dark:text-[#8BFF24] text-[#5046E5] font-bold">REAL-TIME FLOW</span>
+              <span className="text-[11px] font-mono dark:text-[#8FB5FF] text-[#5046E5] font-bold">REAL-TIME FLOW</span>
             </div>
 
             <div className="pt-4 space-y-3">
               <div>
-                <span className="text-xs dark:text-[#A5AAA2] text-[#64748B]">Net 7D Wallet Flow:</span>
+                <span className="text-xs dark:text-[#9AA4B8] text-[#64748B]">Net 7D Wallet Flow:</span>
                 <div className="flex items-baseline space-x-1 mt-0.5">
-                  <span className="text-2xl font-extrabold dark:text-[#8BFF24] text-[#5046E5] font-mono">
+                  <span className="text-2xl font-extrabold dark:text-[#8FB5FF] text-[#5046E5] font-mono">
                     <AnimatedAmount value={completedAmount || 12500} prefix="+$" />
                   </span>
-                  <span className="text-xs dark:text-[#A5AAA2] text-[#64748B] font-mono">USD</span>
+                  <span className="text-xs dark:text-[#9AA4B8] text-[#64748B] font-mono">USD</span>
                 </div>
               </div>
 
@@ -624,9 +624,9 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                   <div key={idx} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
                     <div
                       style={{ height: `${val}%`, animationDelay: `${350 + idx * 70}ms` }}
-                      className="w-full rounded-t-md dark:bg-[#8BFF24]/80 dark:hover:bg-[#8BFF24] bg-[#818CF8]/80 hover:bg-[#5046E5] bar-grow transition-all"
+                      className="w-full rounded-t-md dark:bg-[#1F61EF]/80 dark:hover:bg-[#174EC4] bg-[#818CF8]/80 hover:bg-[#5046E5] bar-grow transition-all"
                     />
-                    <span className="text-[9px] font-mono dark:text-[#A5AAA2] text-[#64748B]">
+                    <span className="text-[9px] font-mono dark:text-[#9AA4B8] text-[#64748B]">
                       {['M', 'T', 'W', 'T', 'F', 'S', 'S'][idx]}
                     </span>
                   </div>
@@ -635,17 +635,17 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             </div>
           </div>
 
-          <div className="pt-3 border-t dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] flex items-center justify-between text-xs">
+          <div className="pt-3 border-t dark:border-[#272B38] border-[#E2E8F0] flex items-center justify-between text-xs">
             <button
               onClick={() => onNavigate('wallet')}
-              className="dark:text-[#8BFF24] text-[#5046E5] hover:underline font-semibold font-mono inline-flex items-center space-x-1 cursor-pointer"
+              className="dark:text-[#8FB5FF] text-[#5046E5] hover:underline font-semibold font-mono inline-flex items-center space-x-1 cursor-pointer"
             >
               <span>Go to Virtual Vault</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => onNavigate('contracts')}
-              className="dark:text-[#A5AAA2] text-[#64748B] hover:text-[#5046E5] font-medium font-mono inline-flex items-center space-x-1 cursor-pointer"
+              className="dark:text-[#9AA4B8] text-[#64748B] hover:text-[#5046E5] font-medium font-mono inline-flex items-center space-x-1 cursor-pointer"
             >
               <span>Agreements</span>
               <ChevronRight className="w-3.5 h-3.5" />
@@ -657,22 +657,22 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
       {/* Bento Section 4: Operational Contracts Board & Real-Time Telemetry Feed */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left (Span 7): Contracts Operations Board */}
-        <div className="lg:col-span-7 dark:bg-[#151715] bg-white border dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] rounded-2xl p-6 space-y-4 shadow-sm transition-colors">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] pb-3">
+        <div className="lg:col-span-7 dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-2xl p-6 space-y-4 shadow-sm transition-colors">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b dark:border-[#272B38] border-[#E2E8F0] pb-3">
             <div className="flex items-center space-x-2">
-              <Briefcase className="w-4 h-4 dark:text-[#8BFF24] text-[#5046E5]" />
+              <Briefcase className="w-4 h-4 dark:text-[#8FB5FF] text-[#5046E5]" />
               <h3 className="text-sm font-bold dark:text-[#E8EAE6] text-[#111827]">Agreement Operations Board</h3>
             </div>
 
-            <div className="flex items-center space-x-1 p-0.5 rounded-lg dark:bg-[#202220] bg-[#F1F5F9] text-xs">
+            <div className="flex items-center space-x-1 p-0.5 rounded-lg dark:bg-[#191D2A] bg-[#F1F5F9] text-xs">
               {(['ALL', 'ACTIVE', 'PENDING'] as const).map((filter) => (
                 <button
                   key={filter}
                   onClick={() => setActiveContractFilter(filter)}
                   className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition cursor-pointer ${
                     activeContractFilter === filter
-                      ? 'dark:bg-[#8BFF24] dark:text-[#050605] bg-[#5046E5] text-white font-bold shadow-md shadow-[#5046E5]/25'
-                      : 'dark:text-[#A5AAA2] text-[#64748B] hover:dark:text-[#E8EAE6] hover:text-[#111827]'
+                      ? 'dark:bg-[#1F61EF] dark:text-white bg-[#5046E5] text-white font-bold shadow-md shadow-[#5046E5]/25'
+                      : 'dark:text-[#9AA4B8] text-[#64748B] hover:dark:text-[#E8EAE6] hover:text-[#111827]'
                   }`}
                 >
                   {filter}
@@ -682,7 +682,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
           </div>
 
           {filteredContracts.length === 0 ? (
-            <div className="py-12 text-center dark:text-[#A5AAA2] text-[#64748B] text-xs">
+            <div className="py-12 text-center dark:text-[#9AA4B8] text-[#64748B] text-xs">
               No agreements matching filter criteria. Create a proposal to initiate milestone escrow.
             </div>
           ) : (
@@ -691,15 +691,15 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                 <div
                   key={contract.id}
                   onClick={() => onNavigate('contracts')}
-                  className="p-3.5 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] hover:dark:border-[rgba(139,255,36,0.3)] hover:border-[#5046E5]/40 transition flex items-center justify-between gap-3 cursor-pointer group"
+                  className="p-3.5 rounded-xl dark:bg-[#191D2A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] hover:dark:border-[rgba(31,97,239,0.25)] hover:border-[#5046E5]/40 transition flex items-center justify-between gap-3 cursor-pointer group"
                 >
                   <div className="space-y-1">
                     <div className="flex items-center space-x-2">
-                      <span className="font-mono text-xs font-semibold dark:text-[#8BFF24] text-[#5046E5]">{contract.contractNumber}</span>
+                      <span className="font-mono text-xs font-semibold dark:text-[#8FB5FF] text-[#5046E5]">{contract.contractNumber}</span>
                       <span
                         className={`text-[10px] px-2 py-0.5 rounded-full font-semibold font-mono ${
                           contract.status === 'ACTIVE'
-                            ? 'dark:bg-[#8BFF24]/10 dark:text-[#8BFF24] bg-[#EEF2FF] text-[#5046E5] border dark:border-[rgba(139,255,36,0.25)] border-[#C7D2FE]'
+                            ? 'dark:bg-[#1C2740] dark:text-[#8FB5FF] bg-[#EEF2FF] text-[#5046E5] border dark:border-[rgba(31,97,239,0.2)] border-[#C7D2FE]'
                             : contract.status === 'COMPLETED'
                               ? 'dark:bg-[#E8EAE6]/10 bg-slate-200 dark:text-[#E8EAE6] text-slate-800 border dark:border-[rgba(255,255,255,0.15)] border-slate-300'
                               : 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
@@ -708,19 +708,19 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                         {contract.status}
                       </span>
                     </div>
-                    <h5 className="text-xs font-bold dark:text-[#E8EAE6] text-[#111827] group-hover:dark:text-[#8BFF24] group-hover:text-[#5046E5] transition line-clamp-1">
+                    <h5 className="text-xs font-bold dark:text-[#E8EAE6] text-[#111827] group-hover:dark:text-[#8FB5FF] group-hover:text-[#5046E5] transition line-clamp-1">
                       {contract.title}
                     </h5>
-                    <p className="text-[11px] dark:text-[#A5AAA2] text-[#64748B]">
+                    <p className="text-[11px] dark:text-[#9AA4B8] text-[#64748B]">
                       {isClient ? `Specialist: ${contract.worker?.firstName || 'Assigned Specialist'}` : `Client: ${contract.client?.firstName || 'Client'}`}
                     </p>
                   </div>
 
                   <div className="text-right shrink-0">
-                    <span className="text-sm font-bold dark:text-[#8BFF24] text-[#111827] font-mono tabular-nums block">
+                    <span className="text-sm font-bold dark:text-[#8FB5FF] text-[#111827] font-mono tabular-nums block">
                       ${Number(contract.totalAmount).toLocaleString()}
                     </span>
-                    <span className="text-[10px] dark:text-[#A5AAA2] text-[#64748B] font-mono">{contract.currency}</span>
+                    <span className="text-[10px] dark:text-[#9AA4B8] text-[#64748B] font-mono">{contract.currency}</span>
                   </div>
                 </div>
               ))}
@@ -729,13 +729,13 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
         </div>
 
         {/* Right (Span 5): Real-Time Telemetry Event Stream */}
-        <div className="lg:col-span-5 dark:bg-[#151715] bg-white border dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] rounded-2xl p-6 space-y-4 shadow-sm transition-colors">
-          <div className="flex items-center justify-between border-b dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] pb-3">
+        <div className="lg:col-span-5 dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-2xl p-6 space-y-4 shadow-sm transition-colors">
+          <div className="flex items-center justify-between border-b dark:border-[#272B38] border-[#E2E8F0] pb-3">
             <div className="flex items-center space-x-2">
-              <Activity className="w-4 h-4 dark:text-[#8BFF24] text-[#5046E5]" />
+              <Activity className="w-4 h-4 dark:text-[#8FB5FF] text-[#5046E5]" />
               <h3 className="text-sm font-bold dark:text-[#E8EAE6] text-[#111827]">Audit Telemetry Feed</h3>
             </div>
-            <span className="text-[10px] dark:text-[#8BFF24] text-[#5046E5] font-mono font-bold">SUPABASE REALTIME</span>
+            <span className="text-[10px] dark:text-[#8FB5FF] text-[#5046E5] font-mono font-bold">SUPABASE REALTIME</span>
           </div>
 
           {metrics?.recentActivities && metrics.recentActivities.length > 0 ? (
@@ -743,20 +743,20 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
               {metrics.recentActivities.slice(0, 6).map((act) => (
                 <div
                   key={act.id}
-                  className="p-3 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] flex items-start justify-between gap-3 text-xs"
+                  className="p-3 rounded-xl dark:bg-[#191D2A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] flex items-start justify-between gap-3 text-xs"
                 >
                   <div className="space-y-0.5">
                     <span className="font-semibold dark:text-[#E8EAE6] text-[#111827]">{act.title}</span>
-                    <p className="dark:text-[#A5AAA2] text-[#64748B] text-[11px] leading-relaxed">{act.description}</p>
+                    <p className="dark:text-[#9AA4B8] text-[#64748B] text-[11px] leading-relaxed">{act.description}</p>
                   </div>
-                  <span className="text-[10px] dark:text-[#A5AAA2] text-[#64748B] font-mono shrink-0">
+                  <span className="text-[10px] dark:text-[#9AA4B8] text-[#64748B] font-mono shrink-0">
                     {new Date(act.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-xs dark:text-[#A5AAA2] text-[#64748B] italic py-8 text-center">
+            <p className="text-xs dark:text-[#9AA4B8] text-[#64748B] italic py-8 text-center">
               No recent activity recorded yet. Create a proposal or start work on an active contract to stream events.
             </p>
           )}

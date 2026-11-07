@@ -36,11 +36,11 @@ export function streamInvoicePdf(res: Response, data: InvoiceDto): void {
 
 function buildInvoicePdf(doc: InstanceType<typeof PDFDocument>, data: InvoiceDto): void {
   // 1. Header Banner
-  doc.rect(0, 0, doc.page.width, 70).fill('#080908');
-  doc.font('Helvetica-Bold').fillColor('#8BFF24').fontSize(20).text('TRUSTPAY', 40, 20);
+  doc.rect(0, 0, doc.page.width, 70).fill('#0B0D14');
+  doc.font('Helvetica-Bold').fillColor('#1F61EF').fontSize(20).text('TRUSTPAY', 40, 20);
   doc.font('Helvetica').fillColor('#94a3b8').fontSize(9).text('ENTERPRISE DIGITAL ESCROW & INVOICING', 40, 44);
   doc.font('Helvetica-Bold').fillColor('#ffffff').fontSize(11).text(`INVOICE: ${data.invoiceNumber}`, 360, 22, { align: 'right' });
-  doc.font('Helvetica').fillColor('#8BFF24').fontSize(9).text(`STATUS: ${data.status}`, 360, 40, { align: 'right' });
+  doc.font('Helvetica').fillColor('#1F61EF').fontSize(9).text(`STATUS: ${data.status}`, 360, 40, { align: 'right' });
 
   doc.moveDown(3);
 

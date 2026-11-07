@@ -352,7 +352,7 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
   };
 
   return (
-    <div className="rounded-xl border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] dark:bg-[#171717] bg-white p-4 space-y-4 shadow-sm transition-colors">
+    <div className="rounded-xl border dark:border-[#272B38] border-[#E2E8F0] dark:bg-[#191B25] bg-white p-4 space-y-4 shadow-sm transition-colors">
       {/* Alert Notices */}
       {actionMessage && (
         <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 dark:text-emerald-400 text-xs flex items-center justify-between">
@@ -379,13 +379,13 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
       )}
 
       {/* Tabs Row */}
-      <div className="flex items-center space-x-2 border-b dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] pb-2.5 text-xs overflow-x-auto">
+      <div className="flex items-center space-x-2 border-b dark:border-[#272B38] border-[#E2E8F0] pb-2.5 text-xs overflow-x-auto">
         <button
           onClick={() => setActiveTab('disputes')}
           className={`px-3 py-1.5 rounded-lg font-semibold flex items-center space-x-1.5 transition shrink-0 ${
             activeTab === 'disputes'
               ? 'bg-[#5046E5] text-white shadow-sm'
-              : 'dark:text-[#A5A5A5] text-[#475569] hover:dark:text-[#CDCBCA] hover:text-[#242424] dark:bg-[#202020] bg-[#F1F5F9]'
+              : 'dark:text-[#9AA4B8] text-[#475569] hover:dark:text-[#E8ECF5] hover:text-[#242424] dark:bg-[#191D2A] bg-[#F1F5F9]'
           }`}
         >
           <Scale className="w-3.5 h-3.5" />
@@ -397,7 +397,7 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
           className={`px-3 py-1.5 rounded-lg font-semibold flex items-center space-x-1.5 transition shrink-0 ${
             activeTab === 'amendments'
               ? 'bg-[#5046E5] text-white shadow-sm'
-              : 'dark:text-[#A5A5A5] text-[#475569] hover:dark:text-[#CDCBCA] hover:text-[#242424] dark:bg-[#202020] bg-[#F1F5F9]'
+              : 'dark:text-[#9AA4B8] text-[#475569] hover:dark:text-[#E8ECF5] hover:text-[#242424] dark:bg-[#191D2A] bg-[#F1F5F9]'
           }`}
         >
           <FileEdit className="w-3.5 h-3.5" />
@@ -409,7 +409,7 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
           className={`px-3 py-1.5 rounded-lg font-semibold flex items-center space-x-1.5 transition shrink-0 ${
             activeTab === 'termination'
               ? 'bg-[#5046E5] text-white shadow-sm'
-              : 'dark:text-[#A5A5A5] text-[#475569] hover:dark:text-[#CDCBCA] hover:text-[#242424] dark:bg-[#202020] bg-[#F1F5F9]'
+              : 'dark:text-[#9AA4B8] text-[#475569] hover:dark:text-[#E8ECF5] hover:text-[#242424] dark:bg-[#191D2A] bg-[#F1F5F9]'
           }`}
         >
           <ShieldAlert className="w-3.5 h-3.5" />
@@ -421,7 +421,7 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
           className={`px-3 py-1.5 rounded-lg font-semibold flex items-center space-x-1.5 transition shrink-0 ${
             activeTab === 'versions'
               ? 'bg-[#5046E5] text-white shadow-sm'
-              : 'dark:text-[#A5A5A5] text-[#475569] hover:dark:text-[#CDCBCA] hover:text-[#242424] dark:bg-[#202020] bg-[#F1F5F9]'
+              : 'dark:text-[#9AA4B8] text-[#475569] hover:dark:text-[#E8ECF5] hover:text-[#242424] dark:bg-[#191D2A] bg-[#F1F5F9]'
           }`}
         >
           <History className="w-3.5 h-3.5" />
@@ -433,7 +433,7 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
           className={`px-3 py-1.5 rounded-lg font-semibold flex items-center space-x-1.5 transition shrink-0 ${
             activeTab === 'integrity'
               ? 'bg-[#5046E5] text-white shadow-sm'
-              : 'dark:text-[#A5A5A5] text-[#475569] hover:dark:text-[#CDCBCA] hover:text-[#242424] dark:bg-[#202020] bg-[#F1F5F9]'
+              : 'dark:text-[#9AA4B8] text-[#475569] hover:dark:text-[#E8ECF5] hover:text-[#242424] dark:bg-[#191D2A] bg-[#F1F5F9]'
           }`}
         >
           <ShieldCheck className="w-3.5 h-3.5" />
@@ -445,7 +445,7 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
           className={`px-3 py-1.5 rounded-lg font-semibold flex items-center space-x-1.5 transition shrink-0 ${
             activeTab === 'activities'
               ? 'bg-[#5046E5] text-white shadow-sm'
-              : 'dark:text-[#A5A5A5] text-[#475569] hover:dark:text-[#CDCBCA] hover:text-[#242424] dark:bg-[#202020] bg-[#F1F5F9]'
+              : 'dark:text-[#9AA4B8] text-[#475569] hover:dark:text-[#E8ECF5] hover:text-[#242424] dark:bg-[#191D2A] bg-[#F1F5F9]'
           }`}
         >
           <Binary className="w-3.5 h-3.5" />
@@ -466,8 +466,8 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
                       {dispute.status}
                     </span>
                   </div>
-                  <h4 className="text-xs font-semibold dark:text-[#CDCBCA] text-[#242424] mt-1">{dispute.title}</h4>
-                  <p className="text-[11px] dark:text-[#A5A5A5] text-[#475569]">{dispute.description}</p>
+                  <h4 className="text-xs font-semibold dark:text-[#E8ECF5] text-[#242424] mt-1">{dispute.title}</h4>
+                  <p className="text-[11px] dark:text-[#9AA4B8] text-[#475569]">{dispute.description}</p>
                 </div>
                 {dispute.disputeHoldActive && (
                   <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded bg-red-500/10 text-red-500 border border-red-500/20 text-[10px] font-bold self-start sm:self-auto font-mono">
@@ -480,22 +480,22 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
               {/* Resolution Proposals */}
               {dispute.resolutions && dispute.resolutions.length > 0 && (
                 <div className="space-y-2">
-                  <span className="text-[10px] font-bold dark:text-[#777777] text-[#64748B] uppercase tracking-wider font-mono">
+                  <span className="text-[10px] font-bold dark:text-[#9AA4B8] text-[#64748B] uppercase tracking-wider font-mono">
                     Settlement Proposals
                   </span>
                   {dispute.resolutions.map((res) => (
-                    <div key={res.id} className="p-3 rounded-lg dark:bg-[#202020] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] text-xs space-y-2">
+                    <div key={res.id} className="p-3 rounded-lg dark:bg-[#191D2A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] text-xs space-y-2">
                       <div className="flex items-center justify-between">
                         <span className="font-semibold text-[#5046E5]">
                           {res.resolutionType.replace(/_/g, ' ')} ({res.status})
                         </span>
-                        <span className="dark:text-[#777777] text-[#64748B] text-[10px] font-mono">{new Date(res.createdAt).toLocaleDateString()}</span>
+                        <span className="dark:text-[#9AA4B8] text-[#64748B] text-[10px] font-mono">{new Date(res.createdAt).toLocaleDateString()}</span>
                       </div>
-                      <p className="dark:text-[#A5A5A5] text-[#475569] text-[11px]">{res.rationale}</p>
-                      <div className="flex items-center justify-between text-[11px] dark:text-[#777777] text-[#64748B] pt-1 border-t dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]">
+                      <p className="dark:text-[#9AA4B8] text-[#475569] text-[11px]">{res.rationale}</p>
+                      <div className="flex items-center justify-between text-[11px] dark:text-[#9AA4B8] text-[#64748B] pt-1 border-t dark:border-[#272B38] border-[#E2E8F0]">
                         <div>
-                          Client Share: <span className="font-mono tabular-nums dark:text-[#CDCBCA] text-[#242424] font-semibold">{formatCurrencyMinor(res.clientAmountMinor)}</span> |{' '}
-                          Worker Share: <span className="font-mono tabular-nums dark:text-[#CDCBCA] text-[#242424] font-semibold">{formatCurrencyMinor(res.workerAmountMinor)}</span>
+                          Client Share: <span className="font-mono tabular-nums dark:text-[#E8ECF5] text-[#242424] font-semibold">{formatCurrencyMinor(res.clientAmountMinor)}</span> |{' '}
+                          Worker Share: <span className="font-mono tabular-nums dark:text-[#E8ECF5] text-[#242424] font-semibold">{formatCurrencyMinor(res.workerAmountMinor)}</span>
                         </div>
                         {res.status === 'PROPOSED' && (
                           <div className="flex items-center space-x-1.5">
@@ -523,17 +523,17 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
 
               {/* Statements Timeline */}
               <div className="space-y-2">
-                <span className="text-[10px] font-bold dark:text-[#777777] text-[#64748B] uppercase tracking-wider font-mono">
+                <span className="text-[10px] font-bold dark:text-[#9AA4B8] text-[#64748B] uppercase tracking-wider font-mono">
                   Dispute Discussion Thread
                 </span>
                 <div className="max-h-40 overflow-y-auto space-y-1.5">
                   {dispute.responses.map((r) => (
-                    <div key={r.id} className="p-2.5 rounded dark:bg-[#080808] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] text-[11px] space-y-0.5">
-                      <div className="flex justify-between dark:text-[#777777] text-[#64748B]">
-                        <span className="font-semibold dark:text-[#CDCBCA] text-[#242424]">{r.authorName} ({r.authorRole})</span>
+                    <div key={r.id} className="p-2.5 rounded dark:bg-[#0B0D14] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] text-[11px] space-y-0.5">
+                      <div className="flex justify-between dark:text-[#9AA4B8] text-[#64748B]">
+                        <span className="font-semibold dark:text-[#E8ECF5] text-[#242424]">{r.authorName} ({r.authorRole})</span>
                         <span className="font-mono text-[10px]">{new Date(r.createdAt).toLocaleTimeString()}</span>
                       </div>
-                      <p className="dark:text-[#A5A5A5] text-[#475569]">{r.content}</p>
+                      <p className="dark:text-[#9AA4B8] text-[#475569]">{r.content}</p>
                     </div>
                   ))}
                 </div>
@@ -544,7 +544,7 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
                     placeholder="Submit formal statement or evidence reference..."
                     value={statementContent}
                     onChange={(e) => setStatementContent(e.target.value)}
-                    className="flex-1 dark:bg-[#080808] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-lg px-3 py-1.5 text-xs dark:text-[#CDCBCA] text-[#242424] dark:placeholder-[#777777] placeholder-[#64748B] focus:outline-none focus:ring-1 focus:ring-[#5046E5]"
+                    className="flex-1 dark:bg-[#0B0D14] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] rounded-lg px-3 py-1.5 text-xs dark:text-[#E8ECF5] text-[#242424] dark:placeholder-[#777777] placeholder-[#64748B] focus:outline-none focus:ring-1 focus:ring-[#5046E5]"
                   />
                   <button
                     onClick={handleSendStatement}
@@ -557,16 +557,16 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
               </div>
 
               {/* Evidence Documents Section */}
-              <div className="space-y-2 pt-2 border-t dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]">
+              <div className="space-y-2 pt-2 border-t dark:border-[#272B38] border-[#E2E8F0]">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold dark:text-[#777777] text-[#64748B] uppercase tracking-wider font-mono">
+                  <span className="text-[10px] font-bold dark:text-[#9AA4B8] text-[#64748B] uppercase tracking-wider font-mono">
                     Dispute Evidence &amp; Attachments ({dispute.evidence?.length || 0})
                   </span>
                   {!showAddEvidence && (
                     <button
                       type="button"
                       onClick={() => setShowAddEvidence(true)}
-                      className="px-2.5 py-1 rounded dark:bg-[#202020] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] text-emerald-500 text-[10px] font-medium border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] flex items-center space-x-1"
+                      className="px-2.5 py-1 rounded dark:bg-[#191D2A] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] text-emerald-500 text-[10px] font-medium border dark:border-[#272B38] border-[#E2E8F0] flex items-center space-x-1"
                     >
                       <FileUp className="w-3 h-3" />
                       <span>Attach Evidence</span>
@@ -577,19 +577,19 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
                 {dispute.evidence && dispute.evidence.length > 0 ? (
                   <div className="space-y-1.5">
                     {dispute.evidence.map((ev) => (
-                      <div key={ev.id} className="p-2.5 rounded-lg dark:bg-[#080808] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] flex items-center justify-between text-xs">
+                      <div key={ev.id} className="p-2.5 rounded-lg dark:bg-[#0B0D14] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] flex items-center justify-between text-xs">
                         <div className="space-y-0.5">
                           <div className="flex items-center space-x-2">
-                            <span className="font-semibold dark:text-[#CDCBCA] text-[#242424]">{ev.fileName}</span>
-                            <span className="text-[10px] dark:text-[#777777] text-[#64748B]">by {ev.uploaderName}</span>
+                            <span className="font-semibold dark:text-[#E8ECF5] text-[#242424]">{ev.fileName}</span>
+                            <span className="text-[10px] dark:text-[#9AA4B8] text-[#64748B]">by {ev.uploaderName}</span>
                           </div>
-                          {ev.description && <p className="text-[11px] dark:text-[#A5A5A5] text-[#475569]">{ev.description}</p>}
+                          {ev.description && <p className="text-[11px] dark:text-[#9AA4B8] text-[#475569]">{ev.description}</p>}
                         </div>
                         <a
                           href={ev.downloadUrl || ev.fileUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-2.5 py-1 rounded dark:bg-[#202020] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] text-emerald-500 text-[11px] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] flex items-center space-x-1 shrink-0"
+                          className="px-2.5 py-1 rounded dark:bg-[#191D2A] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] text-emerald-500 text-[11px] border dark:border-[#272B38] border-[#E2E8F0] flex items-center space-x-1 shrink-0"
                         >
                           <ExternalLink className="w-3 h-3" />
                           <span>View Evidence</span>
@@ -598,51 +598,51 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
                     ))}
                   </div>
                 ) : (
-                  <p className="text-[11px] dark:text-[#777777] text-[#64748B] italic">No formal evidence attachments recorded yet.</p>
+                  <p className="text-[11px] dark:text-[#9AA4B8] text-[#64748B] italic">No formal evidence attachments recorded yet.</p>
                 )}
 
                 {showAddEvidence && (
-                  <form onSubmit={handleAddEvidence} className="p-3 rounded-lg dark:bg-[#202020] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] space-y-2 text-xs">
-                    <span className="font-semibold dark:text-[#CDCBCA] text-[#242424] text-xs block">Submit New Evidence</span>
+                  <form onSubmit={handleAddEvidence} className="p-3 rounded-lg dark:bg-[#191D2A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] space-y-2 text-xs">
+                    <span className="font-semibold dark:text-[#E8ECF5] text-[#242424] text-xs block">Submit New Evidence</span>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <div>
-                        <label className="block text-[11px] dark:text-[#A5A5A5] text-[#475569] mb-1">File or Document Name *</label>
+                        <label className="block text-[11px] dark:text-[#9AA4B8] text-[#475569] mb-1">File or Document Name *</label>
                         <input
                           type="text"
                           placeholder="e.g. TestReport.pdf or PR-102"
                           value={evidenceFileName}
                           onChange={(e) => setEvidenceFileName(e.target.value)}
-                          className="w-full dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-lg px-2.5 py-1.5 dark:text-[#CDCBCA] text-[#242424] text-xs focus:outline-none focus:ring-1 focus:ring-[#5046E5]"
+                          className="w-full dark:bg-[#0B0D14] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-lg px-2.5 py-1.5 dark:text-[#E8ECF5] text-[#242424] text-xs focus:outline-none focus:ring-1 focus:ring-[#5046E5]"
                           required
                         />
                       </div>
                       <div>
-                        <label className="block text-[11px] dark:text-[#A5A5A5] text-[#475569] mb-1">File URL / Evidence Link *</label>
+                        <label className="block text-[11px] dark:text-[#9AA4B8] text-[#475569] mb-1">File URL / Evidence Link *</label>
                         <input
                           type="url"
                           placeholder="https://..."
                           value={evidenceFileUrl}
                           onChange={(e) => setEvidenceFileUrl(e.target.value)}
-                          className="w-full dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-lg px-2.5 py-1.5 dark:text-[#CDCBCA] text-[#242424] text-xs focus:outline-none focus:ring-1 focus:ring-[#5046E5]"
+                          className="w-full dark:bg-[#0B0D14] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-lg px-2.5 py-1.5 dark:text-[#E8ECF5] text-[#242424] text-xs focus:outline-none focus:ring-1 focus:ring-[#5046E5]"
                           required
                         />
                       </div>
                     </div>
                     <div>
-                      <label className="block text-[11px] dark:text-[#A5A5A5] text-[#475569] mb-1">Description / Context</label>
+                      <label className="block text-[11px] dark:text-[#9AA4B8] text-[#475569] mb-1">Description / Context</label>
                       <input
                         type="text"
                         placeholder="Brief note about this evidence..."
                         value={evidenceDescription}
                         onChange={(e) => setEvidenceDescription(e.target.value)}
-                        className="w-full dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-lg px-2.5 py-1.5 dark:text-[#CDCBCA] text-[#242424] text-xs focus:outline-none focus:ring-1 focus:ring-[#5046E5]"
+                        className="w-full dark:bg-[#0B0D14] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-lg px-2.5 py-1.5 dark:text-[#E8ECF5] text-[#242424] text-xs focus:outline-none focus:ring-1 focus:ring-[#5046E5]"
                       />
                     </div>
                     <div className="flex justify-end space-x-2 pt-1">
                       <button
                         type="button"
                         onClick={() => setShowAddEvidence(false)}
-                        className="px-2.5 py-1 rounded dark:bg-[#171717] bg-[#E2E8F0] dark:text-[#CDCBCA] text-[#242424] text-xs font-semibold"
+                        className="px-2.5 py-1 rounded dark:bg-[#191B25] bg-[#E2E8F0] dark:text-[#E8ECF5] text-[#242424] text-xs font-semibold"
                       >
                         Cancel
                       </button>
@@ -660,7 +660,7 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
             </div>
           ) : (
             <div className="text-center py-6 space-y-3">
-              <p className="text-xs dark:text-[#777777] text-[#64748B]">
+              <p className="text-xs dark:text-[#9AA4B8] text-[#64748B]">
                 No disputes have been raised. If deliverables do not match contract requirements, contract participants can initiate mediation.
               </p>
               {!showCreateDispute && contract.status === 'ACTIVE' && (
@@ -677,15 +677,15 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
 
           {/* Create Dispute Form */}
           {showCreateDispute && (
-            <form onSubmit={handleCreateDispute} className="p-4 rounded-xl dark:bg-[#202020] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] space-y-3 text-xs">
-              <h4 className="font-bold dark:text-[#CDCBCA] text-[#242424] text-xs">Initiate Formal Contract Dispute</h4>
+            <form onSubmit={handleCreateDispute} className="p-4 rounded-xl dark:bg-[#191D2A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] space-y-3 text-xs">
+              <h4 className="font-bold dark:text-[#E8ECF5] text-[#242424] text-xs">Initiate Formal Contract Dispute</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block dark:text-[#A5A5A5] text-[#475569] mb-1">Dispute Category *</label>
+                  <label className="block dark:text-[#9AA4B8] text-[#475569] mb-1">Dispute Category *</label>
                   <select
                     value={disputeCategory}
                     onChange={(e) => setDisputeCategory(e.target.value as DisputeCategory)}
-                    className="w-full dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-lg px-3 py-1.5 dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:ring-1 focus:ring-[#5046E5]"
+                    className="w-full dark:bg-[#0B0D14] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-lg px-3 py-1.5 dark:text-[#E8ECF5] text-[#242424] focus:outline-none focus:ring-1 focus:ring-[#5046E5]"
                   >
                     {Object.values(DisputeCategory).map((cat) => (
                       <option key={cat} value={cat}>
@@ -695,38 +695,38 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
                   </select>
                 </div>
                 <div>
-                  <label className="block dark:text-[#A5A5A5] text-[#475569] mb-1">Claimed Amount ($)</label>
+                  <label className="block dark:text-[#9AA4B8] text-[#475569] mb-1">Claimed Amount ($)</label>
                   <input
                     type="number"
                     step="0.01"
                     placeholder="e.g. 500"
                     value={disputeClaim}
                     onChange={(e) => setDisputeClaim(e.target.value)}
-                    className="w-full dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-lg px-3 py-1.5 dark:text-[#CDCBCA] text-[#242424] font-mono focus:outline-none focus:ring-1 focus:ring-[#5046E5]"
+                    className="w-full dark:bg-[#0B0D14] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-lg px-3 py-1.5 dark:text-[#E8ECF5] text-[#242424] font-mono focus:outline-none focus:ring-1 focus:ring-[#5046E5]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block dark:text-[#A5A5A5] text-[#475569] mb-1">Dispute Summary *</label>
+                <label className="block dark:text-[#9AA4B8] text-[#475569] mb-1">Dispute Summary *</label>
                 <input
                   type="text"
                   placeholder="Summary of grievance (min 5 chars)..."
                   value={disputeTitle}
                   onChange={(e) => setDisputeTitle(e.target.value)}
-                  className="w-full dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-lg px-3 py-1.5 dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:ring-1 focus:ring-[#5046E5]"
+                  className="w-full dark:bg-[#0B0D14] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-lg px-3 py-1.5 dark:text-[#E8ECF5] text-[#242424] focus:outline-none focus:ring-1 focus:ring-[#5046E5]"
                   required
                 />
               </div>
 
               <div>
-                <label className="block dark:text-[#A5A5A5] text-[#475569] mb-1">Detailed Findings &amp; Evidence Description *</label>
+                <label className="block dark:text-[#9AA4B8] text-[#475569] mb-1">Detailed Findings &amp; Evidence Description *</label>
                 <textarea
                   rows={3}
                   placeholder="Explain why requirements were missed, breached, or disputed (min 20 chars)..."
                   value={disputeDesc}
                   onChange={(e) => setDisputeDesc(e.target.value)}
-                  className="w-full dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-lg p-2.5 dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:ring-1 focus:ring-[#5046E5]"
+                  className="w-full dark:bg-[#0B0D14] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-lg p-2.5 dark:text-[#E8ECF5] text-[#242424] focus:outline-none focus:ring-1 focus:ring-[#5046E5]"
                   required
                 />
               </div>
@@ -735,7 +735,7 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowCreateDispute(false)}
-                  className="px-3 py-1.5 rounded-lg dark:bg-[#171717] bg-[#E2E8F0] dark:text-[#CDCBCA] text-[#242424] font-semibold"
+                  className="px-3 py-1.5 rounded-lg dark:bg-[#191B25] bg-[#E2E8F0] dark:text-[#E8ECF5] text-[#242424] font-semibold"
                 >
                   Cancel
                 </button>
@@ -757,7 +757,7 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
       {activeTab === 'amendments' && (
         <div className="space-y-4">
           <div className="flex justify-between items-center text-xs">
-            <span className="font-semibold dark:text-[#CDCBCA] text-[#242424]">Contract Version Amendments</span>
+            <span className="font-semibold dark:text-[#E8ECF5] text-[#242424]">Contract Version Amendments</span>
             {!showProposeAmendment && contract.status === 'ACTIVE' && (
               <button
                 onClick={() => setShowProposeAmendment(true)}
@@ -769,7 +769,7 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
           </div>
 
           {amendments.length === 0 && !showProposeAmendment ? (
-            <p className="text-xs dark:text-[#777777] text-[#64748B] italic text-center py-4">
+            <p className="text-xs dark:text-[#9AA4B8] text-[#64748B] italic text-center py-4">
               No amendments proposed. Both parties are operating on Contract v{contract.version}.
             </p>
           ) : (
@@ -777,11 +777,11 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
               {amendments.map((amd) => {
                 const isProposer = amd.proposedById === currentUserId;
                 return (
-                  <div key={amd.id} className="p-3 rounded-lg dark:bg-[#202020] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] text-xs space-y-2">
+                  <div key={amd.id} className="p-3 rounded-lg dark:bg-[#191D2A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] text-xs space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <span className="font-bold text-[#5046E5] font-mono">{amd.amendmentNumber}</span>
-                        <span className="text-[10px] dark:text-[#777777] text-[#64748B] font-mono">Proposed v{amd.proposedVersion}</span>
+                        <span className="text-[10px] dark:text-[#9AA4B8] text-[#64748B] font-mono">Proposed v{amd.proposedVersion}</span>
                         <span
                           className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
                             amd.status === 'ACCEPTED'
@@ -794,13 +794,13 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
                           {amd.status}
                         </span>
                       </div>
-                      <span className="dark:text-[#777777] text-[#64748B] text-[10px] font-mono">{new Date(amd.createdAt).toLocaleDateString()}</span>
+                      <span className="dark:text-[#9AA4B8] text-[#64748B] text-[10px] font-mono">{new Date(amd.createdAt).toLocaleDateString()}</span>
                     </div>
 
-                    <p className="dark:text-[#A5A5A5] text-[#475569]">{amd.reason}</p>
+                    <p className="dark:text-[#9AA4B8] text-[#475569]">{amd.reason}</p>
 
                     {amd.status === 'PENDING_REVIEW' && !isProposer && (
-                      <div className="flex items-center justify-end space-x-2 pt-2 border-t dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]">
+                      <div className="flex items-center justify-end space-x-2 pt-2 border-t dark:border-[#272B38] border-[#E2E8F0]">
                         <button
                           onClick={() => handleVoteAmendment(amd.id, true)}
                           disabled={isLoading}
@@ -827,46 +827,46 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
 
           {/* Propose Amendment Form */}
           {showProposeAmendment && (
-            <form onSubmit={handleProposeAmendment} className="p-4 rounded-xl dark:bg-[#202020] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] space-y-3 text-xs">
-              <h4 className="font-bold dark:text-[#CDCBCA] text-[#242424] text-xs">Propose Contract Amendment</h4>
+            <form onSubmit={handleProposeAmendment} className="p-4 rounded-xl dark:bg-[#191D2A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] space-y-3 text-xs">
+              <h4 className="font-bold dark:text-[#E8ECF5] text-[#242424] text-xs">Propose Contract Amendment</h4>
               <div>
-                <label className="block dark:text-[#A5A5A5] text-[#475569] mb-1">Amended Title (Optional)</label>
+                <label className="block dark:text-[#9AA4B8] text-[#475569] mb-1">Amended Title (Optional)</label>
                 <input
                   type="text"
                   placeholder={contract.title}
                   value={amendTitle}
                   onChange={(e) => setAmendTitle(e.target.value)}
-                  className="w-full dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-lg px-3 py-1.5 dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:ring-1 focus:ring-[#5046E5]"
+                  className="w-full dark:bg-[#0B0D14] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-lg px-3 py-1.5 dark:text-[#E8ECF5] text-[#242424] focus:outline-none focus:ring-1 focus:ring-[#5046E5]"
                 />
               </div>
               <div>
-                <label className="block dark:text-[#A5A5A5] text-[#475569] mb-1">Updated Scope of Work (Optional)</label>
+                <label className="block dark:text-[#9AA4B8] text-[#475569] mb-1">Updated Scope of Work (Optional)</label>
                 <textarea
                   rows={2}
                   placeholder={contract.scopeOfWork || 'Additional scope requirements...'}
                   value={amendScope}
                   onChange={(e) => setAmendScope(e.target.value)}
-                  className="w-full dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-lg p-2 dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:ring-1 focus:ring-[#5046E5]"
+                  className="w-full dark:bg-[#0B0D14] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-lg p-2 dark:text-[#E8ECF5] text-[#242424] focus:outline-none focus:ring-1 focus:ring-[#5046E5]"
                 />
               </div>
               <div>
-                <label className="block dark:text-[#A5A5A5] text-[#475569] mb-1">Updated Contract Terms (Optional)</label>
+                <label className="block dark:text-[#9AA4B8] text-[#475569] mb-1">Updated Contract Terms (Optional)</label>
                 <textarea
                   rows={2}
                   placeholder="Additional contractual terms or stipulations..."
                   value={amendTerms}
                   onChange={(e) => setAmendTerms(e.target.value)}
-                  className="w-full dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-lg p-2 dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:ring-1 focus:ring-[#5046E5]"
+                  className="w-full dark:bg-[#0B0D14] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-lg p-2 dark:text-[#E8ECF5] text-[#242424] focus:outline-none focus:ring-1 focus:ring-[#5046E5]"
                 />
               </div>
               <div>
-                <label className="block dark:text-[#A5A5A5] text-[#475569] mb-1">Justification Reason *</label>
+                <label className="block dark:text-[#9AA4B8] text-[#475569] mb-1">Justification Reason *</label>
                 <textarea
                   rows={2}
                   placeholder="Explain why this amendment is necessary..."
                   value={amendReason}
                   onChange={(e) => setAmendReason(e.target.value)}
-                  className="w-full dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-lg p-2 dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:ring-1 focus:ring-[#5046E5]"
+                  className="w-full dark:bg-[#0B0D14] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-lg p-2 dark:text-[#E8ECF5] text-[#242424] focus:outline-none focus:ring-1 focus:ring-[#5046E5]"
                   required
                 />
               </div>
@@ -874,7 +874,7 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowProposeAmendment(false)}
-                  className="px-3 py-1.5 rounded-lg dark:bg-[#171717] bg-[#E2E8F0] dark:text-[#CDCBCA] text-[#242424] font-semibold"
+                  className="px-3 py-1.5 rounded-lg dark:bg-[#191B25] bg-[#E2E8F0] dark:text-[#E8ECF5] text-[#242424] font-semibold"
                 >
                   Cancel
                 </button>
@@ -895,7 +895,7 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
       {activeTab === 'termination' && (
         <div className="space-y-4 text-xs">
           <div className="flex justify-between items-center">
-            <span className="font-semibold dark:text-[#CDCBCA] text-[#242424]">Early Termination Workflows</span>
+            <span className="font-semibold dark:text-[#E8ECF5] text-[#242424]">Early Termination Workflows</span>
             {!showRequestTermination && contract.status === 'ACTIVE' && (
               <button
                 onClick={() => setShowRequestTermination(true)}
@@ -907,18 +907,18 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
           </div>
 
           {terminations.length === 0 && !showRequestTermination ? (
-            <p className="dark:text-[#777777] text-[#64748B] italic text-center py-4">No early termination requests on file.</p>
+            <p className="dark:text-[#9AA4B8] text-[#64748B] italic text-center py-4">No early termination requests on file.</p>
           ) : (
             <div className="space-y-2">
               {terminations.map((t) => (
-                <div key={t.id} className="p-3 rounded-lg dark:bg-[#202020] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] space-y-2">
+                <div key={t.id} className="p-3 rounded-lg dark:bg-[#191D2A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] space-y-2">
                   <div className="flex justify-between">
-                    <span className="font-bold dark:text-[#CDCBCA] text-[#242424]">Initiated by {t.initiatorName}</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded dark:bg-[#171717] bg-[#E2E8F0] dark:text-[#A5A5A5] text-[#475569] font-mono">{t.status}</span>
+                    <span className="font-bold dark:text-[#E8ECF5] text-[#242424]">Initiated by {t.initiatorName}</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded dark:bg-[#191B25] bg-[#E2E8F0] dark:text-[#9AA4B8] text-[#475569] font-mono">{t.status}</span>
                   </div>
-                  <p className="dark:text-[#A5A5A5] text-[#475569]">{t.reason}</p>
+                  <p className="dark:text-[#9AA4B8] text-[#475569]">{t.reason}</p>
                   {t.status === 'PENDING_REVIEW' && t.initiatedById !== currentUserId && (
-                    <div className="flex justify-end space-x-2 pt-2 border-t dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]">
+                    <div className="flex justify-end space-x-2 pt-2 border-t dark:border-[#272B38] border-[#E2E8F0]">
                       <button
                         onClick={() => handleVoteTermination(t.id, true)}
                         disabled={isLoading}
@@ -929,7 +929,7 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
                       <button
                         onClick={() => handleVoteTermination(t.id, false)}
                         disabled={isLoading}
-                        className="px-3 py-1 rounded dark:bg-[#171717] bg-[#E2E8F0] dark:text-[#CDCBCA] text-[#242424] font-semibold transition"
+                        className="px-3 py-1 rounded dark:bg-[#191B25] bg-[#E2E8F0] dark:text-[#E8ECF5] text-[#242424] font-semibold transition"
                       >
                         Decline
                       </button>
@@ -941,35 +941,35 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
           )}
 
           {showRequestTermination && (
-            <form onSubmit={handleProposeTermination} className="p-4 rounded-xl dark:bg-[#202020] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] space-y-3">
-              <h4 className="font-bold dark:text-[#CDCBCA] text-[#242424]">Request Mutual Early Contract Termination</h4>
+            <form onSubmit={handleProposeTermination} className="p-4 rounded-xl dark:bg-[#191D2A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] space-y-3">
+              <h4 className="font-bold dark:text-[#E8ECF5] text-[#242424]">Request Mutual Early Contract Termination</h4>
               <div>
-                <label className="block dark:text-[#A5A5A5] text-[#475569] mb-1">Reason for Termination *</label>
+                <label className="block dark:text-[#9AA4B8] text-[#475569] mb-1">Reason for Termination *</label>
                 <textarea
                   rows={3}
                   placeholder="Detail the circumstances necessitating early cancellation..."
                   value={terminationReason}
                   onChange={(e) => setTerminationReason(e.target.value)}
-                  className="w-full dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-lg p-2 dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:ring-1 focus:ring-[#5046E5]"
+                  className="w-full dark:bg-[#0B0D14] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-lg p-2 dark:text-[#E8ECF5] text-[#242424] focus:outline-none focus:ring-1 focus:ring-[#5046E5]"
                   required
                 />
               </div>
               <div>
-                <label className="block dark:text-[#A5A5A5] text-[#475569] mb-1">Proposed Settlement Amount ($) (Optional)</label>
+                <label className="block dark:text-[#9AA4B8] text-[#475569] mb-1">Proposed Settlement Amount ($) (Optional)</label>
                 <input
                   type="number"
                   step="0.01"
                   placeholder="0.00"
                   value={terminationSettlement}
                   onChange={(e) => setTerminationSettlement(e.target.value)}
-                  className="w-full dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-lg px-3 py-1.5 dark:text-[#CDCBCA] text-[#242424] font-mono focus:outline-none focus:ring-1 focus:ring-[#5046E5]"
+                  className="w-full dark:bg-[#0B0D14] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-lg px-3 py-1.5 dark:text-[#E8ECF5] text-[#242424] font-mono focus:outline-none focus:ring-1 focus:ring-[#5046E5]"
                 />
               </div>
               <div className="flex justify-end space-x-2 pt-1">
                 <button
                   type="button"
                   onClick={() => setShowRequestTermination(false)}
-                  className="px-3 py-1.5 rounded-lg dark:bg-[#171717] bg-[#E2E8F0] dark:text-[#CDCBCA] text-[#242424] font-semibold"
+                  className="px-3 py-1.5 rounded-lg dark:bg-[#191B25] bg-[#E2E8F0] dark:text-[#E8ECF5] text-[#242424] font-semibold"
                 >
                   Cancel
                 </button>
@@ -990,25 +990,25 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
       {activeTab === 'versions' && (
         <div className="space-y-3 text-xs">
           <div className="flex items-center justify-between">
-            <span className="font-semibold dark:text-[#CDCBCA] text-[#242424]">Monotonically Increasing Version Snapshots</span>
-            <span className="text-[11px] dark:text-[#777777] text-[#64748B] font-mono">Current: v{contract.version}</span>
+            <span className="font-semibold dark:text-[#E8ECF5] text-[#242424]">Monotonically Increasing Version Snapshots</span>
+            <span className="text-[11px] dark:text-[#9AA4B8] text-[#64748B] font-mono">Current: v{contract.version}</span>
           </div>
 
           {versions.length === 0 ? (
-            <div className="p-4 rounded-lg dark:bg-[#080808] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] text-center dark:text-[#777777] text-[#64748B]">
+            <div className="p-4 rounded-lg dark:bg-[#0B0D14] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] text-center dark:text-[#9AA4B8] text-[#64748B]">
               <p>Current Version: v{contract.version}</p>
-              <p className="text-[11px] dark:text-[#777777] text-[#64748B] mt-1 font-mono">Initial contract version snapshot active.</p>
+              <p className="text-[11px] dark:text-[#9AA4B8] text-[#64748B] mt-1 font-mono">Initial contract version snapshot active.</p>
             </div>
           ) : (
             <div className="space-y-2 max-h-72 overflow-y-auto">
               {versions.map((v) => (
-                <div key={v.id} className="p-3 rounded-lg dark:bg-[#202020] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] space-y-1.5">
+                <div key={v.id} className="p-3 rounded-lg dark:bg-[#191D2A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] space-y-1.5">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                       <span className="px-2 py-0.5 rounded font-mono font-bold bg-[#5046E5]/10 text-[#5046E5] border border-[#5046E5]/20 text-[11px]">
                         v{v.version}
                       </span>
-                      <span className="font-semibold dark:text-[#CDCBCA] text-[#242424]">{v.title}</span>
+                      <span className="font-semibold dark:text-[#E8ECF5] text-[#242424]">{v.title}</span>
                       {v.version === contract.version && (
                         <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-mono">
                           CURRENT
@@ -1018,9 +1018,9 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
                     <span className="font-mono tabular-nums text-emerald-500 font-bold">${v.totalAmount.toLocaleString()} {v.currency}</span>
                   </div>
 
-                  <p className="dark:text-[#A5A5A5] text-[#475569] text-[11px]">{v.description}</p>
+                  <p className="dark:text-[#9AA4B8] text-[#475569] text-[11px]">{v.description}</p>
                   
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between text-[10px] dark:text-[#777777] text-[#64748B] pt-1 border-t dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] gap-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between text-[10px] dark:text-[#9AA4B8] text-[#64748B] pt-1 border-t dark:border-[#272B38] border-[#E2E8F0] gap-1">
                     <span className="font-mono truncate max-w-xs" title={v.documentHash}>
                       SHA-256: {v.documentHash.slice(0, 20)}...
                     </span>
@@ -1049,8 +1049,8 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
         <div className="space-y-3 text-xs">
           <div className="flex items-center justify-between">
             <div>
-              <span className="font-semibold dark:text-[#CDCBCA] text-[#242424]">Cryptographic Integrity Audit</span>
-              <p className="text-[11px] dark:text-[#777777] text-[#64748B]">Deterministic SHA-256 canonical hash comparison &amp; tamper detection</p>
+              <span className="font-semibold dark:text-[#E8ECF5] text-[#242424]">Cryptographic Integrity Audit</span>
+              <p className="text-[11px] dark:text-[#9AA4B8] text-[#64748B]">Deterministic SHA-256 canonical hash comparison &amp; tamper detection</p>
             </div>
             <button
               onClick={handleRunIntegrityAudit}
@@ -1062,18 +1062,18 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
             </button>
           </div>
 
-          <div className="p-3.5 rounded-xl dark:bg-[#202020] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] space-y-2 font-mono text-[11px]">
+          <div className="p-3.5 rounded-xl dark:bg-[#191D2A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] space-y-2 font-mono text-[11px]">
             <div className="space-y-1">
-              <span className="dark:text-[#777777] text-[#64748B] font-sans text-xs">Authoritative Stored Hash:</span>
-              <div className="p-2 rounded dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] break-all dark:text-[#CDCBCA] text-[#242424]">
+              <span className="dark:text-[#9AA4B8] text-[#64748B] font-sans text-xs">Authoritative Stored Hash:</span>
+              <div className="p-2 rounded dark:bg-[#0B0D14] bg-white border dark:border-[#272B38] border-[#E2E8F0] break-all dark:text-[#E8ECF5] text-[#242424]">
                 {contract.documentHash || 'Hash pending bilateral sign-off'}
               </div>
             </div>
 
             {integrityReport && (
-              <div className="space-y-2 pt-2 border-t dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]">
+              <div className="space-y-2 pt-2 border-t dark:border-[#272B38] border-[#E2E8F0]">
                 <div className="flex items-center space-x-2">
-                  <span className="font-sans text-xs dark:text-[#777777] text-[#64748B]">Audit Status:</span>
+                  <span className="font-sans text-xs dark:text-[#9AA4B8] text-[#64748B]">Audit Status:</span>
                   {integrityReport.isTamperFree ? (
                     <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center space-x-1 font-mono">
                       <CheckCircle2 className="w-3 h-3" />
@@ -1088,15 +1088,15 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 text-[10px] font-sans">
-                  <div className="p-2 rounded dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]">
-                    <span className="dark:text-[#777777] text-[#64748B]">Milestone Total vs Contract:</span>
-                    <p className="font-bold dark:text-[#CDCBCA] text-[#242424] mt-0.5 font-mono tabular-nums">
+                  <div className="p-2 rounded dark:bg-[#0B0D14] bg-white border dark:border-[#272B38] border-[#E2E8F0]">
+                    <span className="dark:text-[#9AA4B8] text-[#64748B]">Milestone Total vs Contract:</span>
+                    <p className="font-bold dark:text-[#E8ECF5] text-[#242424] mt-0.5 font-mono tabular-nums">
                       ${integrityReport.details.totalMilestoneAmount.toLocaleString()} vs ${integrityReport.details.contractTotalAmount.toLocaleString()}
                     </p>
                   </div>
-                  <div className="p-2 rounded dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]">
-                    <span className="dark:text-[#777777] text-[#64748B]">Acceptances:</span>
-                    <p className="font-bold dark:text-[#CDCBCA] text-[#242424] mt-0.5">
+                  <div className="p-2 rounded dark:bg-[#0B0D14] bg-white border dark:border-[#272B38] border-[#E2E8F0]">
+                    <span className="dark:text-[#9AA4B8] text-[#64748B]">Acceptances:</span>
+                    <p className="font-bold dark:text-[#E8ECF5] text-[#242424] mt-0.5">
                       Client: {integrityReport.details.clientAccepted ? '✓ Signed' : 'Pending'} • Specialist: {integrityReport.details.workerAccepted ? '✓ Signed' : 'Pending'}
                     </p>
                   </div>
@@ -1110,9 +1110,9 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
       {/* 6. ESCROW & CONTRACT AUDIT LOG TAB */}
       {activeTab === 'activities' && (
         <div className="space-y-2 text-xs">
-          <span className="font-semibold dark:text-[#CDCBCA] text-[#242424]">Chronological Contract Activity History</span>
+          <span className="font-semibold dark:text-[#E8ECF5] text-[#242424]">Chronological Contract Activity History</span>
           {activityHistory.length === 0 && activities.length === 0 ? (
-            <p className="dark:text-[#777777] text-[#64748B] italic text-center py-4">No activity events recorded yet.</p>
+            <p className="dark:text-[#9AA4B8] text-[#64748B] italic text-center py-4">No activity events recorded yet.</p>
           ) : (
             <div className="max-h-64 overflow-y-auto space-y-1.5">
               {(activityHistory.length > 0 ? activityHistory : activities).map((item) => {
@@ -1121,12 +1121,12 @@ export const ContractLifecyclePanel: React.FC<ContractLifecyclePanelProps> = ({
                 const desc = isActLog ? JSON.stringify((item as ContractActivityHistoryDto).details || {}) : (item as EscrowActivityDto).description;
                 const date = new Date(item.createdAt).toLocaleString();
                 return (
-                  <div key={item.id} className="p-2.5 rounded dark:bg-[#080808] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] space-y-0.5">
-                    <div className="flex justify-between dark:text-[#777777] text-[#64748B] text-[11px]">
-                      <span className="font-bold dark:text-[#CDCBCA] text-[#242424]">{title}</span>
+                  <div key={item.id} className="p-2.5 rounded dark:bg-[#0B0D14] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] space-y-0.5">
+                    <div className="flex justify-between dark:text-[#9AA4B8] text-[#64748B] text-[11px]">
+                      <span className="font-bold dark:text-[#E8ECF5] text-[#242424]">{title}</span>
                       <span className="font-mono text-[10px]">{date}</span>
                     </div>
-                    <p className="dark:text-[#A5A5A5] text-[#475569] font-mono text-[10px] truncate">{desc}</p>
+                    <p className="dark:text-[#9AA4B8] text-[#475569] font-mono text-[10px] truncate">{desc}</p>
                   </div>
                 );
               })}

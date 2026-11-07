@@ -101,10 +101,10 @@ export const NotificationDropdown: React.FC = () => {
       return <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />;
     }
     if (type.includes('HIRING') || type.includes('PROPOSAL')) {
-      return <Send className="w-3.5 h-3.5 text-[#2563EB] dark:text-[#CDCBCA]" />;
+      return <Send className="w-3.5 h-3.5 text-[#2563EB] dark:text-[#E8ECF5]" />;
     }
     if (type.includes('CONTRACT') || type.includes('AMENDMENT')) {
-      return <FileText className="w-3.5 h-3.5 text-[#2563EB] dark:text-[#CDCBCA]" />;
+      return <FileText className="w-3.5 h-3.5 text-[#2563EB] dark:text-[#E8ECF5]" />;
     }
     return <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />;
   };
@@ -113,7 +113,7 @@ export const NotificationDropdown: React.FC = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 rounded-xl dark:bg-[#171717] bg-white hover:dark:bg-[#202020] hover:bg-[#F1F5F9] dark:text-[#CDCBCA] text-[#242424] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] transition flex items-center justify-center focus:outline-none focus:ring-1 focus:ring-[#2563EB] shadow-sm"
+        className="relative p-2 rounded-xl dark:bg-[#191B25] bg-white hover:dark:bg-[#191D2A] hover:bg-[#F1F5F9] dark:text-[#E8ECF5] text-[#242424] border dark:border-[#272B38] border-[#E2E8F0] transition flex items-center justify-center focus:outline-none focus:ring-1 focus:ring-[#2563EB] shadow-sm"
         title="Admin Notifications"
         aria-label="Toggle admin notifications"
       >
@@ -126,11 +126,11 @@ export const NotificationDropdown: React.FC = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] shadow-2xl z-50 overflow-hidden text-xs dark:text-[#CDCBCA] text-[#242424] font-sans">
+        <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] shadow-2xl z-50 overflow-hidden text-xs dark:text-[#E8ECF5] text-[#242424] font-sans">
           {/* Header */}
-          <div className="p-3.5 border-b dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] flex items-center justify-between dark:bg-[#202020] bg-[#F1F5F9]">
+          <div className="p-3.5 border-b dark:border-[#272B38] border-[#E2E8F0] flex items-center justify-between dark:bg-[#191D2A] bg-[#F1F5F9]">
             <div className="flex items-center space-x-2">
-              <span className="font-bold dark:text-[#CDCBCA] text-[#242424] text-sm">Governance Alerts</span>
+              <span className="font-bold dark:text-[#E8ECF5] text-[#242424] text-sm">Governance Alerts</span>
               {unreadCount > 0 && (
                 <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 border border-emerald-500/20 text-[10px] font-mono font-semibold">
                   {unreadCount} unread
@@ -143,14 +143,14 @@ export const NotificationDropdown: React.FC = () => {
                 <button
                   onClick={handleMarkAllRead}
                   disabled={isLoading}
-                  className="text-[11px] dark:text-[#A5A5A5] text-[#64748B] hover:text-[#2563EB] dark:hover:text-white transition font-medium"
+                  className="text-[11px] dark:text-[#9AA4B8] text-[#64748B] hover:text-[#2563EB] dark:hover:text-white transition font-medium"
                 >
                   Mark all read
                 </button>
               )}
               <button
                 onClick={() => setIsOpen(false)}
-                className="dark:text-[#777777] text-[#64748B] hover:dark:text-[#CDCBCA] hover:text-[#242424] p-1 rounded-lg hover:dark:bg-[#303030] hover:bg-[#E2E8F0] transition"
+                className="dark:text-[#9AA4B8] text-[#64748B] hover:dark:text-[#E8ECF5] hover:text-[#242424] p-1 rounded-lg hover:dark:bg-[#303030] hover:bg-[#E2E8F0] transition"
                 aria-label="Close alerts"
               >
                 <X className="w-3.5 h-3.5" />
@@ -161,7 +161,7 @@ export const NotificationDropdown: React.FC = () => {
           {/* Alert List */}
           <div className="max-h-80 overflow-y-auto divide-y dark:divide-[rgba(205,203,202,0.1)] divide-[#E2E8F0]">
             {notifications.length === 0 ? (
-              <div className="p-8 text-center dark:text-[#777777] text-[#64748B] italic">
+              <div className="p-8 text-center dark:text-[#9AA4B8] text-[#64748B] italic">
                 No active governance alerts.
               </div>
             ) : (
@@ -171,23 +171,23 @@ export const NotificationDropdown: React.FC = () => {
                   onClick={(e) => !n.isRead && handleMarkAsRead(n.id, e)}
                   className={`p-3.5 transition cursor-pointer flex items-start space-x-3 ${
                     n.isRead
-                      ? 'dark:bg-[#171717] bg-white hover:dark:bg-[#202020] hover:bg-[#F8FAFC]'
-                      : 'dark:bg-[#202020]/70 bg-[#EFF6FF] hover:dark:bg-[#202020] hover:bg-[#DBEAFE]/60'
+                      ? 'dark:bg-[#191B25] bg-white hover:dark:bg-[#191D2A] hover:bg-[#F8FAFC]'
+                      : 'dark:bg-[#191D2A]/70 bg-[#EFF6FF] hover:dark:bg-[#191D2A] hover:bg-[#DBEAFE]/60'
                   }`}
                 >
                   <div className="mt-0.5 shrink-0">{getNotificationIcon(n.type)}</div>
 
                   <div className="flex-1 space-y-0.5">
                     <div className="flex items-center justify-between">
-                      <span className={`font-semibold ${n.isRead ? 'dark:text-[#A5A5A5] text-[#475569]' : 'dark:text-[#CDCBCA] text-[#242424]'}`}>
+                      <span className={`font-semibold ${n.isRead ? 'dark:text-[#9AA4B8] text-[#475569]' : 'dark:text-[#E8ECF5] text-[#242424]'}`}>
                         {n.title}
                       </span>
                       {!n.isRead && (
                         <span className="w-2 h-2 rounded-full bg-[#2563EB] shrink-0 ml-1.5" />
                       )}
                     </div>
-                    <p className="dark:text-[#A5A5A5] text-[#64748B] text-[11px] leading-relaxed">{n.message}</p>
-                    <span className="text-[10px] dark:text-[#777777] text-[#64748B] font-mono tabular-nums block pt-0.5">
+                    <p className="dark:text-[#9AA4B8] text-[#64748B] text-[11px] leading-relaxed">{n.message}</p>
+                    <span className="text-[10px] dark:text-[#9AA4B8] text-[#64748B] font-mono tabular-nums block pt-0.5">
                       {new Date(n.createdAt).toLocaleDateString([], {
                         month: 'short',
                         day: 'numeric',
@@ -201,7 +201,7 @@ export const NotificationDropdown: React.FC = () => {
                     <button
                       onClick={(e) => handleMarkAsRead(n.id, e)}
                       title="Mark as read"
-                      className="p-1 rounded-md dark:text-[#777777] text-[#64748B] hover:text-[#2563EB] dark:hover:text-[#CDCBCA] transition shrink-0"
+                      className="p-1 rounded-md dark:text-[#9AA4B8] text-[#64748B] hover:text-[#2563EB] dark:hover:text-[#CDCBCA] transition shrink-0"
                     >
                       <Check className="w-3.5 h-3.5" />
                     </button>

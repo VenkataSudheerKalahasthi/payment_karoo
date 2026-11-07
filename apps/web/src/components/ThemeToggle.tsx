@@ -34,12 +34,12 @@ export const ThemeToggle: React.FC<{ className?: string }> = ({ className = '' }
       aria-label="Toggle theme"
       className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer active:scale-90 ${
         theme === 'dark'
-          ? 'bg-white/5 hover:bg-white/10 text-[#CDCBCA] hover:text-[#8BFF24] border border-white/10 shadow-sm'
+          ? 'bg-white/5 hover:bg-white/10 text-[#E8ECF5] hover:text-[#8FB5FF] border border-[#272B38] shadow-sm'
           : 'bg-black/5 hover:bg-black/10 text-[#475569] hover:text-[#5046E5] border border-black/10 shadow-sm'
       } ${className}`}
     >
       {theme === 'dark' ? (
-        <Sun className="w-4 h-4 text-[#CDCBCA] hover:text-[#8BFF24] transition-colors" />
+        <Sun className="w-4 h-4 text-[#E8ECF5] hover:text-[#8FB5FF] transition-colors" />
       ) : (
         <Moon className="w-4 h-4 text-[#475569] hover:text-[#5046E5] transition-colors" />
       )}

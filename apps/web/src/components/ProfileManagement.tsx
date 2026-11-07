@@ -278,8 +278,8 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
   return (
     <div className="space-y-6 max-w-4xl mx-auto font-sans">
       <div>
-        <h3 className="text-xl font-bold dark:text-[#CDCBCA] text-[#242424] tracking-tight">Account &amp; Professional Settings</h3>
-        <p className="text-xs dark:text-[#A5A5A5] text-[#64748B] mt-1">
+        <h3 className="text-xl font-bold dark:text-[#E8ECF5] text-[#242424] tracking-tight">Account &amp; Professional Settings</h3>
+        <p className="text-xs dark:text-[#9AA4B8] text-[#64748B] mt-1">
           Manage your contact credentials, organization identity, and specialist taxonomy.
         </p>
       </div>
@@ -299,114 +299,114 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
       )}
 
       {/* General Personal / Company Profile */}
-      <form onSubmit={handleSaveGeneralProfile} className="dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl p-6 space-y-4 shadow-sm">
-        <div className="flex items-center space-x-2 border-b dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] pb-3">
+      <form onSubmit={handleSaveGeneralProfile} className="dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-2xl p-6 space-y-4 shadow-sm">
+        <div className="flex items-center space-x-2 border-b dark:border-[#272B38] border-[#E2E8F0] pb-3">
           <User className="w-4 h-4 text-[#5046E5]" />
-          <h4 className="text-sm font-bold dark:text-[#CDCBCA] text-[#242424]">Identity &amp; Contact Details</h4>
+          <h4 className="text-sm font-bold dark:text-[#E8ECF5] text-[#242424]">Identity &amp; Contact Details</h4>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-medium dark:text-[#A5A5A5] text-[#475569] mb-1">First Name</label>
+            <label className="block text-xs font-medium dark:text-[#9AA4B8] text-[#475569] mb-1">First Name</label>
             <input
               type="text"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               placeholder="e.g. Alex"
-              className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
+              className="w-full px-3 py-2 rounded-xl dark:bg-[#0B0D14] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#E8ECF5] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-medium dark:text-[#A5A5A5] text-[#475569] mb-1">Last Name</label>
+            <label className="block text-xs font-medium dark:text-[#9AA4B8] text-[#475569] mb-1">Last Name</label>
             <input
               type="text"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               placeholder="e.g. Morgan"
-              className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
+              className="w-full px-3 py-2 rounded-xl dark:bg-[#0B0D14] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#E8ECF5] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-medium dark:text-[#A5A5A5] text-[#475569] mb-1">Profile Avatar URL</label>
+          <label className="block text-xs font-medium dark:text-[#9AA4B8] text-[#475569] mb-1">Profile Avatar URL</label>
           <input
             type="url"
             value={avatarUrl}
             onChange={(e) => setAvatarUrl(e.target.value)}
             placeholder="https://example.com/avatar.jpg"
-            className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
+            className="w-full px-3 py-2 rounded-xl dark:bg-[#0B0D14] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#E8ECF5] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
           />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-medium dark:text-[#A5A5A5] text-[#475569] mb-1">Company / Organization</label>
+            <label className="block text-xs font-medium dark:text-[#9AA4B8] text-[#475569] mb-1">Company / Organization</label>
             <input
               type="text"
               value={companyName}
               onChange={(e) => setCompanyName(e.target.value)}
               placeholder="e.g. Acme Tech Innovations"
-              className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
+              className="w-full px-3 py-2 rounded-xl dark:bg-[#0B0D14] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#E8ECF5] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-medium dark:text-[#A5A5A5] text-[#475569] mb-1">Contact Phone</label>
+            <label className="block text-xs font-medium dark:text-[#9AA4B8] text-[#475569] mb-1">Contact Phone</label>
             <input
               type="tel"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
               placeholder="+1 (555) 000-0000"
-              className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
+              className="w-full px-3 py-2 rounded-xl dark:bg-[#0B0D14] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#E8ECF5] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-medium dark:text-[#A5A5A5] text-[#475569] mb-1">Country</label>
+            <label className="block text-xs font-medium dark:text-[#9AA4B8] text-[#475569] mb-1">Country</label>
             <input
               type="text"
               value={country}
               onChange={(e) => setCountry(e.target.value)}
               placeholder="e.g. United States, Germany, India"
-              className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
+              className="w-full px-3 py-2 rounded-xl dark:bg-[#0B0D14] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#E8ECF5] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-medium dark:text-[#A5A5A5] text-[#475569] mb-1">Timezone</label>
+            <label className="block text-xs font-medium dark:text-[#9AA4B8] text-[#475569] mb-1">Timezone</label>
             <input
               type="text"
               value={timezone}
               onChange={(e) => setTimezone(e.target.value)}
               placeholder="e.g. America/New_York, UTC"
-              className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
+              className="w-full px-3 py-2 rounded-xl dark:bg-[#0B0D14] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#E8ECF5] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-medium dark:text-[#A5A5A5] text-[#475569] mb-1">Professional Bio</label>
+          <label className="block text-xs font-medium dark:text-[#9AA4B8] text-[#475569] mb-1">Professional Bio</label>
           <textarea
             value={bio}
             onChange={(e) => setBio(e.target.value)}
             rows={3}
             placeholder="Share an overview of your organization or personal technical domain..."
-            className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
+            className="w-full px-3 py-2 rounded-xl dark:bg-[#0B0D14] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#E8ECF5] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-medium dark:text-[#A5A5A5] text-[#475569] mb-1">Physical Street Address (Private)</label>
+          <label className="block text-xs font-medium dark:text-[#9AA4B8] text-[#475569] mb-1">Physical Street Address (Private)</label>
           <input
             type="text"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
             placeholder="Street address (Never shared publicly)"
-            className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
+            className="w-full px-3 py-2 rounded-xl dark:bg-[#0B0D14] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#E8ECF5] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
           />
         </div>
 
@@ -425,16 +425,16 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
       {/* Specialist Details Form (Worker Only) */}
       {isWorker && (
         <>
-          <form onSubmit={handleSaveWorkerProfile} className="dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl p-6 space-y-4 shadow-sm">
-            <div className="flex items-center justify-between border-b dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] pb-3">
+          <form onSubmit={handleSaveWorkerProfile} className="dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-2xl p-6 space-y-4 shadow-sm">
+            <div className="flex items-center justify-between border-b dark:border-[#272B38] border-[#E2E8F0] pb-3">
               <div className="flex items-center space-x-2">
                 <Briefcase className="w-4 h-4 text-[#5046E5]" />
-                <h4 className="text-sm font-bold dark:text-[#CDCBCA] text-[#242424]">Specialist Marketplace Parameters</h4>
+                <h4 className="text-sm font-bold dark:text-[#E8ECF5] text-[#242424]">Specialist Marketplace Parameters</h4>
               </div>
               <button
                 type="button"
                 onClick={() => setShowPublicPreview(true)}
-                className="px-3.5 py-1.5 rounded-xl dark:bg-[#202020] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] text-xs font-semibold dark:text-[#CDCBCA] text-[#242424] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] flex items-center space-x-1.5 transition shadow-sm"
+                className="px-3.5 py-1.5 rounded-xl dark:bg-[#191D2A] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] text-xs font-semibold dark:text-[#E8ECF5] text-[#242424] border dark:border-[#272B38] border-[#E2E8F0] flex items-center space-x-1.5 transition shadow-sm"
               >
                 <Eye className="w-3.5 h-3.5 text-[#5046E5]" />
                 <span>Preview Public Profile</span>
@@ -442,35 +442,35 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-medium dark:text-[#A5A5A5] text-[#475569] mb-1">Professional Headline</label>
+              <label className="block text-xs font-medium dark:text-[#9AA4B8] text-[#475569] mb-1">Professional Headline</label>
               <input
                 type="text"
                 value={headline}
                 onChange={(e) => setHeadline(e.target.value)}
                 placeholder="e.g. Senior Fullstack Architect &amp; Distributed Systems Specialist"
-                className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
+                className="w-full px-3 py-2 rounded-xl dark:bg-[#0B0D14] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#E8ECF5] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-medium dark:text-[#A5A5A5] text-[#475569] mb-1">Hourly Commercial Rate ($ USD)</label>
+                <label className="block text-xs font-medium dark:text-[#9AA4B8] text-[#475569] mb-1">Hourly Commercial Rate ($ USD)</label>
                 <input
                   type="number"
                   step="0.01"
                   value={hourlyRate}
                   onChange={(e) => setHourlyRate(e.target.value)}
                   placeholder="e.g. 95"
-                  className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] font-mono focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
+                  className="w-full px-3 py-2 rounded-xl dark:bg-[#0B0D14] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#E8ECF5] text-[#242424] font-mono focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium dark:text-[#A5A5A5] text-[#475569] mb-1">Marketplace Availability Status</label>
+                <label className="block text-xs font-medium dark:text-[#9AA4B8] text-[#475569] mb-1">Marketplace Availability Status</label>
                 <select
                   value={availability}
                   onChange={(e) => setAvailability(e.target.value as WorkerAvailability)}
-                  className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
+                  className="w-full px-3 py-2 rounded-xl dark:bg-[#0B0D14] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#E8ECF5] text-[#242424] focus:outline-none focus:border-[#5046E5] focus:ring-1 focus:ring-[#5046E5]"
                 >
                   <option value="AVAILABLE">Available for Engagements</option>
                   <option value="BUSY">In Active Engagement (Busy)</option>
@@ -492,15 +492,15 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
           </form>
 
           {/* Specialist Skills Management */}
-          <div className="dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl p-6 space-y-4 shadow-sm">
-            <div className="flex items-center justify-between border-b dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] pb-3">
+          <div className="dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-2xl p-6 space-y-4 shadow-sm">
+            <div className="flex items-center justify-between border-b dark:border-[#272B38] border-[#E2E8F0] pb-3">
               <div className="flex items-center space-x-2">
                 <Layers className="w-4 h-4 text-[#5046E5]" />
-                <h4 className="text-sm font-bold dark:text-[#CDCBCA] text-[#242424]">
+                <h4 className="text-sm font-bold dark:text-[#E8ECF5] text-[#242424]">
                   Skills Taxonomy ({workerProfile?.skills?.length || 0})
                 </h4>
               </div>
-              <span className="text-[11px] dark:text-[#A5A5A5] text-[#64748B]">
+              <span className="text-[11px] dark:text-[#9AA4B8] text-[#64748B]">
                 Type custom skills or choose from suggestions
               </span>
             </div>
@@ -511,9 +511,9 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                 workerProfile.skills.map((ws) => (
                   <div
                     key={ws.id}
-                    className="pl-3 pr-2 py-1.5 rounded-xl dark:bg-[#202020] bg-[#F1F5F9] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] flex items-center space-x-2 text-xs"
+                    className="pl-3 pr-2 py-1.5 rounded-xl dark:bg-[#191D2A] bg-[#F1F5F9] border dark:border-[#272B38] border-[#E2E8F0] flex items-center space-x-2 text-xs"
                   >
-                    <span className="dark:text-[#CDCBCA] text-[#242424] font-medium">
+                    <span className="dark:text-[#E8ECF5] text-[#242424] font-medium">
                       {ws.skillName || (ws as unknown as { skill?: { name: string } }).skill?.name}
                     </span>
                     <span className="text-emerald-500 text-[10px] bg-emerald-500/10 px-1.5 py-0.5 rounded font-mono border border-emerald-500/20">
@@ -522,7 +522,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                     <button
                       type="button"
                       onClick={() => handleRemoveSkill(ws.skillId || (ws as unknown as { skill?: { id: string } }).skill?.id || '')}
-                      className="dark:text-[#777777] text-[#64748B] hover:text-rose-500 transition p-0.5"
+                      className="dark:text-[#9AA4B8] text-[#64748B] hover:text-rose-500 transition p-0.5"
                       title="Remove skill"
                     >
                       <Trash2 className="w-3 h-3" />
@@ -530,7 +530,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                   </div>
                 ))
               ) : (
-                <p className="text-xs dark:text-[#777777] text-[#64748B] italic">No skills attached to profile yet. Add your competencies below.</p>
+                <p className="text-xs dark:text-[#9AA4B8] text-[#64748B] italic">No skills attached to profile yet. Add your competencies below.</p>
               )}
             </div>
 
@@ -550,7 +550,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                       }
                     }}
                     placeholder="Type skill name (e.g. Next.js, Python, Figma) or comma-separated..."
-                    className="w-full dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] rounded-xl px-3.5 py-2 text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5] transition"
+                    className="w-full dark:bg-[#0B0D14] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] rounded-xl px-3.5 py-2 text-xs dark:text-[#E8ECF5] text-[#242424] focus:outline-none focus:border-[#5046E5] transition"
                   />
                 </div>
 
@@ -562,7 +562,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                     const found = availableSkills.find((s) => s.id === e.target.value);
                     if (found) setCustomSkillInput(found.name);
                   }}
-                  className="dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] rounded-xl px-3 py-2 text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5]"
+                  className="dark:bg-[#0B0D14] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] rounded-xl px-3 py-2 text-xs dark:text-[#E8ECF5] text-[#242424] focus:outline-none focus:border-[#5046E5]"
                 >
                   <option value="">Or pick standard skill...</option>
                   {availableSkills.map((s) => (
@@ -580,9 +580,9 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                     max="40"
                     value={skillExperience}
                     onChange={(e) => setSkillExperience(e.target.value)}
-                    className="w-14 px-2 py-2 rounded-xl dark:bg-[#080808] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] text-center font-mono tabular-nums"
+                    className="w-14 px-2 py-2 rounded-xl dark:bg-[#0B0D14] bg-[#F5F7FA] border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#E8ECF5] text-[#242424] text-center font-mono tabular-nums"
                   />
-                  <span className="dark:text-[#A5A5A5] text-[#64748B]">years</span>
+                  <span className="dark:text-[#9AA4B8] text-[#64748B]">years</span>
                 </div>
 
                 <button
@@ -597,7 +597,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
 
               {/* Quick Suggestion Pills */}
               <div className="flex flex-wrap items-center gap-1.5 text-[11px] pt-1">
-                <span className="dark:text-[#777777] text-[#94A3B8] text-[10px] uppercase font-semibold">Quick add:</span>
+                <span className="dark:text-[#9AA4B8] text-[#94A3B8] text-[10px] uppercase font-semibold">Quick add:</span>
                 {['React', 'TypeScript', 'Node.js', 'Python', 'Next.js', 'UI/UX Design', 'Solidity', 'DevOps'].map((skill) => (
                   <button
                     key={skill}
@@ -609,7 +609,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                       });
                       loadWorkerData();
                     }}
-                    className="px-2 py-0.5 rounded-lg dark:bg-[#202020] bg-slate-100 hover:dark:bg-[#303030] hover:bg-slate-200 dark:text-[#CDCBCA] text-slate-700 border dark:border-[rgba(205,203,202,0.12)] border-slate-200 transition text-[10px]"
+                    className="px-2 py-0.5 rounded-lg dark:bg-[#191D2A] bg-slate-100 hover:dark:bg-[#303030] hover:bg-slate-200 dark:text-[#E8ECF5] text-slate-700 border dark:border-[#272B38] border-slate-200 transition text-[10px]"
                   >
                     + {skill}
                   </button>
@@ -619,11 +619,11 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
           </div>
 
           {/* Specialist Portfolio Management */}
-          <div className="dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl p-6 space-y-4 shadow-sm">
-            <div className="flex items-center justify-between border-b dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] pb-3">
+          <div className="dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-2xl p-6 space-y-4 shadow-sm">
+            <div className="flex items-center justify-between border-b dark:border-[#272B38] border-[#E2E8F0] pb-3">
               <div className="flex items-center space-x-2">
                 <Briefcase className="w-4 h-4 text-[#5046E5]" />
-                <h4 className="text-sm font-bold dark:text-[#CDCBCA] text-[#242424]">Portfolio Showcase</h4>
+                <h4 className="text-sm font-bold dark:text-[#E8ECF5] text-[#242424]">Portfolio Showcase</h4>
               </div>
 
               {!isAddingPortfolio && (
@@ -640,57 +640,57 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
 
             {/* Add / Edit Portfolio Form */}
             {isAddingPortfolio && (
-              <form onSubmit={handleSavePortfolioItem} className="p-4 rounded-xl dark:bg-[#202020] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] space-y-3 text-xs">
+              <form onSubmit={handleSavePortfolioItem} className="p-4 rounded-xl dark:bg-[#191D2A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] space-y-3 text-xs">
                 <div className="flex items-center justify-between">
-                  <h5 className="font-semibold dark:text-[#CDCBCA] text-[#242424]">
+                  <h5 className="font-semibold dark:text-[#E8ECF5] text-[#242424]">
                     {editingPortfolioId ? 'Edit Portfolio Project' : 'New Portfolio Project'}
                   </h5>
                 </div>
 
                 <div>
-                  <label className="block dark:text-[#A5A5A5] text-[#475569] font-medium mb-1">Project Title *</label>
+                  <label className="block dark:text-[#9AA4B8] text-[#475569] font-medium mb-1">Project Title *</label>
                   <input
                     type="text"
                     value={portfolioTitle}
                     onChange={(e) => setPortfolioTitle(e.target.value)}
                     placeholder="e.g. Automated Escrow Smart Engine"
-                    className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5]"
+                    className="w-full px-3 py-2 rounded-xl dark:bg-[#0B0D14] bg-white border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#E8ECF5] text-[#242424] focus:outline-none focus:border-[#5046E5]"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block dark:text-[#A5A5A5] text-[#475569] font-medium mb-1">Project Description *</label>
+                  <label className="block dark:text-[#9AA4B8] text-[#475569] font-medium mb-1">Project Description *</label>
                   <textarea
                     value={portfolioDescription}
                     onChange={(e) => setPortfolioDescription(e.target.value)}
                     rows={3}
                     placeholder="Describe technology stack, your key contributions, and project outcomes..."
-                    className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5]"
+                    className="w-full px-3 py-2 rounded-xl dark:bg-[#0B0D14] bg-white border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#E8ECF5] text-[#242424] focus:outline-none focus:border-[#5046E5]"
                     required
                   />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block dark:text-[#A5A5A5] text-[#475569] font-medium mb-1">Live Project / Demo URL</label>
+                    <label className="block dark:text-[#9AA4B8] text-[#475569] font-medium mb-1">Live Project / Demo URL</label>
                     <input
                       type="url"
                       value={portfolioUrl}
                       onChange={(e) => setPortfolioUrl(e.target.value)}
                       placeholder="https://github.com/... or https://..."
-                      className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5]"
+                      className="w-full px-3 py-2 rounded-xl dark:bg-[#0B0D14] bg-white border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#E8ECF5] text-[#242424] focus:outline-none focus:border-[#5046E5]"
                     />
                   </div>
 
                   <div>
-                    <label className="block dark:text-[#A5A5A5] text-[#475569] font-medium mb-1">Project Image / Attachment URL</label>
+                    <label className="block dark:text-[#9AA4B8] text-[#475569] font-medium mb-1">Project Image / Attachment URL</label>
                     <input
                       type="url"
                       value={portfolioAttachmentUrl}
                       onChange={(e) => setPortfolioAttachmentUrl(e.target.value)}
                       placeholder="https://images.unsplash.com/... or https://..."
-                      className="w-full px-3 py-2 rounded-xl dark:bg-[#080808] bg-white border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#CDCBCA] text-[#242424] focus:outline-none focus:border-[#5046E5]"
+                      className="w-full px-3 py-2 rounded-xl dark:bg-[#0B0D14] bg-white border dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] text-xs dark:text-[#E8ECF5] text-[#242424] focus:outline-none focus:border-[#5046E5]"
                     />
                   </div>
                 </div>
@@ -706,7 +706,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                       setPortfolioUrl('');
                       setPortfolioAttachmentUrl('');
                     }}
-                    className="px-3.5 py-1.5 rounded-xl dark:bg-[#303030] bg-[#E2E8F0] dark:text-[#CDCBCA] text-[#475569] hover:opacity-80 transition"
+                    className="px-3.5 py-1.5 rounded-xl dark:bg-[#303030] bg-[#E2E8F0] dark:text-[#E8ECF5] text-[#475569] hover:opacity-80 transition"
                   >
                     Cancel
                   </button>
@@ -726,11 +726,11 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                 workerProfile.portfolioItems.map((item) => (
                   <div
                     key={item.id}
-                    className="p-4 rounded-xl dark:bg-[#202020]/50 bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] space-y-2 flex flex-col justify-between"
+                    className="p-4 rounded-xl dark:bg-[#191D2A]/50 bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] space-y-2 flex flex-col justify-between"
                   >
                     <div>
                       {item.attachmentUrl && (
-                        <div className="h-28 w-full rounded-xl overflow-hidden dark:bg-[#080808] bg-slate-200 border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] mb-2">
+                        <div className="h-28 w-full rounded-xl overflow-hidden dark:bg-[#0B0D14] bg-slate-200 border dark:border-[#272B38] border-[#E2E8F0] mb-2">
                           <img
                             src={item.attachmentUrl}
                             alt={item.title}
@@ -742,12 +742,12 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                         </div>
                       )}
                       <div className="flex items-center justify-between">
-                        <h5 className="text-xs font-semibold dark:text-[#CDCBCA] text-[#242424]">{item.title}</h5>
+                        <h5 className="text-xs font-semibold dark:text-[#E8ECF5] text-[#242424]">{item.title}</h5>
                         <div className="flex items-center space-x-1">
                           <button
                             type="button"
                             onClick={() => handleStartEditPortfolio(item)}
-                            className="p-1 dark:text-[#777777] text-[#64748B] hover:text-[#5046E5] transition"
+                            className="p-1 dark:text-[#9AA4B8] text-[#64748B] hover:text-[#5046E5] transition"
                             title="Edit Project"
                           >
                             <Pencil className="w-3.5 h-3.5" />
@@ -755,14 +755,14 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                           <button
                             type="button"
                             onClick={() => handleDeletePortfolioItem(item.id)}
-                            className="p-1 dark:text-[#777777] text-[#64748B] hover:text-rose-500 transition"
+                            className="p-1 dark:text-[#9AA4B8] text-[#64748B] hover:text-rose-500 transition"
                             title="Delete Project"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>
                       </div>
-                      <p className="text-xs dark:text-[#A5A5A5] text-[#64748B] mt-1 line-clamp-3 leading-relaxed">{item.description}</p>
+                      <p className="text-xs dark:text-[#9AA4B8] text-[#64748B] mt-1 line-clamp-3 leading-relaxed">{item.description}</p>
                     </div>
 
                     <div className="flex items-center justify-between pt-2 border-t dark:border-[rgba(205,203,202,0.1)] border-[#E2E8F0] text-xs">
@@ -777,14 +777,14 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                           <ExternalLink className="w-3 h-3" />
                         </a>
                       ) : (
-                        <span className="text-[10px] dark:text-[#777777] text-[#64748B]">Internal Project</span>
+                        <span className="text-[10px] dark:text-[#9AA4B8] text-[#64748B]">Internal Project</span>
                       )}
                       {item.attachmentUrl && (
                         <a
                           href={item.attachmentUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="dark:text-[#A5A5A5] text-[#64748B] hover:text-[#5046E5] text-[11px] inline-flex items-center space-x-1"
+                          className="dark:text-[#9AA4B8] text-[#64748B] hover:text-[#5046E5] text-[11px] inline-flex items-center space-x-1"
                         >
                           <span>Attachment</span>
                           <ExternalLink className="w-2.5 h-2.5" />
@@ -794,7 +794,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                   </div>
                 ))
               ) : (
-                <p className="text-xs dark:text-[#777777] text-[#64748B] italic col-span-2">No portfolio items posted yet.</p>
+                <p className="text-xs dark:text-[#9AA4B8] text-[#64748B] italic col-span-2">No portfolio items posted yet.</p>
               )}
             </div>
           </div>
@@ -804,16 +804,16 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
       {/* Public Profile Preview Modal */}
       {showPublicPreview && workerProfile && (
         <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="dark:bg-[#171717] bg-white border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] rounded-2xl max-w-2xl w-full p-6 space-y-5 dark:text-[#CDCBCA] text-[#242424] shadow-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] pb-3">
+          <div className="dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-2xl max-w-2xl w-full p-6 space-y-5 dark:text-[#E8ECF5] text-[#242424] shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b dark:border-[#272B38] border-[#E2E8F0] pb-3">
               <div className="flex items-center space-x-2">
                 <Eye className="w-4 h-4 text-[#5046E5]" />
-                <h4 className="text-sm font-bold dark:text-[#CDCBCA] text-[#242424]">Public Specialist Profile Preview</h4>
+                <h4 className="text-sm font-bold dark:text-[#E8ECF5] text-[#242424]">Public Specialist Profile Preview</h4>
               </div>
               <button
                 type="button"
                 onClick={() => setShowPublicPreview(false)}
-                className="p-1 rounded-lg dark:text-[#777777] text-[#64748B] hover:dark:text-[#CDCBCA] hover:text-[#242424] hover:dark:bg-[#202020] hover:bg-[#F1F5F9] transition"
+                className="p-1 rounded-lg dark:text-[#9AA4B8] text-[#64748B] hover:dark:text-[#E8ECF5] hover:text-[#242424] hover:dark:bg-[#191D2A] hover:bg-[#F1F5F9] transition"
                 aria-label="Close modal"
               >
                 <X className="w-4 h-4" />
@@ -821,9 +821,9 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
             </div>
 
             {/* Profile Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl dark:bg-[#080808] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl dark:bg-[#0B0D14] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0]">
               <div className="flex items-center space-x-3.5">
-                <div className="w-14 h-14 rounded-full dark:bg-[#202020] bg-slate-200 border-2 dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] overflow-hidden flex items-center justify-center dark:text-[#A5A5A5] text-[#64748B] shrink-0">
+                <div className="w-14 h-14 rounded-full dark:bg-[#191D2A] bg-slate-200 border-2 dark:border-[rgba(205,203,202,0.2)] border-[#E2E8F0] overflow-hidden flex items-center justify-center dark:text-[#9AA4B8] text-[#64748B] shrink-0">
                   {avatarUrl ? (
                     <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                   ) : (
@@ -831,22 +831,22 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                   )}
                 </div>
                 <div>
-                  <h3 className="text-base font-bold dark:text-[#CDCBCA] text-[#242424]">
+                  <h3 className="text-base font-bold dark:text-[#E8ECF5] text-[#242424]">
                     {firstName || lastName ? `${firstName} ${lastName}`.trim() : 'Anonymous Specialist'}
                   </h3>
                   <p className="text-xs text-[#5046E5] font-medium">{headline || 'Specialist on TrustPay'}</p>
-                  <p className="text-[11px] dark:text-[#777777] text-[#64748B] mt-0.5">{country || 'Remote'} • {companyName || 'Independent Consultant'}</p>
+                  <p className="text-[11px] dark:text-[#9AA4B8] text-[#64748B] mt-0.5">{country || 'Remote'} • {companyName || 'Independent Consultant'}</p>
                 </div>
               </div>
 
               <div className="text-right">
                 <div className="text-lg font-bold font-mono text-[#5046E5]">
-                  ${hourlyRate || '0'}<span className="text-xs font-normal dark:text-[#777777] text-[#64748B]">/hr</span>
+                  ${hourlyRate || '0'}<span className="text-xs font-normal dark:text-[#9AA4B8] text-[#64748B]">/hr</span>
                 </div>
                 <span className={`inline-block mt-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${
                   availability === 'AVAILABLE' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' :
                   availability === 'BUSY' ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' :
-                  'dark:bg-[#202020] bg-slate-200 dark:text-[#777777] text-[#64748B]'
+                  'dark:bg-[#191D2A] bg-slate-200 dark:text-[#9AA4B8] text-[#64748B]'
                 }`}>
                   {availability}
                 </span>
@@ -856,8 +856,8 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
             {/* Bio */}
             {bio && (
               <div className="space-y-1">
-                <span className="text-xs font-bold dark:text-[#A5A5A5] text-[#475569] uppercase tracking-wider">About Me</span>
-                <p className="text-xs dark:text-[#CDCBCA] text-[#242424] dark:bg-[#080808]/70 bg-[#F8FAFC] p-3 rounded-xl border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] leading-relaxed">
+                <span className="text-xs font-bold dark:text-[#9AA4B8] text-[#475569] uppercase tracking-wider">About Me</span>
+                <p className="text-xs dark:text-[#E8ECF5] text-[#242424] dark:bg-[#0B0D14]/70 bg-[#F8FAFC] p-3 rounded-xl border dark:border-[#272B38] border-[#E2E8F0] leading-relaxed">
                   {bio}
                 </p>
               </div>
@@ -865,13 +865,13 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
 
             {/* Skills */}
             <div className="space-y-1.5">
-              <span className="text-xs font-bold dark:text-[#A5A5A5] text-[#475569] uppercase tracking-wider">Verified Technical Skills</span>
+              <span className="text-xs font-bold dark:text-[#9AA4B8] text-[#475569] uppercase tracking-wider">Verified Technical Skills</span>
               <div className="flex flex-wrap gap-1.5">
                 {workerProfile.skills && workerProfile.skills.length > 0 ? (
                   workerProfile.skills.map((s) => (
                     <span
                       key={s.id}
-                      className="px-2.5 py-1 rounded-xl dark:bg-[#202020] bg-[#F1F5F9] text-xs dark:text-[#CDCBCA] text-[#242424] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] flex items-center space-x-1.5"
+                      className="px-2.5 py-1 rounded-xl dark:bg-[#191D2A] bg-[#F1F5F9] text-xs dark:text-[#E8ECF5] text-[#242424] border dark:border-[#272B38] border-[#E2E8F0] flex items-center space-x-1.5"
                     >
                       <span>{s.skillName || (s as unknown as { skill?: { name: string } }).skill?.name}</span>
                       <span className="text-[10px] text-emerald-500 bg-emerald-500/10 px-1 py-0.2 rounded font-mono">
@@ -880,27 +880,27 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                     </span>
                   ))
                 ) : (
-                  <p className="text-xs dark:text-[#777777] text-[#64748B] italic">No skills listed yet.</p>
+                  <p className="text-xs dark:text-[#9AA4B8] text-[#64748B] italic">No skills listed yet.</p>
                 )}
               </div>
             </div>
 
             {/* Portfolio Preview */}
             <div className="space-y-2">
-              <span className="text-xs font-bold dark:text-[#A5A5A5] text-[#475569] uppercase tracking-wider">
+              <span className="text-xs font-bold dark:text-[#9AA4B8] text-[#475569] uppercase tracking-wider">
                 Showcased Projects ({workerProfile.portfolioItems?.length || 0})
               </span>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {workerProfile.portfolioItems && workerProfile.portfolioItems.length > 0 ? (
                   workerProfile.portfolioItems.map((item) => (
-                    <div key={item.id} className="p-3.5 rounded-xl dark:bg-[#080808] bg-[#F8FAFC] border dark:border-[rgba(205,203,202,0.18)] border-[#E2E8F0] space-y-1.5">
+                    <div key={item.id} className="p-3.5 rounded-xl dark:bg-[#0B0D14] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] space-y-1.5">
                       {item.attachmentUrl && (
-                        <div className="h-20 w-full rounded-lg overflow-hidden dark:bg-[#171717] bg-slate-200 border dark:border-[rgba(205,203,202,0.1)] border-[#E2E8F0]">
+                        <div className="h-20 w-full rounded-lg overflow-hidden dark:bg-[#191B25] bg-slate-200 border dark:border-[rgba(205,203,202,0.1)] border-[#E2E8F0]">
                           <img src={item.attachmentUrl} alt={item.title} className="w-full h-full object-cover" />
                         </div>
                       )}
-                      <h5 className="text-xs font-semibold dark:text-[#CDCBCA] text-[#242424]">{item.title}</h5>
-                      <p className="text-[11px] dark:text-[#A5A5A5] text-[#64748B] line-clamp-2">{item.description}</p>
+                      <h5 className="text-xs font-semibold dark:text-[#E8ECF5] text-[#242424]">{item.title}</h5>
+                      <p className="text-[11px] dark:text-[#9AA4B8] text-[#64748B] line-clamp-2">{item.description}</p>
                       {item.projectUrl && (
                         <a
                           href={item.projectUrl}
@@ -915,7 +915,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
                     </div>
                   ))
                 ) : (
-                  <p className="text-xs dark:text-[#777777] text-[#64748B] italic col-span-2">No projects showcased yet.</p>
+                  <p className="text-xs dark:text-[#9AA4B8] text-[#64748B] italic col-span-2">No projects showcased yet.</p>
                 )}
               </div>
             </div>
@@ -924,7 +924,7 @@ export const ProfileManagement: React.FC<ProfileManagementProps> = ({
               <button
                 type="button"
                 onClick={() => setShowPublicPreview(false)}
-                className="px-4 py-2 rounded-xl dark:bg-[#202020] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] text-xs font-semibold dark:text-[#CDCBCA] text-[#242424] transition shadow-sm"
+                className="px-4 py-2 rounded-xl dark:bg-[#191D2A] bg-[#F1F5F9] hover:dark:bg-[#303030] hover:bg-[#E2E8F0] text-xs font-semibold dark:text-[#E8ECF5] text-[#242424] transition shadow-sm"
               >
                 Close Preview
               </button>

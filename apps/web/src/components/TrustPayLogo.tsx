@@ -41,11 +41,11 @@ export const TrustPayLogo: React.FC<TrustPayLogoProps> = ({
           loading="eager"
         />
 
-        {/* Dark Theme Icon Emblem (Neon Lime Green 3D Hexagon Shield) */}
+        {/* Dark Theme Icon Emblem (Electric Blue 3D Hexagon Shield) */}
         <img
           src="/trustpay-icon-dark.png"
           alt="TrustPay Emblem"
-          className={`${iconSizeClasses[size]} object-contain hidden dark:block transition-all duration-300 dark:drop-shadow-[0_0_15px_rgba(139,255,36,0.4)]`}
+          className={`${iconSizeClasses[size]} object-contain hidden dark:block transition-all duration-300 dark:drop-shadow-[0_0_15px_rgba(31,97,239,0.35)]`}
           loading="eager"
         />
       </div>
@@ -62,11 +62,11 @@ export const TrustPayLogo: React.FC<TrustPayLogoProps> = ({
         loading="eager"
       />
 
-      {/* 2nd Image Logo: Dark Theme (Neon Lime Green / Obsidian Enterprise Edition PNG) */}
+      {/* 2nd Image Logo: Dark Theme (Electric Blue / Dark Navy Enterprise Edition PNG) */}
       <img
         src="/trustpay-logo-dark.png"
         alt="TrustPay Enterprise"
-        className={`${fullSizeClasses[size]} w-auto object-contain hidden dark:block transition-all duration-300 dark:drop-shadow-[0_0_20px_rgba(139,255,36,0.35)]`}
+        className={`${fullSizeClasses[size]} w-auto object-contain hidden dark:block transition-all duration-300 dark:drop-shadow-[0_0_20px_rgba(31,97,239,0.3)]`}
         loading="eager"
       />
     </div>

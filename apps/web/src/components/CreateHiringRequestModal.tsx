@@ -86,22 +86,22 @@ export const CreateHiringRequestModal: React.FC<CreateHiringRequestModalProps> =
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
-      <div className="dark:bg-[#151715] bg-white border dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] rounded-2xl max-w-xl w-full p-6 space-y-5 dark:text-[#E8EAE6] text-[#111827] shadow-2xl">
-        <div className="flex items-start justify-between border-b dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] pb-4">
+      <div className="dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-2xl max-w-xl w-full p-6 space-y-5 dark:text-[#E8EAE6] text-[#111827] shadow-2xl">
+        <div className="flex items-start justify-between border-b dark:border-[#272B38] border-[#E2E8F0] pb-4">
           <div className="flex items-center space-x-2.5">
-            <div className="w-9 h-9 rounded-xl dark:bg-[#202220] bg-[#EFF6FF] border dark:border-[rgba(139,255,36,0.25)] border-[#DBEAFE] flex items-center justify-center dark:text-[#8BFF24] text-[#2563EB]">
+            <div className="w-9 h-9 rounded-xl dark:bg-[#191D2A] bg-[#EFF6FF] border dark:border-[rgba(31,97,239,0.2)] border-[#DBEAFE] flex items-center justify-center dark:text-[#8FB5FF] text-[#2563EB]">
               <FileText className="w-5 h-5" />
             </div>
             <div>
               <h3 className="text-base font-bold dark:text-[#E8EAE6] text-[#111827]">Send Hiring Proposal</h3>
-              <p className="text-xs dark:text-[#A5AAA2] text-[#64748B] mt-0.5">
-                Target Specialist: <span className="dark:text-[#8BFF24] text-[#5046E5] font-semibold">{workerName}</span> ({worker.headline || 'Specialist'})
+              <p className="text-xs dark:text-[#9AA4B8] text-[#64748B] mt-0.5">
+                Target Specialist: <span className="dark:text-[#8FB5FF] text-[#5046E5] font-semibold">{workerName}</span> ({worker.headline || 'Specialist'})
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="dark:text-[#A5AAA2] text-[#64748B] hover:dark:text-[#E8EAE6] hover:text-[#111827] p-1.5 rounded-lg dark:bg-[#202220] bg-[#F1F5F9] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] transition"
+            className="dark:text-[#9AA4B8] text-[#64748B] hover:dark:text-[#E8EAE6] hover:text-[#111827] p-1.5 rounded-lg dark:bg-[#191D2A] bg-[#F1F5F9] border dark:border-[#272B38] border-[#CBD5E1] transition"
           >
             <X className="w-4 h-4" />
           </button>
@@ -122,7 +122,7 @@ export const CreateHiringRequestModal: React.FC<CreateHiringRequestModalProps> =
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Enterprise Fullstack React & PostgreSQL Architecture"
-              className="w-full px-3 py-2 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] text-xs dark:text-[#E8EAE6] text-[#111827] placeholder:text-[#6A6F68] focus:outline-none dark:focus:border-[#8BFF24] focus:border-[#5046E5] transition"
+              className="w-full px-3 py-2 rounded-xl dark:bg-[#191D2A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#CBD5E1] text-xs dark:text-[#E8EAE6] text-[#111827] placeholder:text-[#6A6F68] focus:outline-none dark:focus:border-[#1F61EF] focus:border-[#5046E5] transition"
               required
             />
           </div>
@@ -136,7 +136,7 @@ export const CreateHiringRequestModal: React.FC<CreateHiringRequestModalProps> =
               onChange={(e) => setDescription(e.target.value)}
               rows={4}
               placeholder="Provide clear specifications, technical stack, deliverable requirements..."
-              className="w-full px-3 py-2 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] text-xs dark:text-[#E8EAE6] text-[#111827] placeholder:text-[#6A6F68] focus:outline-none dark:focus:border-[#8BFF24] focus:border-[#5046E5] transition leading-relaxed"
+              className="w-full px-3 py-2 rounded-xl dark:bg-[#191D2A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#CBD5E1] text-xs dark:text-[#E8EAE6] text-[#111827] placeholder:text-[#6A6F68] focus:outline-none dark:focus:border-[#1F61EF] focus:border-[#5046E5] transition leading-relaxed"
               required
             />
           </div>
@@ -152,7 +152,7 @@ export const CreateHiringRequestModal: React.FC<CreateHiringRequestModalProps> =
                 value={proposedBudget}
                 onChange={(e) => setProposedBudget(e.target.value)}
                 placeholder="e.g. 2500"
-                className="w-full px-3 py-2 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] text-xs dark:text-[#8BFF24] text-[#5046E5] focus:outline-none dark:focus:border-[#8BFF24] focus:border-[#5046E5] font-mono tabular-nums transition font-semibold"
+                className="w-full px-3 py-2 rounded-xl dark:bg-[#191D2A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#CBD5E1] text-xs dark:text-[#8FB5FF] text-[#5046E5] focus:outline-none dark:focus:border-[#1F61EF] focus:border-[#5046E5] font-mono tabular-nums transition font-semibold"
                 required
               />
             </div>
@@ -166,7 +166,7 @@ export const CreateHiringRequestModal: React.FC<CreateHiringRequestModalProps> =
                 value={requiredSkills}
                 onChange={(e) => setRequiredSkills(e.target.value)}
                 placeholder="e.g. React, TypeScript, Node.js"
-                className="w-full px-3 py-2 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] text-xs dark:text-[#E8EAE6] text-[#111827] placeholder:text-[#6A6F68] focus:outline-none dark:focus:border-[#8BFF24] focus:border-[#5046E5] transition"
+                className="w-full px-3 py-2 rounded-xl dark:bg-[#191D2A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#CBD5E1] text-xs dark:text-[#E8EAE6] text-[#111827] placeholder:text-[#6A6F68] focus:outline-none dark:focus:border-[#1F61EF] focus:border-[#5046E5] transition"
               />
             </div>
           </div>
@@ -178,7 +178,7 @@ export const CreateHiringRequestModal: React.FC<CreateHiringRequestModalProps> =
                 type="date"
                 value={proposedStartDate}
                 onChange={(e) => setProposedStartDate(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] text-xs dark:text-[#E8EAE6] text-[#111827] focus:outline-none dark:focus:border-[#8BFF24] focus:border-[#5046E5] font-mono transition"
+                className="w-full px-3 py-2 rounded-xl dark:bg-[#191D2A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#CBD5E1] text-xs dark:text-[#E8EAE6] text-[#111827] focus:outline-none dark:focus:border-[#1F61EF] focus:border-[#5046E5] font-mono transition"
               />
             </div>
 
@@ -188,7 +188,7 @@ export const CreateHiringRequestModal: React.FC<CreateHiringRequestModalProps> =
                 type="date"
                 value={expectedCompletionDate}
                 onChange={(e) => setExpectedCompletionDate(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] text-xs dark:text-[#E8EAE6] text-[#111827] focus:outline-none dark:focus:border-[#8BFF24] focus:border-[#5046E5] font-mono transition"
+                className="w-full px-3 py-2 rounded-xl dark:bg-[#191D2A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#CBD5E1] text-xs dark:text-[#E8EAE6] text-[#111827] focus:outline-none dark:focus:border-[#1F61EF] focus:border-[#5046E5] font-mono transition"
               />
             </div>
           </div>
@@ -200,23 +200,23 @@ export const CreateHiringRequestModal: React.FC<CreateHiringRequestModalProps> =
               onChange={(e) => setClientMessage(e.target.value)}
               rows={2}
               placeholder="Introduce your project context and any specific timeline expectations..."
-              className="w-full px-3 py-2 rounded-xl dark:bg-[#202220] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] text-xs dark:text-[#E8EAE6] text-[#111827] placeholder:text-[#6A6F68] focus:outline-none dark:focus:border-[#8BFF24] focus:border-[#5046E5] transition leading-relaxed"
+              className="w-full px-3 py-2 rounded-xl dark:bg-[#191D2A] bg-[#F8FAFC] border dark:border-[#272B38] border-[#CBD5E1] text-xs dark:text-[#E8EAE6] text-[#111827] placeholder:text-[#6A6F68] focus:outline-none dark:focus:border-[#1F61EF] focus:border-[#5046E5] transition leading-relaxed"
             />
           </div>
 
-          <div className="pt-4 border-t dark:border-[rgba(255,255,255,0.10)] border-[#E2E8F0] flex items-center justify-end space-x-3">
+          <div className="pt-4 border-t dark:border-[#272B38] border-[#E2E8F0] flex items-center justify-end space-x-3">
             <button
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="px-4 py-2 rounded-xl dark:bg-[#202220] bg-[#F1F5F9] dark:hover:bg-[#292C28] hover:bg-[#E2E8F0] text-xs font-semibold dark:text-[#E8EAE6] text-[#111827] border dark:border-[rgba(255,255,255,0.10)] border-[#CBD5E1] transition"
+              className="px-4 py-2 rounded-xl dark:bg-[#191D2A] bg-[#F1F5F9] dark:hover:bg-[#1C2740] hover:bg-[#E2E8F0] text-xs font-semibold dark:text-[#E8EAE6] text-[#111827] border dark:border-[#272B38] border-[#CBD5E1] transition"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-5 py-2 rounded-xl dark:bg-[#8BFF24] bg-[#5046E5] hover:dark:bg-[#A3FF50] hover:bg-[#4338CA] disabled:opacity-50 text-xs font-bold dark:text-[#050605] text-white flex items-center space-x-1.5 dark:shadow-[0_0_15px_rgba(139,255,36,0.2)] shadow-md shadow-[#5046E5]/25 transition active:scale-95 cursor-pointer"
+              className="px-5 py-2 rounded-xl dark:bg-[#1F61EF] bg-[#5046E5] hover:dark:bg-[#A3FF50] hover:bg-[#4338CA] disabled:opacity-50 text-xs font-bold dark:text-white text-white flex items-center space-x-1.5 dark:shadow-[0_0_15px_rgba(31,97,239,0.15)] shadow-md shadow-[#5046E5]/25 transition active:scale-95 cursor-pointer"
             >
               <Send className="w-3.5 h-3.5" />
               <span>{isSubmitting ? 'Submitting...' : 'Send Proposal'}</span>

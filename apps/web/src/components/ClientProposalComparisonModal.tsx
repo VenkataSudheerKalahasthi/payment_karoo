@@ -116,11 +116,11 @@ export const ClientProposalComparisonModal: React.FC<Props> = ({ job, isOpen, on
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5">
-      <div className="dark:bg-[#121212] bg-white border dark:border-[rgba(255,255,255,0.12)] border-[#E2E8F0] rounded-2xl max-w-5xl w-full h-[90vh] flex flex-col shadow-2xl dark:text-[#CDCBCA] text-[#242424] overflow-hidden">
+      <div className="dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-[#E2E8F0] rounded-2xl max-w-5xl w-full h-[90vh] flex flex-col shadow-2xl dark:text-[#E8ECF5] text-[#242424] overflow-hidden">
         {/* Modal Header */}
-        <div className="p-4 sm:p-5 border-b dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] flex items-center justify-between shrink-0">
+        <div className="p-4 sm:p-5 border-b dark:border-[#272B38] border-[#E2E8F0] flex items-center justify-between shrink-0">
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#5046E5] dark:text-[#8BFF24]">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#5046E5] dark:text-[#8FB5FF]">
               Candidate Proposal Review & Comparison
             </span>
             <h3 className="text-base font-extrabold dark:text-[#E8EAE6] text-[#111827]">
@@ -129,7 +129,7 @@ export const ClientProposalComparisonModal: React.FC<Props> = ({ job, isOpen, on
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg dark:hover:bg-[#202020] hover:bg-slate-100 dark:text-[#A5AAA2] text-[#64748B] transition cursor-pointer"
+            className="p-1.5 rounded-lg dark:hover:bg-[#1C2740] hover:bg-slate-100 dark:text-[#9AA4B8] text-[#64748B] transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -147,16 +147,16 @@ export const ClientProposalComparisonModal: React.FC<Props> = ({ job, isOpen, on
         {/* Main Content: Left Column Proposals List + Right Column Comparison & Action */}
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden text-xs">
           {/* Left Proposals Sidebar */}
-          <div className="w-full md:w-80 border-r dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] overflow-y-auto p-3 space-y-2 shrink-0">
-            <div className="flex items-center justify-between pb-2 text-[11px] font-semibold dark:text-[#A5AAA2] text-[#64748B]">
+          <div className="w-full md:w-80 border-r dark:border-[#272B38] border-[#E2E8F0] overflow-y-auto p-3 space-y-2 shrink-0">
+            <div className="flex items-center justify-between pb-2 text-[11px] font-semibold dark:text-[#9AA4B8] text-[#64748B]">
               <span>Applications ({proposals.length})</span>
               <span>Sorted by Shortlist</span>
             </div>
 
             {loading ? (
-              <div className="p-6 text-center dark:text-[#777777] text-[#94A3B8]">Loading candidate proposals...</div>
+              <div className="p-6 text-center dark:text-[#9AA4B8] text-[#94A3B8]">Loading candidate proposals...</div>
             ) : proposals.length === 0 ? (
-              <div className="p-6 text-center dark:text-[#777777] text-[#94A3B8]">No active applications received yet.</div>
+              <div className="p-6 text-center dark:text-[#9AA4B8] text-[#94A3B8]">No active applications received yet.</div>
             ) : (
               proposals.map((p) => {
                 const isSelected = selectedProposal?.id === p.id;
@@ -170,8 +170,8 @@ export const ClientProposalComparisonModal: React.FC<Props> = ({ job, isOpen, on
                     }}
                     className={`p-3 rounded-xl border transition cursor-pointer space-y-2 ${
                       isSelected
-                        ? 'dark:bg-[#1E221E] bg-[#EEF2FF] dark:border-[#8BFF24] border-[#5046E5] shadow-sm'
-                        : 'dark:bg-[#171717] bg-[#F8FAFC] dark:border-[rgba(255,255,255,0.06)] border-[#E2E8F0] hover:border-slate-300'
+                        ? 'dark:bg-[#1E221E] bg-[#EEF2FF] dark:border-[#1F61EF] border-[#5046E5] shadow-sm'
+                        : 'dark:bg-[#191B25] bg-[#F8FAFC] dark:border-[#272B38] border-[#E2E8F0] hover:border-slate-300'
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -192,15 +192,15 @@ export const ClientProposalComparisonModal: React.FC<Props> = ({ job, isOpen, on
                     </div>
 
                     <div className="flex items-center justify-between text-[11px] font-mono tabular-nums">
-                      <span className="font-extrabold dark:text-[#8BFF24] text-[#5046E5]">
+                      <span className="font-extrabold dark:text-[#8FB5FF] text-[#5046E5]">
                         ${Number(p.proposedAmount).toLocaleString()} {p.currency}
                       </span>
-                      <span className="text-[10px] dark:text-[#A5AAA2] text-[#64748B]">
+                      <span className="text-[10px] dark:text-[#9AA4B8] text-[#64748B]">
                         {p.estimatedTimeline || 'Flexible'}
                       </span>
                     </div>
 
-                    <div className="flex items-center justify-between text-[10px] dark:text-[#A5AAA2] text-[#64748B] pt-1 border-t dark:border-[rgba(255,255,255,0.05)] border-[#E2E8F0]">
+                    <div className="flex items-center justify-between text-[10px] dark:text-[#9AA4B8] text-[#64748B] pt-1 border-t dark:border-[rgba(255,255,255,0.05)] border-[#E2E8F0]">
                       <span className="flex items-center space-x-1">
                         {isTeam ? <Users className="w-3 h-3 text-purple-400" /> : <Star className="w-3 h-3 text-amber-400 fill-amber-400" />}
                         <span>{isTeam ? `Team (${p.team?.members?.length || 0})` : `${p.worker?.workerProfile?.rating || '5.0'} / 5.0`}</span>
@@ -227,7 +227,7 @@ export const ClientProposalComparisonModal: React.FC<Props> = ({ job, isOpen, on
             {selectedProposal ? (
               <div className="space-y-5">
                 {/* Applicant Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl dark:bg-[#181818] bg-slate-50 border dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0]">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl dark:bg-[#181818] bg-slate-50 border dark:border-[#272B38] border-[#E2E8F0]">
                   <div>
                     <span className="text-[10px] font-bold uppercase tracking-wider text-purple-500">
                       {selectedProposal.proposalType === 'TEAM' ? 'Team Lead Submission' : 'Individual Specialist'}
@@ -237,16 +237,16 @@ export const ClientProposalComparisonModal: React.FC<Props> = ({ job, isOpen, on
                         ? selectedProposal.team?.name
                         : `${selectedProposal.worker?.firstName} ${selectedProposal.worker?.lastName}`}
                     </h3>
-                    <p className="text-xs dark:text-[#A5AAA2] text-[#64748B]">
+                    <p className="text-xs dark:text-[#9AA4B8] text-[#64748B]">
                       {selectedProposal.worker?.workerProfile?.headline || 'Verified Professional Specialist'}
                     </p>
                   </div>
 
                   <div className="text-right font-mono">
-                    <div className="text-lg font-black dark:text-[#8BFF24] text-[#5046E5] tabular-nums">
+                    <div className="text-lg font-black dark:text-[#8FB5FF] text-[#5046E5] tabular-nums">
                       ${Number(selectedProposal.proposedAmount).toLocaleString()} {selectedProposal.currency}
                     </div>
-                    <div className="text-[11px] dark:text-[#A5AAA2] text-[#64748B]">
+                    <div className="text-[11px] dark:text-[#9AA4B8] text-[#64748B]">
                       Est. Timeline: {selectedProposal.estimatedTimeline || 'Standard'}
                     </div>
                   </div>
@@ -254,20 +254,20 @@ export const ClientProposalComparisonModal: React.FC<Props> = ({ job, isOpen, on
 
                 {/* Cover Letter & Approach */}
                 <div className="space-y-1.5">
-                  <h4 className="font-bold text-xs uppercase tracking-wider dark:text-[#CDCBCA] text-[#475569]">
+                  <h4 className="font-bold text-xs uppercase tracking-wider dark:text-[#E8ECF5] text-[#475569]">
                     Cover Letter & Scope Pitch
                   </h4>
-                  <div className="p-3.5 rounded-xl dark:bg-[#151515] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] leading-relaxed dark:text-[#CDCBCA] text-[#334155]">
+                  <div className="p-3.5 rounded-xl dark:bg-[#151515] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] leading-relaxed dark:text-[#E8ECF5] text-[#334155]">
                     {selectedProposal.coverLetter}
                   </div>
                 </div>
 
                 {selectedProposal.workApproach && (
                   <div className="space-y-1.5">
-                    <h4 className="font-bold text-xs uppercase tracking-wider dark:text-[#CDCBCA] text-[#475569]">
+                    <h4 className="font-bold text-xs uppercase tracking-wider dark:text-[#E8ECF5] text-[#475569]">
                       Work Methodology & Approach
                     </h4>
-                    <div className="p-3.5 rounded-xl dark:bg-[#151515] bg-[#F8FAFC] border dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] leading-relaxed dark:text-[#CDCBCA] text-[#334155]">
+                    <div className="p-3.5 rounded-xl dark:bg-[#151515] bg-[#F8FAFC] border dark:border-[#272B38] border-[#E2E8F0] leading-relaxed dark:text-[#E8ECF5] text-[#334155]">
                       {selectedProposal.workApproach}
                     </div>
                   </div>
@@ -284,7 +284,7 @@ export const ClientProposalComparisonModal: React.FC<Props> = ({ job, isOpen, on
                       {selectedProposal.team.members?.map((m) => (
                         <div
                           key={m.id}
-                          className="p-2.5 rounded-xl dark:bg-[#1A1A1A] bg-white border dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] space-y-1"
+                          className="p-2.5 rounded-xl dark:bg-[#1A1A1A] bg-white border dark:border-[#272B38] border-[#E2E8F0] space-y-1"
                         >
                           <div className="flex items-center justify-between">
                             <span className="font-bold dark:text-[#E8EAE6] text-[#111827]">
@@ -294,7 +294,7 @@ export const ClientProposalComparisonModal: React.FC<Props> = ({ job, isOpen, on
                               {m.role}
                             </span>
                           </div>
-                          <div className="text-[10px] dark:text-[#A5AAA2] text-[#64748B]">
+                          <div className="text-[10px] dark:text-[#9AA4B8] text-[#64748B]">
                             {m.responsibility || 'Project Contributor'}
                           </div>
                         </div>
@@ -306,7 +306,7 @@ export const ClientProposalComparisonModal: React.FC<Props> = ({ job, isOpen, on
                 {/* Versioned Negotiation History */}
                 {selectedProposal.negotiations && selectedProposal.negotiations.length > 0 && (
                   <div className="space-y-2">
-                    <h4 className="font-bold text-xs uppercase tracking-wider text-[#5046E5] dark:text-[#8BFF24] flex items-center space-x-1.5">
+                    <h4 className="font-bold text-xs uppercase tracking-wider text-[#5046E5] dark:text-[#8FB5FF] flex items-center space-x-1.5">
                       <ArrowRightLeft className="w-3.5 h-3.5" />
                       <span>Negotiation Version History ({selectedProposal.negotiations.length} Versions)</span>
                     </h4>
@@ -314,16 +314,16 @@ export const ClientProposalComparisonModal: React.FC<Props> = ({ job, isOpen, on
                       {selectedProposal.negotiations.map((v) => (
                         <div
                           key={v.id}
-                          className="p-2.5 rounded-xl dark:bg-[#161816] bg-slate-50 border dark:border-[rgba(255,255,255,0.06)] border-[#E2E8F0] flex items-center justify-between"
+                          className="p-2.5 rounded-xl dark:bg-[#161816] bg-slate-50 border dark:border-[#272B38] border-[#E2E8F0] flex items-center justify-between"
                         >
                           <div className="space-y-0.5">
-                            <span className="font-bold text-[11px] dark:text-[#CDCBCA] text-[#111827]">
+                            <span className="font-bold text-[11px] dark:text-[#E8ECF5] text-[#111827]">
                               v{v.versionNumber} — {v.counterOfferBy === 'CLIENT' ? 'Client Counteroffer' : 'Specialist Proposal'}
                             </span>
-                            <p className="text-[10px] dark:text-[#A5AAA2] text-[#64748B]">{v.message}</p>
+                            <p className="text-[10px] dark:text-[#9AA4B8] text-[#64748B]">{v.message}</p>
                           </div>
                           <div className="text-right font-mono tabular-nums">
-                            <span className="font-bold dark:text-[#8BFF24] text-[#5046E5]">
+                            <span className="font-bold dark:text-[#8FB5FF] text-[#5046E5]">
                               ${Number(v.proposedAmount).toLocaleString()}
                             </span>
                             <div className="text-[9px] uppercase font-bold text-slate-400">{v.status}</div>
@@ -336,8 +336,8 @@ export const ClientProposalComparisonModal: React.FC<Props> = ({ job, isOpen, on
 
                 {/* Counteroffer Sub-Form */}
                 {isCounteroffering && (
-                  <div className="p-4 rounded-xl dark:bg-[#1C1F1C] bg-[#EEF2FF] border dark:border-[rgba(139,255,36,0.3)] border-[#C7D2FE] space-y-3">
-                    <h4 className="font-bold text-xs dark:text-[#8BFF24] text-[#5046E5]">
+                  <div className="p-4 rounded-xl dark:bg-[#1C2740] bg-[#EEF2FF] border dark:border-[rgba(31,97,239,0.25)] border-[#C7D2FE] space-y-3">
+                    <h4 className="font-bold text-xs dark:text-[#8FB5FF] text-[#5046E5]">
                       Submit Counteroffer & Revised Terms
                     </h4>
                     <div className="grid grid-cols-2 gap-3">
@@ -348,7 +348,7 @@ export const ClientProposalComparisonModal: React.FC<Props> = ({ job, isOpen, on
                           value={counterAmount}
                           onChange={(e) => setCounterAmount(e.target.value)}
                           placeholder="e.g. 4500"
-                          className="w-full px-3 py-1.5 rounded-lg dark:bg-[#121212] bg-white border dark:border-[rgba(255,255,255,0.15)] border-[#CBD5E1] font-mono tabular-nums"
+                          className="w-full px-3 py-1.5 rounded-lg dark:bg-[#191B25] bg-white border dark:border-[rgba(255,255,255,0.15)] border-[#CBD5E1] font-mono tabular-nums"
                         />
                       </div>
                       <div>
@@ -358,7 +358,7 @@ export const ClientProposalComparisonModal: React.FC<Props> = ({ job, isOpen, on
                           value={counterTimeline}
                           onChange={(e) => setCounterTimeline(e.target.value)}
                           placeholder="e.g. 3 weeks"
-                          className="w-full px-3 py-1.5 rounded-lg dark:bg-[#121212] bg-white border dark:border-[rgba(255,255,255,0.15)] border-[#CBD5E1]"
+                          className="w-full px-3 py-1.5 rounded-lg dark:bg-[#191B25] bg-white border dark:border-[rgba(255,255,255,0.15)] border-[#CBD5E1]"
                         />
                       </div>
                     </div>
@@ -369,7 +369,7 @@ export const ClientProposalComparisonModal: React.FC<Props> = ({ job, isOpen, on
                         value={counterMessage}
                         onChange={(e) => setCounterMessage(e.target.value)}
                         placeholder="Explain rationale for counteroffer terms..."
-                        className="w-full px-3 py-1.5 rounded-lg dark:bg-[#121212] bg-white border dark:border-[rgba(255,255,255,0.15)] border-[#CBD5E1]"
+                        className="w-full px-3 py-1.5 rounded-lg dark:bg-[#191B25] bg-white border dark:border-[rgba(255,255,255,0.15)] border-[#CBD5E1]"
                       />
                     </div>
                     <div className="flex justify-end space-x-2">
@@ -384,7 +384,7 @@ export const ClientProposalComparisonModal: React.FC<Props> = ({ job, isOpen, on
                         type="button"
                         disabled={submitting}
                         onClick={handleSendCounteroffer}
-                        className="px-4 py-1.5 rounded-lg bg-[#5046E5] dark:bg-[#8BFF24] text-white dark:text-[#050605] font-bold text-xs cursor-pointer shadow-sm"
+                        className="px-4 py-1.5 rounded-lg bg-[#5046E5] dark:bg-[#1F61EF] text-white dark:text-white font-bold text-xs cursor-pointer shadow-sm"
                       >
                         {submitting ? 'Submitting...' : 'Send Counteroffer'}
                       </button>
@@ -393,7 +393,7 @@ export const ClientProposalComparisonModal: React.FC<Props> = ({ job, isOpen, on
                 )}
 
                 {/* Primary Decision Action Bar */}
-                <div className="flex flex-wrap items-center justify-between pt-4 border-t dark:border-[rgba(255,255,255,0.08)] border-[#E2E8F0] gap-2">
+                <div className="flex flex-wrap items-center justify-between pt-4 border-t dark:border-[#272B38] border-[#E2E8F0] gap-2">
                   <div className="flex items-center space-x-2">
                     {onStartChat && (
                       <button
@@ -402,7 +402,7 @@ export const ClientProposalComparisonModal: React.FC<Props> = ({ job, isOpen, on
                           onClose();
                           onStartChat(selectedProposal.workerId);
                         }}
-                        className="px-3.5 py-2 rounded-xl dark:bg-[#8BFF24]/10 bg-[#EEF2FF] border dark:border-[#8BFF24]/30 border-[#C7D2FE] text-xs font-bold dark:text-[#8BFF24] text-[#5046E5] hover:opacity-80 flex items-center space-x-1.5 transition cursor-pointer"
+                        className="px-3.5 py-2 rounded-xl dark:bg-[#1C2740] bg-[#EEF2FF] border dark:border-[#1F61EF]/30 border-[#C7D2FE] text-xs font-bold dark:text-[#8FB5FF] text-[#5046E5] hover:opacity-80 flex items-center space-x-1.5 transition cursor-pointer"
                         title="Chat directly with specialist"
                       >
                         <MessageSquare className="w-3.5 h-3.5" />
@@ -427,7 +427,7 @@ export const ClientProposalComparisonModal: React.FC<Props> = ({ job, isOpen, on
                           setIsCounteroffering(true);
                           setCounterAmount(selectedProposal.proposedAmount.toString());
                         }}
-                        className="px-3.5 py-2 rounded-xl border dark:border-[rgba(255,255,255,0.15)] border-[#E2E8F0] hover:bg-slate-100 dark:hover:bg-[#202020] text-xs font-semibold flex items-center space-x-1.5 transition cursor-pointer"
+                        className="px-3.5 py-2 rounded-xl border dark:border-[rgba(255,255,255,0.15)] border-[#E2E8F0] hover:bg-slate-100 dark:hover:bg-[#1C2740] text-xs font-semibold flex items-center space-x-1.5 transition cursor-pointer"
                       >
                         <ArrowRightLeft className="w-3.5 h-3.5" />
                         <span>Negotiate Terms</span>
@@ -448,7 +448,7 @@ export const ClientProposalComparisonModal: React.FC<Props> = ({ job, isOpen, on
                         type="button"
                         disabled={submitting}
                         onClick={() => handleAccept(selectedProposal.id)}
-                        className="px-5 py-2 rounded-xl bg-[#5046E5] dark:bg-[#8BFF24] hover:bg-[#4338CA] dark:hover:bg-[#7AE01F] text-white dark:text-[#050605] font-extrabold text-xs flex items-center space-x-2 shadow-lg transition cursor-pointer active:scale-95"
+                        className="px-5 py-2 rounded-xl bg-[#5046E5] dark:bg-[#1F61EF] hover:bg-[#4338CA] dark:hover:bg-[#7AE01F] text-white dark:text-white font-extrabold text-xs flex items-center space-x-2 shadow-lg transition cursor-pointer active:scale-95"
                       >
                         <CheckCircle2 className="w-4 h-4" />
                         <span>Accept Proposal & Enable Contract</span>
@@ -458,7 +458,7 @@ export const ClientProposalComparisonModal: React.FC<Props> = ({ job, isOpen, on
                 </div>
               </div>
             ) : (
-              <div className="h-full flex items-center justify-center text-center dark:text-[#777777] text-[#94A3B8]">
+              <div className="h-full flex items-center justify-center text-center dark:text-[#9AA4B8] text-[#94A3B8]">
                 Select a candidate proposal from the left list to review detailed breakdown and negotiate terms.
               </div>
             )}

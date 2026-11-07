@@ -276,7 +276,7 @@ export const ClientDisputes: React.FC<ClientDisputesProps> = ({ userRole }) => {
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="interactive-card flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm p-6 rounded-2xl">
+      <div className="interactive-card flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-slate-200 shadow-sm p-6 rounded-2xl">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
             <Scale className="w-5 h-5" />
@@ -296,7 +296,7 @@ export const ClientDisputes: React.FC<ClientDisputesProps> = ({ userRole }) => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl dark:bg-[#8BFF24] bg-[#5046E5] hover:dark:bg-[#78e018] hover:bg-[#4338CA] dark:text-black text-white shadow-md shadow-[#5046E5]/25 text-xs font-bold transition shadow-[0_0_12px_rgba(139,255,36,0.2)]"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl dark:bg-[#1F61EF] bg-[#5046E5] hover:dark:bg-[#78e018] hover:bg-[#4338CA] dark:text-black text-white shadow-md shadow-[#5046E5]/25 text-xs font-bold transition shadow-[0_0_12px_rgba(31,97,239,0.15)]"
           >
             <Plus className="w-4 h-4" />
             {isWorker ? 'Raise Issue' : 'File a Dispute'}
@@ -304,7 +304,7 @@ export const ClientDisputes: React.FC<ClientDisputesProps> = ({ userRole }) => {
           <button
             onClick={fetchDisputes}
             disabled={loading}
-            className="p-2 rounded-xl dark:bg-[#1e201e] bg-slate-100 border dark:border-[#2e322e] border-slate-300 dark:text-zinc-300 text-slate-700 hover:dark:text-white hover:text-slate-900 hover:dark:bg-[#2e322e] hover:bg-slate-200 transition"
+            className="p-2 rounded-xl dark:bg-[#191D2A] bg-slate-100 border dark:border-[#272B38] border-slate-300 dark:text-zinc-300 text-slate-700 hover:dark:text-white hover:text-slate-900 hover:dark:bg-[#2e322e] hover:bg-slate-200 transition"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
@@ -313,33 +313,33 @@ export const ClientDisputes: React.FC<ClientDisputesProps> = ({ userRole }) => {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
-        <div className="interactive-card dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm p-4 rounded-xl">
+        <div className="interactive-card dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-slate-200 shadow-sm p-4 rounded-xl">
           <p className="text-xs dark:text-zinc-400 text-slate-500 uppercase tracking-wider font-medium">Total Cases</p>
           <p className="text-2xl font-bold dark:text-white text-slate-900 mt-1">{metrics.count}</p>
           <p className="text-xs text-zinc-500 mt-1">Disputes filed</p>
         </div>
 
-        <div className="interactive-card dark:bg-[#121412] bg-white border border-amber-500/30 p-4 rounded-xl">
+        <div className="interactive-card dark:bg-[#191B25] bg-white border border-amber-500/30 p-4 rounded-xl">
           <p className="text-xs text-amber-400 uppercase tracking-wider font-semibold">Active In Arbitration</p>
           <p className="text-2xl font-bold text-amber-400 mt-1">{metrics.active}</p>
           <p className="text-xs dark:text-zinc-400 text-slate-500 mt-1">Escrow held in safety</p>
         </div>
 
-        <div className="interactive-card dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm p-4 rounded-xl">
+        <div className="interactive-card dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-slate-200 shadow-sm p-4 rounded-xl">
           <p className="text-xs dark:text-zinc-400 text-slate-500 uppercase tracking-wider font-medium">Resolved Cases</p>
           <p className="text-2xl font-bold text-emerald-400 mt-1">{metrics.resolved}</p>
           <p className="text-xs text-zinc-500 mt-1">Successfully settled</p>
         </div>
 
-        <div className="interactive-card dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm p-4 rounded-xl">
+        <div className="interactive-card dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-slate-200 shadow-sm p-4 rounded-xl">
           <p className="text-xs dark:text-zinc-400 text-slate-500 uppercase tracking-wider font-medium">Escrow Protected</p>
-          <p className="text-2xl font-bold dark:text-[#8BFF24] text-[#5046E5] mt-1 font-mono">${metrics.totalDisputedAmount.toLocaleString()}</p>
+          <p className="text-2xl font-bold dark:text-[#8FB5FF] text-[#5046E5] mt-1 font-mono">${metrics.totalDisputedAmount.toLocaleString()}</p>
           <p className="text-xs text-zinc-500 mt-1">Funds frozen from release</p>
         </div>
       </div>
 
       {/* Search and Filters */}
-      <div className="interactive-card dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm p-4 rounded-xl flex flex-col md:flex-row gap-3 items-center justify-between">
+      <div className="interactive-card dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-slate-200 shadow-sm p-4 rounded-xl flex flex-col md:flex-row gap-3 items-center justify-between">
         <div className="relative w-full md:w-80">
           <Search className="w-4 h-4 dark:text-zinc-400 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
@@ -347,7 +347,7 @@ export const ClientDisputes: React.FC<ClientDisputesProps> = ({ userRole }) => {
             placeholder="Search dispute # or description..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full dark:bg-[#181a18] bg-slate-50 border dark:border-[#2e322e] border-slate-300 rounded-lg pl-9 pr-4 py-2 text-sm dark:text-white text-slate-900 placeholder-zinc-400 focus:outline-none focus:dark:border-[#8BFF24]/60 focus:border-[#5046E5] transition"
+            className="w-full dark:bg-[#191B25] bg-slate-50 border dark:border-[#272B38] border-slate-300 rounded-lg pl-9 pr-4 py-2 text-sm dark:text-white text-slate-900 placeholder-zinc-400 focus:outline-none focus:dark:border-[#1F61EF]/60 focus:border-[#5046E5] transition"
           />
         </div>
 
@@ -358,8 +358,8 @@ export const ClientDisputes: React.FC<ClientDisputesProps> = ({ userRole }) => {
               onClick={() => setStatusFilter(st)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
                 statusFilter === st
-                  ? 'dark:bg-[#8BFF24] bg-[#5046E5] dark:text-black text-white shadow-sm'
-                  : 'dark:bg-[#181a18] bg-slate-50 dark:text-zinc-300 text-slate-700 hover:dark:text-white hover:text-[#5046E5] hover:dark:bg-[#202220] hover:bg-[#EEF2FF] border dark:border-[#2e322e] border-slate-300'
+                  ? 'dark:bg-[#1F61EF] bg-[#5046E5] dark:text-black text-white shadow-sm'
+                  : 'dark:bg-[#191B25] bg-slate-50 dark:text-zinc-300 text-slate-700 hover:dark:text-white hover:text-[#5046E5] hover:dark:bg-[#191D2A] hover:bg-[#EEF2FF] border dark:border-[#272B38] border-slate-300'
               }`}
             >
               {st}
@@ -370,8 +370,8 @@ export const ClientDisputes: React.FC<ClientDisputesProps> = ({ userRole }) => {
 
       {/* Disputes Table */}
       {loading ? (
-        <div className="dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm p-12 rounded-2xl flex flex-col items-center justify-center text-center">
-          <RefreshCw className="w-8 h-8 dark:text-[#8BFF24] text-[#5046E5] animate-spin mb-3" />
+        <div className="dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-slate-200 shadow-sm p-12 rounded-2xl flex flex-col items-center justify-center text-center">
+          <RefreshCw className="w-8 h-8 dark:text-[#8FB5FF] text-[#5046E5] animate-spin mb-3" />
           <p className="dark:text-zinc-400 text-slate-500 text-sm">Querying active arbitration files...</p>
         </div>
       ) : error ? (
@@ -380,7 +380,7 @@ export const ClientDisputes: React.FC<ClientDisputesProps> = ({ userRole }) => {
           <p className="text-sm">{error}</p>
         </div>
       ) : filteredDisputes.length === 0 ? (
-        <div className="dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm p-12 rounded-2xl text-center">
+        <div className="dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-slate-200 shadow-sm p-12 rounded-2xl text-center">
           <Scale className="w-10 h-10 text-zinc-600 mx-auto mb-3" />
           <h3 className="text-base font-semibold dark:text-white text-slate-900">No active dispute cases</h3>
           <p className="text-xs dark:text-zinc-400 text-slate-500 mt-1 max-w-sm mx-auto">
@@ -388,10 +388,10 @@ export const ClientDisputes: React.FC<ClientDisputesProps> = ({ userRole }) => {
           </p>
         </div>
       ) : (
-        <div className="interactive-card dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm rounded-2xl overflow-hidden">
+        <div className="interactive-card dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-slate-200 shadow-sm rounded-2xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="dark:bg-[#181a18] bg-slate-50 border-b dark:border-[#262926] border-slate-200 text-xs uppercase dark:text-zinc-400 text-slate-500 tracking-wider">
+              <thead className="dark:bg-[#191B25] bg-slate-50 border-b dark:border-[#272B38] border-slate-200 text-xs uppercase dark:text-zinc-400 text-slate-500 tracking-wider">
                 <tr>
                   <th className="py-3.5 px-4 font-semibold">Case #</th>
                   <th className="py-3.5 px-4 font-semibold">Category</th>
@@ -422,10 +422,10 @@ export const ClientDisputes: React.FC<ClientDisputesProps> = ({ userRole }) => {
                     <td className="py-3.5 px-4 text-right">
                       <button
                         onClick={() => handleOpenDetail(d.id)}
-                        className="inline-flex items-center gap-1 px-3 py-1 rounded-lg dark:bg-[#1e201e] bg-slate-100 hover:dark:bg-[#282c28] hover:bg-[#EEF2FF] border dark:border-[#2e322e] border-slate-300 dark:text-zinc-300 text-slate-700 hover:dark:text-white hover:text-[#5046E5] text-xs transition"
+                        className="inline-flex items-center gap-1 px-3 py-1 rounded-lg dark:bg-[#191D2A] bg-slate-100 hover:dark:bg-[#282c28] hover:bg-[#EEF2FF] border dark:border-[#272B38] border-slate-300 dark:text-zinc-300 text-slate-700 hover:dark:text-white hover:text-[#5046E5] text-xs transition"
                       >
                         Inspect Case
-                        <ChevronRight className="w-3.5 h-3.5 dark:text-[#8BFF24] text-[#5046E5]" />
+                        <ChevronRight className="w-3.5 h-3.5 dark:text-[#8FB5FF] text-[#5046E5]" />
                       </button>
                     </td>
                   </tr>
@@ -439,7 +439,7 @@ export const ClientDisputes: React.FC<ClientDisputesProps> = ({ userRole }) => {
       {/* Case Details Drawer / Modal */}
       {selectedDisputeId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl p-6 space-y-4 shadow-2xl relative">
+          <div className="dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-slate-200 shadow-sm w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl p-6 space-y-4 shadow-2xl relative">
             <button
               onClick={() => setSelectedDisputeId(null)}
               className="absolute top-4 right-4 dark:text-zinc-400 text-slate-500 hover:dark:text-white hover:text-slate-900 p-1 rounded-lg hover:dark:bg-zinc-800 hover:bg-slate-100"
@@ -449,7 +449,7 @@ export const ClientDisputes: React.FC<ClientDisputesProps> = ({ userRole }) => {
 
             {detailLoading || !disputeDetail ? (
               <div className="p-12 text-center flex flex-col items-center">
-                <RefreshCw className="w-6 h-6 dark:text-[#8BFF24] text-[#5046E5] animate-spin mb-2" />
+                <RefreshCw className="w-6 h-6 dark:text-[#8FB5FF] text-[#5046E5] animate-spin mb-2" />
                 <p className="dark:text-zinc-400 text-slate-500 text-xs">Loading case dossier...</p>
               </div>
             ) : (
@@ -478,7 +478,7 @@ export const ClientDisputes: React.FC<ClientDisputesProps> = ({ userRole }) => {
                 </div>
 
                 {/* Case Claim */}
-                <div className="p-4 rounded-xl dark:bg-[#181a18] bg-slate-50 border dark:border-[#262926] border-slate-200 space-y-2 text-xs">
+                <div className="p-4 rounded-xl dark:bg-[#191B25] bg-slate-50 border dark:border-[#272B38] border-slate-200 space-y-2 text-xs">
                   <span className="text-zinc-500 font-semibold uppercase text-[10px] block">Claim Details</span>
                   <p className="dark:text-zinc-200 text-slate-800">{disputeDetail.description}</p>
                 </div>
@@ -492,7 +492,7 @@ export const ClientDisputes: React.FC<ClientDisputesProps> = ({ userRole }) => {
                     <button
                       type="button"
                       onClick={() => setShowAddEvidence(!showAddEvidence)}
-                      className="text-xs dark:text-[#8BFF24] text-[#5046E5] hover:underline flex items-center gap-1 font-medium"
+                      className="text-xs dark:text-[#8FB5FF] text-[#5046E5] hover:underline flex items-center gap-1 font-medium"
                     >
                       <Plus className="w-3 h-3" />
                       {showAddEvidence ? 'Cancel' : isWorker ? 'Submit Work Rebuttal / Evidence' : 'Attach More Evidence'}
@@ -507,9 +507,9 @@ export const ClientDisputes: React.FC<ClientDisputesProps> = ({ userRole }) => {
                           href={ev.fileUrl}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg dark:bg-[#181a18] bg-slate-50 border dark:border-[#262926] border-slate-200 hover:dark:border-[#8BFF24]/40 border-[#C7D2FE] text-xs dark:text-zinc-300 text-slate-700 hover:text-white transition"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg dark:bg-[#191B25] bg-slate-50 border dark:border-[#272B38] border-slate-200 hover:dark:border-[#1F61EF]/40 border-[#C7D2FE] text-xs dark:text-zinc-300 text-slate-700 hover:text-white transition"
                         >
-                          <FileText className="w-3.5 h-3.5 dark:text-[#8BFF24] text-[#5046E5]" />
+                          <FileText className="w-3.5 h-3.5 dark:text-[#8FB5FF] text-[#5046E5]" />
                           {ev.fileName || `Evidence #${idx + 1}`}
                           <ExternalLink className="w-3 h-3 text-zinc-500" />
                         </a>
@@ -520,9 +520,9 @@ export const ClientDisputes: React.FC<ClientDisputesProps> = ({ userRole }) => {
                   )}
 
                   {showAddEvidence && (
-                    <form onSubmit={handleUploadAdditionalEvidence} className="p-3 dark:bg-[#181a18] bg-slate-50 rounded-xl border dark:border-[#262926] border-slate-200 space-y-2.5 text-xs">
+                    <form onSubmit={handleUploadAdditionalEvidence} className="p-3 dark:bg-[#191B25] bg-slate-50 rounded-xl border dark:border-[#272B38] border-slate-200 space-y-2.5 text-xs">
                       <div className="flex items-center gap-2 dark:text-zinc-300 text-slate-700 font-semibold text-xs">
-                        <Upload className="w-3.5 h-3.5 dark:text-[#8BFF24] text-[#5046E5]" />
+                        <Upload className="w-3.5 h-3.5 dark:text-[#8FB5FF] text-[#5046E5]" />
                         {isWorker ? 'Upload Specialist Rebuttal or Deliverable Proof' : 'Upload Dispute Evidence Document'}
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -531,7 +531,7 @@ export const ClientDisputes: React.FC<ClientDisputesProps> = ({ userRole }) => {
                           placeholder="Evidence title (e.g. GitHub PR, Deliverable ZIP, Chat Logs)..."
                           value={newEvidenceName}
                           onChange={(e) => setNewEvidenceName(e.target.value)}
-                          className="dark:bg-[#141614] bg-white border dark:border-[#2e322e] border-slate-300 rounded-lg px-3 py-1.5 text-xs dark:text-white text-slate-900 placeholder-zinc-400 focus:outline-none focus:dark:border-[#8BFF24]/60 focus:border-[#5046E5]"
+                          className="dark:bg-[#141614] bg-white border dark:border-[#272B38] border-slate-300 rounded-lg px-3 py-1.5 text-xs dark:text-white text-slate-900 placeholder-zinc-400 focus:outline-none focus:dark:border-[#1F61EF]/60 focus:border-[#5046E5]"
                         />
                         <input
                           type="url"
@@ -539,7 +539,7 @@ export const ClientDisputes: React.FC<ClientDisputesProps> = ({ userRole }) => {
                           placeholder="Document or storage URL (https://...)..."
                           value={newEvidenceUrl}
                           onChange={(e) => setNewEvidenceUrl(e.target.value)}
-                          className="dark:bg-[#141614] bg-white border dark:border-[#2e322e] border-slate-300 rounded-lg px-3 py-1.5 text-xs dark:text-white text-slate-900 placeholder-zinc-400 focus:outline-none focus:dark:border-[#8BFF24]/60 focus:border-[#5046E5]"
+                          className="dark:bg-[#141614] bg-white border dark:border-[#272B38] border-slate-300 rounded-lg px-3 py-1.5 text-xs dark:text-white text-slate-900 placeholder-zinc-400 focus:outline-none focus:dark:border-[#1F61EF]/60 focus:border-[#5046E5]"
                         />
                       </div>
                       <div className="flex justify-end gap-2 pt-1">
@@ -553,7 +553,7 @@ export const ClientDisputes: React.FC<ClientDisputesProps> = ({ userRole }) => {
                         <button
                           type="submit"
                           disabled={uploadingEvidence || !newEvidenceUrl.trim()}
-                          className="px-3 py-1 rounded-lg dark:bg-[#8BFF24] bg-[#5046E5] dark:text-black text-white shadow-sm font-bold text-xs hover:bg-[#78e018] transition disabled:opacity-50"
+                          className="px-3 py-1 rounded-lg dark:bg-[#1F61EF] bg-[#5046E5] dark:text-black text-white shadow-sm font-bold text-xs hover:bg-[#78e018] transition disabled:opacity-50"
                         >
                           {uploadingEvidence ? 'Uploading...' : 'Submit Evidence Dossier'}
                         </button>
@@ -567,7 +567,7 @@ export const ClientDisputes: React.FC<ClientDisputesProps> = ({ userRole }) => {
                   <div className="space-y-2">
                     <span className="text-xs font-semibold dark:text-zinc-400 text-slate-500 uppercase tracking-wider">Proposed Resolutions</span>
                     {disputeDetail.resolutions.map((res: any) => (
-                      <div key={res.id} className="p-3.5 dark:bg-[#181a18] bg-slate-50 border border-blue-500/30 rounded-xl text-xs space-y-2">
+                      <div key={res.id} className="p-3.5 dark:bg-[#191B25] bg-slate-50 border border-blue-500/30 rounded-xl text-xs space-y-2">
                         <div className="flex justify-between items-center">
                           <span className="font-semibold dark:text-white text-slate-900">Proposal: {res.resolutionType}</span>
                           <span className="dark:text-zinc-400 text-slate-500 text-[11px] font-mono">Status: {res.status}</span>
@@ -597,7 +597,7 @@ export const ClientDisputes: React.FC<ClientDisputesProps> = ({ userRole }) => {
                 {/* Responses Thread */}
                 <div className="space-y-2">
                   <span className="text-xs font-semibold dark:text-zinc-400 text-slate-500 uppercase tracking-wider">Case Discussion & Statements</span>
-                  <div className="max-h-52 overflow-y-auto space-y-2 p-3 dark:bg-[#181a18] bg-slate-50 rounded-xl border dark:border-[#262926] border-slate-200">
+                  <div className="max-h-52 overflow-y-auto space-y-2 p-3 dark:bg-[#191B25] bg-slate-50 rounded-xl border dark:border-[#272B38] border-slate-200">
                     {disputeDetail.responses && disputeDetail.responses.length > 0 ? (
                       disputeDetail.responses.map((resp: any) => (
                         <div key={resp.id} className="p-2.5 rounded-lg dark:bg-[#141614] bg-white border dark:border-[#222422] border-slate-200 text-xs space-y-1 shadow-sm">
@@ -623,12 +623,12 @@ export const ClientDisputes: React.FC<ClientDisputesProps> = ({ userRole }) => {
                     placeholder="Submit a statement or question for arbitration..."
                     value={responseText}
                     onChange={(e) => setResponseText(e.target.value)}
-                    className="flex-1 dark:bg-[#181a18] bg-slate-50 border dark:border-[#2e322e] border-slate-300 rounded-xl px-4 py-2 text-xs dark:text-white text-slate-900 placeholder-zinc-400 focus:outline-none focus:dark:border-[#8BFF24]/60 focus:border-[#5046E5]"
+                    className="flex-1 dark:bg-[#191B25] bg-slate-50 border dark:border-[#272B38] border-slate-300 rounded-xl px-4 py-2 text-xs dark:text-white text-slate-900 placeholder-zinc-400 focus:outline-none focus:dark:border-[#1F61EF]/60 focus:border-[#5046E5]"
                   />
                   <button
                     type="submit"
                     disabled={!responseText.trim() || sendingResponse}
-                    className="px-4 py-2 rounded-xl dark:bg-[#8BFF24] bg-[#5046E5] hover:dark:bg-[#78e018] hover:bg-[#4338CA] dark:text-black text-white shadow-md shadow-[#5046E5]/25 text-xs font-bold transition disabled:opacity-40"
+                    className="px-4 py-2 rounded-xl dark:bg-[#1F61EF] bg-[#5046E5] hover:dark:bg-[#78e018] hover:bg-[#4338CA] dark:text-black text-white shadow-md shadow-[#5046E5]/25 text-xs font-bold transition disabled:opacity-40"
                   >
                     {sendingResponse ? 'Submitting...' : 'Submit'}
                   </button>
@@ -642,7 +642,7 @@ export const ClientDisputes: React.FC<ClientDisputesProps> = ({ userRole }) => {
       {/* File Dispute Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="dark:bg-[#121412] bg-white border dark:border-[#262926] border-slate-200 shadow-sm w-full max-w-lg rounded-2xl p-6 space-y-4 shadow-2xl relative">
+          <div className="dark:bg-[#191B25] bg-white border dark:border-[#272B38] border-slate-200 shadow-sm w-full max-w-lg rounded-2xl p-6 space-y-4 shadow-2xl relative">
             <button
               onClick={() => setShowCreateModal(false)}
               className="absolute top-4 right-4 dark:text-zinc-400 text-slate-500 hover:dark:text-white hover:text-slate-900 p-1 rounded-lg hover:dark:bg-zinc-800 hover:bg-slate-100"
@@ -668,7 +668,7 @@ export const ClientDisputes: React.FC<ClientDisputesProps> = ({ userRole }) => {
                 <select
                   value={selectedContractId}
                   onChange={(e) => setSelectedContractId(e.target.value)}
-                  className="w-full dark:bg-[#181a18] bg-slate-50 border dark:border-[#2e322e] border-slate-300 rounded-xl p-2.5 dark:text-zinc-200 text-slate-800 focus:outline-none focus:dark:border-[#8BFF24]/60 border-[#5046E5]"
+                  className="w-full dark:bg-[#191B25] bg-slate-50 border dark:border-[#272B38] border-slate-300 rounded-xl p-2.5 dark:text-zinc-200 text-slate-800 focus:outline-none focus:dark:border-[#1F61EF]/60 border-[#5046E5]"
                 >
                   <option value="">Select an active contract...</option>
                   {contracts.map((c) => (
@@ -684,7 +684,7 @@ export const ClientDisputes: React.FC<ClientDisputesProps> = ({ userRole }) => {
                 <select
                   value={disputeCategory}
                   onChange={(e) => setDisputeCategory(e.target.value as DisputeCategory)}
-                  className="w-full dark:bg-[#181a18] bg-slate-50 border dark:border-[#2e322e] border-slate-300 rounded-xl p-2.5 dark:text-zinc-200 text-slate-800 focus:outline-none focus:dark:border-[#8BFF24]/60 border-[#5046E5]"
+                  className="w-full dark:bg-[#191B25] bg-slate-50 border dark:border-[#272B38] border-slate-300 rounded-xl p-2.5 dark:text-zinc-200 text-slate-800 focus:outline-none focus:dark:border-[#1F61EF]/60 border-[#5046E5]"
                 >
                   <option value={DisputeCategory.QUALITY_OF_WORK}>Quality of Work / Unsatisfactory Deliverables</option>
                   <option value={DisputeCategory.MISSED_DEADLINE}>Missed Deadlines / Delayed Delivery</option>
@@ -703,7 +703,7 @@ export const ClientDisputes: React.FC<ClientDisputesProps> = ({ userRole }) => {
                   value={disputeTitle}
                   onChange={(e) => setDisputeTitle(e.target.value)}
                   placeholder="e.g. Incomplete API implementation for milestone 2"
-                  className="w-full dark:bg-[#181a18] bg-slate-50 border dark:border-[#2e322e] border-slate-300 rounded-xl p-2.5 dark:text-white text-slate-900 placeholder-zinc-400 focus:outline-none focus:dark:border-[#8BFF24]/60 focus:border-[#5046E5]"
+                  className="w-full dark:bg-[#191B25] bg-slate-50 border dark:border-[#272B38] border-slate-300 rounded-xl p-2.5 dark:text-white text-slate-900 placeholder-zinc-400 focus:outline-none focus:dark:border-[#1F61EF]/60 focus:border-[#5046E5]"
                 />
               </div>
 
@@ -714,7 +714,7 @@ export const ClientDisputes: React.FC<ClientDisputesProps> = ({ userRole }) => {
                   value={disputeDescription}
                   onChange={(e) => setDisputeDescription(e.target.value)}
                   placeholder="Explain the specific issue, milestone deliverable concerns, and desired resolution..."
-                  className="w-full dark:bg-[#181a18] bg-slate-50 border dark:border-[#2e322e] border-slate-300 rounded-xl p-3 dark:text-white text-slate-900 placeholder-zinc-400 focus:outline-none focus:dark:border-[#8BFF24]/60 focus:border-[#5046E5]"
+                  className="w-full dark:bg-[#191B25] bg-slate-50 border dark:border-[#272B38] border-slate-300 rounded-xl p-3 dark:text-white text-slate-900 placeholder-zinc-400 focus:outline-none focus:dark:border-[#1F61EF]/60 focus:border-[#5046E5]"
                 />
               </div>
 
@@ -725,11 +725,11 @@ export const ClientDisputes: React.FC<ClientDisputesProps> = ({ userRole }) => {
                   value={evidenceUrl}
                   onChange={(e) => setEvidenceUrl(e.target.value)}
                   placeholder="https://..."
-                  className="w-full dark:bg-[#181a18] bg-slate-50 border dark:border-[#2e322e] border-slate-300 rounded-xl p-2.5 dark:text-white text-slate-900 placeholder-zinc-400 focus:outline-none focus:dark:border-[#8BFF24]/60 focus:border-[#5046E5]"
+                  className="w-full dark:bg-[#191B25] bg-slate-50 border dark:border-[#272B38] border-slate-300 rounded-xl p-2.5 dark:text-white text-slate-900 placeholder-zinc-400 focus:outline-none focus:dark:border-[#1F61EF]/60 focus:border-[#5046E5]"
                 />
               </div>
 
-              <div className="flex justify-end gap-2.5 pt-3 border-t dark:border-[#262926] border-slate-200">
+              <div className="flex justify-end gap-2.5 pt-3 border-t dark:border-[#272B38] border-slate-200">
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(false)}

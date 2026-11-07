@@ -28,10 +28,10 @@ export const ThreeEscrowVisual: React.FC = () => {
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       currentMount.appendChild(renderer.domElement);
 
-      // Inner Core - Neon Lime (#8BFF24)
+      // Inner Core - Electric Blue (#1F61EF)
       coreGeometry = new THREE.IcosahedronGeometry(1.2, 1);
       coreMaterial = new THREE.MeshBasicMaterial({
-        color: 0x8BFF24,
+        color: 0x1F61EF,
         wireframe: true,
         transparent: true,
         opacity: 0.75,
